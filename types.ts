@@ -43,3 +43,12 @@ export interface ChatMessage {
   text: string;
   isError?: boolean;
 }
+
+export interface SecuritySegment {
+  id: string;
+  name: string;
+  description: string;
+  full_content: string;
+  image: string;
+  created_at?: string;
+}

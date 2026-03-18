@@ -3,15 +3,13 @@ import { supabase } from './supabaseClient';
 import { 
   Plus, Trash2, Edit2, Save, X, LogOut, 
   Newspaper, Video, Link as LinkIcon, ExternalLink,
-  ChevronRight, LayoutDashboard, Settings
+  ChevronRight, LayoutDashboard, Settings, Shield
 } from 'lucide-react';
-
-const ADMIN_EMAIL = "contatosa2marketing@gmail.com";
 
 const Admin: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'news' | 'videos' | 'links'>('news');
+  const [activeTab, setActiveTab] = useState<'news' | 'videos' | 'links' | 'segments'>('news');
   
   // Auth States
   const [authEmail, setAuthEmail] = useState('');
@@ -22,19 +20,51 @@ const Admin: React.FC = () => {
   const [news, setNews] = useState<any[]>([]);
   const [videos, setVideos] = useState<any[]>([]);
   const [links, setLinks] = useState<any[]>([]);
+  const [segments, setSegments] = useState<any[]>([]);
 
   // Form States
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user?.email === ADMIN_EMAIL ? session.user : null);
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile?.is_admin) {
+          setUser(session.user);
+        } else {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
       setLoading(false);
-    });
+    };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user?.email === ADMIN_EMAIL ? session.user : null);
+    checkUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile?.is_admin) {
+          setUser(session.user);
+        } else {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
@@ -53,6 +83,9 @@ const Admin: React.FC = () => {
 
       const { data: linksData } = await supabase.from('drive_links').select('*');
       if (linksData) setLinks(linksData);
+
+      const { data: segmentsData } = await supabase.from('security_segments').select('*');
+      if (segmentsData) setSegments(segmentsData);
     };
 
     fetchData();
@@ -60,11 +93,13 @@ const Admin: React.FC = () => {
     const newsSub = supabase.channel('news-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'news' }, fetchData).subscribe();
     const videosSub = supabase.channel('videos-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, fetchData).subscribe();
     const linksSub = supabase.channel('links-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'drive_links' }, fetchData).subscribe();
+    const segmentsSub = supabase.channel('segments-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'security_segments' }, fetchData).subscribe();
 
     return () => {
       supabase.removeChannel(newsSub);
       supabase.removeChannel(videosSub);
       supabase.removeChannel(linksSub);
+      supabase.removeChannel(segmentsSub);
     };
   }, [user]);
 
@@ -80,9 +115,17 @@ const Admin: React.FC = () => {
       
       if (error) throw error;
       
-      if (data.user?.email !== ADMIN_EMAIL) {
+      // Verification is handled by the useEffect onAuthStateChange hook
+      // But we can add a quick check here to show a specific error if needed
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', data.user.id)
+        .single();
+
+      if (!profile?.is_admin) {
         await supabase.auth.signOut();
-        setLoginError("Acesso restrito apenas ao administrador.");
+        setLoginError("Seu usuário não possui permissão de administrador.");
       }
     } catch (error: any) {
       setLoginError(error.message || "Erro ao realizar login.");
@@ -116,7 +159,7 @@ const Admin: React.FC = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : 'drive_links';
+    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : 'drive_links';
     
     let finalData = { ...formData };
     
@@ -141,7 +184,7 @@ const Admin: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : 'drive_links';
+    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : 'drive_links';
     if (window.confirm("Tem certeza que deseja excluir?")) {
       try {
         await supabase.from(tableName).delete().eq('id', id);
@@ -198,7 +241,6 @@ const Admin: React.FC = () => {
           {[
             { id: 'news', label: 'Notícias', icon: <Newspaper size={20} /> },
             { id: 'videos', label: 'Vídeos', icon: <Video size={20} /> },
-            { id: 'links', label: 'Links Drive', icon: <LinkIcon size={20} /> },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -208,6 +250,18 @@ const Admin: React.FC = () => {
               {tab.icon} {tab.label}
             </button>
           ))}
+            <button 
+              onClick={() => { setActiveTab('segments'); setIsEditing(null); setFormData({}); }}
+              className={`w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all ${activeTab === 'segments' ? 'bg-white text-[#002776]' : 'hover:bg-white/10 text-white/60'}`}
+            >
+              <Shield size={20} /> Segurança
+            </button>
+            <button 
+              onClick={() => { setActiveTab('links'); setIsEditing(null); setFormData({}); }}
+              className={`w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all ${activeTab === 'links' ? 'bg-white text-[#002776]' : 'hover:bg-white/10 text-white/60'}`}
+            >
+              <LinkIcon size={20} /> Drive Links
+            </button>
         </nav>
 
         <button 
@@ -326,27 +380,38 @@ const Admin: React.FC = () => {
                   </>
                 )}
 
-                {activeTab === 'links' && (
+                {activeTab === 'segments' && (
                   <>
-                    <select 
-                      required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
-                      value={formData.key || ''} onChange={e => setFormData({...formData, key: e.target.value, label: e.target.options[e.target.selectedIndex].text})}
-                    >
-                      <option value="">Selecione o Destino</option>
-                      <option value="panfletos">Panfletos (Baixe e Compartilhe)</option>
-                      <option value="artes">Artes Sociais (Baixe e Compartilhe)</option>
-                      <option value="videos_curtos">Vídeos Curtos (Baixe e Compartilhe)</option>
-                      <option value="informativos">Informativos (Baixe e Compartilhe)</option>
-                      <option value="releases">Releases (Imprensa)</option>
-                      <option value="fotos_alta">Fotos Alta (Imprensa)</option>
-                      <option value="biografia">Biografia (Imprensa)</option>
-                      <option value="biblioteca">Biblioteca (Arquivos)</option>
-                    </select>
                     <input 
-                      type="url" placeholder="Link do Google Drive" required
+                      type="text" placeholder="Nome da Segmentação (ex: Polícia Civil)" required
                       className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
-                      value={formData.url || ''} onChange={e => setFormData({...formData, url: e.target.value})}
+                      value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})}
                     />
+                    <input 
+                      type="text" placeholder="Breve Descrição (ex: Projetos e Lutas)" required
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                      value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})}
+                    />
+                    <textarea 
+                      placeholder="Conteúdo Completo (Aparece na subpágina)" required rows={10}
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                      value={formData.full_content || ''} onChange={e => setFormData({...formData, full_content: e.target.value})}
+                    />
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase">Imagem de Fundo</label>
+                      <div className="flex gap-4 items-center">
+                        <input 
+                          type="url" placeholder="URL da Imagem"
+                          className="flex-1 p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                          value={formData.image || ''} onChange={e => setFormData({...formData, image: e.target.value})}
+                        />
+                        <label className="cursor-pointer bg-slate-100 p-4 rounded-xl hover:bg-slate-200 transition-all">
+                          <Plus size={20} />
+                          <input type="file" className="hidden" accept="image/*" onChange={e => handleFileChange(e, 'image')} />
+                        </label>
+                      </div>
+                      {formData.image && <img src={formData.image} className="h-20 rounded-xl border" alt="Preview" />}
+                    </div>
                   </>
                 )}
 
@@ -380,6 +445,20 @@ const Admin: React.FC = () => {
               <div className="flex-1">
                 <h4 className="text-xl font-bold text-[#002776]">{item.title}</h4>
                 <div className="text-xs text-slate-400 font-medium truncate max-w-xs">{item.url}</div>
+              </div>
+              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={20} /></button>
+                <button onClick={() => handleDelete(item.id)} className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 size={20} /></button>
+              </div>
+            </div>
+          ))}
+
+          {activeTab === 'segments' && segments.map(item => (
+            <div key={item.id} className="bg-white p-6 rounded-3xl border border-slate-200 flex items-center gap-6 group hover:shadow-lg transition-all">
+              <img src={item.image || '/fotos-diego/diego-3.jpeg'} className="w-32 h-24 object-cover rounded-xl" alt="" />
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-[#002776]">{item.name}</h4>
+                <div className="text-sm text-slate-400 font-medium truncate max-w-xs">{item.description}</div>
               </div>
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={20} /></button>

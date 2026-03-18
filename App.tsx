@@ -10,16 +10,16 @@ import {
   MapPin, Calendar, Play, ChevronRight, Menu, X,
   Instagram, Twitter, Facebook, MessageCircle,
   FileText, Download, Newspaper, Info, Phone, Mail,
-  ArrowRight, CheckCircle2, Search, TrendingUp
+  ArrowRight, CheckCircle2, Search, TrendingUp, ArrowLeft
 } from 'lucide-react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useParams } from 'react-router-dom';
 import { supabase } from './src/supabaseClient';
 import PatrioticBackground from './components/PatrioticBackground';
 import ImpactText from './components/ImpactText';
 import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
 import Admin from './src/Admin';
-import { Project, News, Video } from './types';
+import { Project, News, Video, SecuritySegment } from './types';
 
 // Mock Data
 const PROJECTS: Project[] = [
@@ -33,17 +33,20 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Portal />} />
+        <Route path="/" element={<Home />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/seguranca/:id" element={<SecuritySegmentPage />} />
       </Routes>
     </BrowserRouter>
   );
 };
 
-const Portal: React.FC = () => {
+const Home: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [news, setNews] = useState<News[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
+  const [securitySegments, setSecuritySegments] = useState<SecuritySegment[]>([]);
+  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
   const [driveLinks, setDriveLinks] = useState<Record<string, string>>({});
 
   const { scrollYProgress } = useScroll();
@@ -66,6 +69,10 @@ const Portal: React.FC = () => {
         linksData.forEach(d => { links[d.key] = d.url; });
         setDriveLinks(links);
       }
+
+      // Security Segments
+      const { data: segmentsData } = await supabase.from('security_segments').select('*');
+      if (segmentsData) setSecuritySegments(segmentsData);
     };
 
     fetchData();
@@ -74,11 +81,13 @@ const Portal: React.FC = () => {
     const newsSub = supabase.channel('news-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'news' }, fetchData).subscribe();
     const videosSub = supabase.channel('videos-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, fetchData).subscribe();
     const linksSub = supabase.channel('links-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'drive_links' }, fetchData).subscribe();
+    const segmentsSub = supabase.channel('segments-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'security_segments' }, fetchData).subscribe();
 
     return () => {
       supabase.removeChannel(newsSub);
       supabase.removeChannel(videosSub);
       supabase.removeChannel(linksSub);
+      supabase.removeChannel(segmentsSub);
     };
   }, []);
 
@@ -433,22 +442,35 @@ const Portal: React.FC = () => {
             <p className="text-xl text-white/80 mb-12 leading-relaxed">
               Como Presidente da Comissão de Segurança, Diego destinou quase R$ 2,5 milhões para viaturas, armamentos e tecnologia. Luta pela blindagem da frota e pelo Sistema de Apoio à Vítima (SAV).
             </p>
-            <div className="flex flex-wrap gap-6">
-              <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
-                <CheckCircle2 className="text-[#ffdf00]" size={32} />
-                <div>
-                  <div className="text-white font-bold">Proteção Policial</div>
-                  <div className="text-white/60 text-sm">Contra câmeras corporais</div>
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="bg-[#ffdf00] p-1.5 rounded-full">
+                      <CheckCircle2 size={16} className="text-[#002776]" />
+                    </div>
+                    <span className="font-bold text-white uppercase tracking-wider text-sm">Proteção Policial</span>
+                  </div>
+                  <p className="text-white/70 text-sm">Contra câmeras corporais</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="bg-[#ffdf00] p-1.5 rounded-full">
+                      <CheckCircle2 size={16} className="text-[#002776]" />
+                    </div>
+                    <span className="font-bold text-white uppercase tracking-wider text-sm">Apoio Jurídico</span>
+                  </div>
+                  <p className="text-white/70 text-sm">Assistência gratuita aos heróis</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
-                <CheckCircle2 className="text-[#ffdf00]" size={32} />
-                <div>
-                  <div className="text-white font-bold">Apoio Jurídico</div>
-                  <div className="text-white/60 text-sm">Assistência gratuita aos heróis</div>
-                </div>
+
+              <div className="mt-8">
+                <button 
+                  onClick={() => setIsSecurityModalOpen(true)}
+                  className="bg-[#ffdf00] text-[#002776] px-8 py-4 rounded-2xl font-black text-lg uppercase tracking-wider hover:bg-white hover:scale-105 transition-all shadow-xl flex items-center gap-3"
+                >
+                  Saiba Mais <ChevronRight size={20} />
+                </button>
               </div>
-            </div>
           </div>
         </div>
       </section>
@@ -906,6 +928,95 @@ const Portal: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Security Modal */}
+      {isSecurityModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#002776]/80 backdrop-blur-xl">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-[2.5rem] p-8 md:p-12 max-w-4xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
+          >
+            <button 
+              onClick={() => setIsSecurityModalOpen(false)}
+              className="absolute top-8 right-8 text-slate-400 hover:text-[#002776] transition-colors"
+            >
+              <X size={32} />
+            </button>
+            
+            <h2 className="text-3xl md:text-4xl font-black text-[#002776] mb-4 uppercase">Segmentações da Segurança</h2>
+            <p className="text-slate-500 mb-10 text-lg">Clique em uma área para ver nossas propostas e ações detalhadas.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {securitySegments.length > 0 ? securitySegments.map((segment) => (
+                <Link 
+                  key={segment.id} 
+                  to={`/seguranca/${segment.id}`}
+                  onClick={() => setIsSecurityModalOpen(false)}
+                  className="group bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-[#005a1a] hover:bg-emerald-50 transition-all flex items-center justify-between"
+                >
+                  <div>
+                    <h3 className="text-xl font-bold text-[#002776] group-hover:text-[#005a1a] transition-colors mb-2">{segment.name}</h3>
+                    <p className="text-slate-400 text-sm">{segment.description}</p>
+                  </div>
+                  <div className="bg-white p-3 rounded-full shadow-sm group-hover:bg-[#005a1a] group-hover:text-white transition-all">
+                    <ChevronRight size={20} />
+                  </div>
+                </Link>
+              )) : (
+                <p className="text-slate-400 italic">Nenhuma segmentação cadastrada ainda.</p>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SecuritySegmentPage = () => {
+  const { id } = useParams();
+  const [segment, setSegment] = useState<SecuritySegment | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSegment = async () => {
+      const { data, error } = await supabase.from('security_segments').select('*').eq('id', id).single();
+      if (!error && data) setSegment(data);
+      setLoading(false);
+    };
+    fetchSegment();
+  }, [id]);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
+  if (!segment) return <div className="min-h-screen flex items-center justify-center">Segmentação não encontrada.</div>;
+
+  return (
+    <div className="min-h-screen pt-32 pb-20 bg-slate-50">
+      <div className="max-w-4xl mx-auto px-6">
+        <Link to="/" className="inline-flex items-center gap-2 text-[#005a1a] font-bold mb-8 hover:gap-3 transition-all">
+          <ArrowLeft size={20} /> Voltar ao Início
+        </Link>
+        
+        <img 
+          src={segment.image || '/fotos-diego/diego-3.jpeg'} 
+          className="w-full h-84 object-cover rounded-[2.5rem] shadow-2xl mb-12" 
+          alt={segment.name} 
+        />
+        
+        <h1 className="text-4xl md:text-6xl font-black text-[#002776] mb-6 uppercase tracking-tight">
+          {segment.name}
+        </h1>
+        
+        <div className="prose prose-lg prose-slate max-w-none">
+          <p className="text-xl text-slate-600 mb-8 font-medium leading-relaxed">
+            {segment.description}
+          </p>
+          <div className="text-slate-700 leading-relaxed space-y-6 whitespace-pre-line">
+            {segment.full_content}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
