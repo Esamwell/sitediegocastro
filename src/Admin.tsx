@@ -21,7 +21,8 @@ const Admin: React.FC = () => {
   const [videos, setVideos] = useState<any[]>([]);
   const [links, setLinks] = useState<any[]>([]);
   const [segments, setSegments] = useState<any[]>([]);
-
+  const [isSaving, setIsSaving] = useState(false);
+  
   // Form States
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
@@ -159,6 +160,9 @@ const Admin: React.FC = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
+    setIsSaving(true);
+
     const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : 'drive_links';
     
     let finalData = { ...formData };
@@ -180,6 +184,8 @@ const Admin: React.FC = () => {
       setFormData({});
     } catch (error) {
       console.error("Error saving document", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -415,8 +421,16 @@ const Admin: React.FC = () => {
                   </>
                 )}
 
-                <button type="submit" className="w-full bg-[#002776] text-white py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-3">
-                  <Save size={24} /> Salvar Alterações
+                <button 
+                  type="submit" 
+                  disabled={isSaving}
+                  className={`w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all ${isSaving ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#002776] hover:bg-[#005a1a]'} text-white`}
+                >
+                  {isSaving ? (
+                    <>Aguarde... Salvando...</>
+                  ) : (
+                    <><Save size={24} /> Salvar Alterações</>
+                  )}
                 </button>
               </form>
             </div>
