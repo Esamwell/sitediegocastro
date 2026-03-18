@@ -13,8 +13,7 @@ import {
   ArrowRight, CheckCircle2, Search, TrendingUp
 } from 'lucide-react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { db } from './src/firebase';
+import { supabase } from './src/supabaseClient';
 import PatrioticBackground from './components/PatrioticBackground';
 import ImpactText from './components/ImpactText';
 import CustomCursor from './components/CustomCursor';
@@ -51,31 +50,35 @@ const Portal: React.FC = () => {
   const opacity = useScroll(); // Placeholder for scroll logic if needed
 
   useEffect(() => {
-    const qNews = query(collection(db, 'news'), orderBy('createdAt', 'desc'));
-    const unsubNews = onSnapshot(qNews, (snap) => {
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as News));
-      setNews(data.length > 0 ? data : []);
-    });
+    const fetchData = async () => {
+      // News
+      const { data: newsData } = await supabase.from('news').select('*').order('created_at', { ascending: false });
+      if (newsData) setNews(newsData);
 
-    const qVideos = query(collection(db, 'videos'), orderBy('createdAt', 'desc'));
-    const unsubVideos = onSnapshot(qVideos, (snap) => {
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Video));
-      setVideos(data.length > 0 ? data : []);
-    });
+      // Videos
+      const { data: videosData } = await supabase.from('videos').select('*').order('created_at', { ascending: false });
+      if (videosData) setVideos(videosData);
 
-    const unsubLinks = onSnapshot(collection(db, 'driveLinks'), (snap) => {
-      const links: Record<string, string> = {};
-      snap.docs.forEach(d => {
-        const data = d.data();
-        links[data.key] = data.url;
-      });
-      setDriveLinks(links);
-    });
+      // Drive Links
+      const { data: linksData } = await supabase.from('drive_links').select('*');
+      if (linksData) {
+        const links: Record<string, string> = {};
+        linksData.forEach(d => { links[d.key] = d.url; });
+        setDriveLinks(links);
+      }
+    };
+
+    fetchData();
+
+    // Subscriptions for real-time updates
+    const newsSub = supabase.channel('news-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'news' }, fetchData).subscribe();
+    const videosSub = supabase.channel('videos-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, fetchData).subscribe();
+    const linksSub = supabase.channel('links-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'drive_links' }, fetchData).subscribe();
 
     return () => {
-      unsubNews();
-      unsubVideos();
-      unsubLinks();
+      supabase.removeChannel(newsSub);
+      supabase.removeChannel(videosSub);
+      supabase.removeChannel(linksSub);
     };
   }, []);
 

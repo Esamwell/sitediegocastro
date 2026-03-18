@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy 
-} from 'firebase/firestore';
-import { 
-  signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut 
-} from 'firebase/auth';
-import { db, auth } from './firebase';
+import { supabase } from './supabaseClient';
 import { 
   Plus, Trash2, Edit2, Save, X, LogOut, 
   Newspaper, Video, Link as LinkIcon, ExternalLink,
@@ -29,51 +23,60 @@ const Admin: React.FC = () => {
   const [formData, setFormData] = useState<any>({});
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      if (u && u.email === ADMIN_EMAIL) {
-        setUser(u);
-      } else {
-        setUser(null);
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user?.email === ADMIN_EMAIL ? session.user : null);
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user?.email === ADMIN_EMAIL ? session.user : null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
     if (!user) return;
 
-    const qNews = query(collection(db, 'news'), orderBy('createdAt', 'desc'));
-    const unsubNews = onSnapshot(qNews, (snap) => {
-      setNews(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    });
+    const fetchData = async () => {
+      const { data: newsData } = await supabase.from('news').select('*').order('created_at', { ascending: false });
+      if (newsData) setNews(newsData);
 
-    const qVideos = query(collection(db, 'videos'), orderBy('createdAt', 'desc'));
-    const unsubVideos = onSnapshot(qVideos, (snap) => {
-      setVideos(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    });
+      const { data: videosData } = await supabase.from('videos').select('*').order('created_at', { ascending: false });
+      if (videosData) setVideos(videosData);
 
-    const unsubLinks = onSnapshot(collection(db, 'driveLinks'), (snap) => {
-      setLinks(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    });
+      const { data: linksData } = await supabase.from('drive_links').select('*');
+      if (linksData) setLinks(linksData);
+    };
+
+    fetchData();
+
+    const newsSub = supabase.channel('news-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'news' }, fetchData).subscribe();
+    const videosSub = supabase.channel('videos-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, fetchData).subscribe();
+    const linksSub = supabase.channel('links-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'drive_links' }, fetchData).subscribe();
 
     return () => {
-      unsubNews();
-      unsubVideos();
-      unsubLinks();
+      supabase.removeChannel(newsSub);
+      supabase.removeChannel(videosSub);
+      supabase.removeChannel(linksSub);
     };
   }, [user]);
 
   const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      await supabase.auth.signInWithOAuth({ 
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/admin'
+        }
+      });
     } catch (error) {
       console.error("Login failed", error);
     }
   };
 
-  const handleLogout = () => signOut(auth);
+  const handleLogout = () => supabase.auth.signOut();
 
   const extractYoutubeId = (url: string) => {
     const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
@@ -98,11 +101,10 @@ const Admin: React.FC = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const collectionName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : 'driveLinks';
+    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : 'drive_links';
     
     let finalData = { ...formData };
     
-    // Auto-generate YouTube thumbnail if not provided
     if (activeTab === 'videos' && finalData.url && !finalData.thumbnail) {
       const videoId = extractYoutubeId(finalData.url);
       if (videoId) {
@@ -112,12 +114,9 @@ const Admin: React.FC = () => {
 
     try {
       if (isEditing && isEditing !== 'new') {
-        await updateDoc(doc(db, collectionName, isEditing), finalData);
+        await supabase.from(tableName).update(finalData).eq('id', isEditing);
       } else {
-        await addDoc(collection(db, collectionName), {
-          ...finalData,
-          createdAt: new Date().toISOString()
-        });
+        await supabase.from(tableName).insert([finalData]);
       }
       setIsEditing(null);
       setFormData({});
@@ -127,10 +126,10 @@ const Admin: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const collectionName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : 'driveLinks';
+    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : 'drive_links';
     if (window.confirm("Tem certeza que deseja excluir?")) {
       try {
-        await deleteDoc(doc(db, collectionName, id));
+        await supabase.from(tableName).delete().eq('id', id);
       } catch (error) {
         console.error("Error deleting document", error);
       }
