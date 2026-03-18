@@ -442,26 +442,6 @@ const Home: React.FC = () => {
             <p className="text-xl text-white/80 mb-12 leading-relaxed">
               Como Presidente da Comissão de Segurança, Diego destinou quase R$ 2,5 milhões para viaturas, armamentos e tecnologia. Luta pela blindagem da frota e pelo Sistema de Apoio à Vítima (SAV).
             </p>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="bg-[#ffdf00] p-1.5 rounded-full">
-                    <CheckCircle2 size={16} className="text-[#002776]" />
-                  </div>
-                  <span className="font-bold text-white uppercase tracking-wider text-sm">Proteção Policial</span>
-                </div>
-                <p className="text-white/70 text-sm">Contra câmeras corporais</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="bg-[#ffdf00] p-1.5 rounded-full">
-                    <CheckCircle2 size={16} className="text-[#002776]" />
-                  </div>
-                  <span className="font-bold text-white uppercase tracking-wider text-sm">Apoio Jurídico</span>
-                </div>
-                <p className="text-white/70 text-sm">Assistência gratuita aos heróis</p>
-              </div>
-            </div>
 
             <div className="mt-8">
               <button

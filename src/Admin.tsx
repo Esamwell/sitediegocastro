@@ -175,15 +175,17 @@ const Admin: React.FC = () => {
     }
 
     try {
-      if (isEditing && isEditing !== 'new') {
-        await supabase.from(tableName).update(finalData).eq('id', isEditing);
-      } else {
-        await supabase.from(tableName).insert([finalData]);
-      }
+      const { error } = isEditing && isEditing !== 'new'
+        ? await supabase.from(tableName).update(finalData).eq('id', isEditing)
+        : await supabase.from(tableName).insert([finalData]);
+
+      if (error) throw error;
+
       setIsEditing(null);
       setFormData({});
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving document", error);
+      alert("Erro ao salvar: " + (error.message || "Erro desconhecido"));
     } finally {
       setIsSaving(false);
     }
@@ -297,8 +299,8 @@ const Admin: React.FC = () => {
 
         {/* Form Modal */}
         {isEditing && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
-            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] p-12 shadow-2xl">
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl max-h-[95vh] overflow-y-auto relative">
               <div className="flex justify-between items-center mb-8">
                 <h3 className="text-2xl font-black text-[#002776] uppercase">
                   {isEditing === 'new' ? 'Novo Item' : 'Editar Item'}
