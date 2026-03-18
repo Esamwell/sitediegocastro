@@ -443,34 +443,34 @@ const Home: React.FC = () => {
               Como Presidente da Comissão de Segurança, Diego destinou quase R$ 2,5 milhões para viaturas, armamentos e tecnologia. Luta pela blindagem da frota e pelo Sistema de Apoio à Vítima (SAV).
             </p>
             <div className="flex flex-col md:flex-row gap-4">
-                <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="bg-[#ffdf00] p-1.5 rounded-full">
-                      <CheckCircle2 size={16} className="text-[#002776]" />
-                    </div>
-                    <span className="font-bold text-white uppercase tracking-wider text-sm">Proteção Policial</span>
+              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-[#ffdf00] p-1.5 rounded-full">
+                    <CheckCircle2 size={16} className="text-[#002776]" />
                   </div>
-                  <p className="text-white/70 text-sm">Contra câmeras corporais</p>
+                  <span className="font-bold text-white uppercase tracking-wider text-sm">Proteção Policial</span>
                 </div>
-                <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="bg-[#ffdf00] p-1.5 rounded-full">
-                      <CheckCircle2 size={16} className="text-[#002776]" />
-                    </div>
-                    <span className="font-bold text-white uppercase tracking-wider text-sm">Apoio Jurídico</span>
-                  </div>
-                  <p className="text-white/70 text-sm">Assistência gratuita aos heróis</p>
-                </div>
+                <p className="text-white/70 text-sm">Contra câmeras corporais</p>
               </div>
+              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-[#ffdf00] p-1.5 rounded-full">
+                    <CheckCircle2 size={16} className="text-[#002776]" />
+                  </div>
+                  <span className="font-bold text-white uppercase tracking-wider text-sm">Apoio Jurídico</span>
+                </div>
+                <p className="text-white/70 text-sm">Assistência gratuita aos heróis</p>
+              </div>
+            </div>
 
-              <div className="mt-8">
-                <button 
-                  onClick={() => setIsSecurityModalOpen(true)}
-                  className="bg-[#ffdf00] text-[#002776] px-8 py-4 rounded-2xl font-black text-lg uppercase tracking-wider hover:bg-white hover:scale-105 transition-all shadow-xl flex items-center gap-3"
-                >
-                  Saiba Mais <ChevronRight size={20} />
-                </button>
-              </div>
+            <div className="mt-8">
+              <button
+                onClick={() => setIsSecurityModalOpen(true)}
+                className="bg-[#ffdf00] text-[#002776] px-8 py-4 rounded-2xl font-black text-lg uppercase tracking-wider hover:bg-white hover:scale-105 transition-all shadow-xl flex items-center gap-3"
+              >
+                Saiba Mais <ChevronRight size={20} />
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -608,6 +608,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+
       {/* DIEGO PELA BAHIA */}
       <section id="bahia" className="py-24 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -680,7 +681,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* VÍDEOS */}
-      <section className="py-24 px-6 bg-slate-900 text-white">
+      <section id="vídeos" className="py-24 px-6 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-black">VÍDEOS RECENTES</h2>
@@ -712,6 +713,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
 
       {/* IMPRENSA E ARQUIVOS */}
       <section id="imprensa" className="py-24 px-6 bg-slate-50">
@@ -919,7 +921,7 @@ const Home: React.FC = () => {
           </div>
 
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">
-            <span>© 2026 Diego Castro. Todos os direitos reservados.</span>
+            <span>© 2026 Diego Castro. Todos os direitos reservados | Desenvolvido por <a href="https://www.sa2marketing.com.br" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Agência SA2 Marketing</a></span>
             <div className="flex gap-8">
               <Link to="/admin" className="hover:text-white transition-colors">Painel Admin</Link>
               <a href="#" className="hover:text-white transition-colors">Privacidade</a>
@@ -932,39 +934,39 @@ const Home: React.FC = () => {
       {/* Security Modal */}
       {isSecurityModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#002776]/80 backdrop-blur-xl">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-[2.5rem] p-8 md:p-12 max-w-4xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-[2rem] p-6 md:p-8 max-w-2xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
           >
-            <button 
+            <button
               onClick={() => setIsSecurityModalOpen(false)}
-              className="absolute top-8 right-8 text-slate-400 hover:text-[#002776] transition-colors"
+              className="absolute top-6 right-6 text-slate-400 hover:text-[#002776] transition-colors"
             >
-              <X size={32} />
+              <X size={24} />
             </button>
-            
-            <h2 className="text-3xl md:text-4xl font-black text-[#002776] mb-4 uppercase">Segmentações da Segurança</h2>
-            <p className="text-slate-500 mb-10 text-lg">Clique em uma área para ver nossas propostas e ações detalhadas.</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <h2 className="text-2xl md:text-3xl font-black text-[#002776] mb-2 uppercase">Segmentações</h2>
+            <p className="text-slate-500 mb-8 text-base">Clique em uma área para ver detalhes.</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {securitySegments.length > 0 ? securitySegments.map((segment) => (
-                <Link 
-                  key={segment.id} 
+                <Link
+                  key={segment.id}
                   to={`/seguranca/${segment.id}`}
                   onClick={() => setIsSecurityModalOpen(false)}
-                  className="group bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-[#005a1a] hover:bg-emerald-50 transition-all flex items-center justify-between"
+                  className="group bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-[#005a1a] hover:bg-emerald-50 transition-all flex items-center justify-between"
                 >
-                  <div>
-                    <h3 className="text-xl font-bold text-[#002776] group-hover:text-[#005a1a] transition-colors mb-2">{segment.name}</h3>
-                    <p className="text-slate-400 text-sm">{segment.description}</p>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-[#002776] group-hover:text-[#005a1a] transition-colors line-clamp-1">{segment.name}</h3>
+                    <p className="text-slate-400 text-xs line-clamp-1">{segment.description}</p>
                   </div>
-                  <div className="bg-white p-3 rounded-full shadow-sm group-hover:bg-[#005a1a] group-hover:text-white transition-all">
-                    <ChevronRight size={20} />
+                  <div className="bg-white p-2 rounded-full shadow-sm group-hover:bg-[#005a1a] group-hover:text-white transition-all ml-3 shrink-0">
+                    <ChevronRight size={16} />
                   </div>
                 </Link>
               )) : (
-                <p className="text-slate-400 italic">Nenhuma segmentação cadastrada ainda.</p>
+                <p className="text-slate-400 italic text-sm">Nenhuma segmentação cadastrada ainda.</p>
               )}
             </div>
           </motion.div>
@@ -997,17 +999,17 @@ const SecuritySegmentPage = () => {
         <Link to="/" className="inline-flex items-center gap-2 text-[#005a1a] font-bold mb-8 hover:gap-3 transition-all">
           <ArrowLeft size={20} /> Voltar ao Início
         </Link>
-        
-        <img 
-          src={segment.image || '/fotos-diego/diego-3.jpeg'} 
-          className="w-full h-84 object-cover rounded-[2.5rem] shadow-2xl mb-12" 
-          alt={segment.name} 
+
+        <img
+          src={segment.image || '/fotos-diego/diego-3.jpeg'}
+          className="w-full h-84 object-cover rounded-[2.5rem] shadow-2xl mb-12"
+          alt={segment.name}
         />
-        
+
         <h1 className="text-4xl md:text-6xl font-black text-[#002776] mb-6 uppercase tracking-tight">
           {segment.name}
         </h1>
-        
+
         <div className="prose prose-lg prose-slate max-w-none">
           <p className="text-xl text-slate-600 mb-8 font-medium leading-relaxed">
             {segment.description}
