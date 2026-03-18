@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brazil-green: #005a1a;
+  --color-brazil-yellow: #ffdf00;
+  --color-brazil-blue: #002776;
+  --color-brazil-blue-light: #003da5;
+  --font-heading: "Montserrat", sans-serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+:root {
+  --bg: #ffffff;
+  --ink: #0f172a;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+.patriotic-gradient {
+  background: linear-gradient(135deg, #005a1a 0%, #002776 100%);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(255, 223, 0, 0.3);
+}

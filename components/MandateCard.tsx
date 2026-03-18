@@ -1,0 +1,88 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Project, News } from '../types';
+import { ArrowRight, Calendar } from 'lucide-react';
+
+interface CardProps {
+  item: Project | News;
+  type: 'project' | 'news';
+}
+
+const MandateCard: React.FC<CardProps> = ({ item, type }) => {
+  if (type === 'project') {
+    const project = item as Project;
+    return (
+      <motion.div 
+        whileHover={{ y: -5 }}
+        className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-100 flex flex-col h-full"
+      >
+        <div className="p-6 flex-grow">
+          <div className="flex justify-between items-start mb-4">
+            <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">
+              {project.category}
+            </span>
+            <span className={`text-xs font-bold px-2 py-1 rounded ${
+              project.status === 'Aprovado' ? 'bg-emerald-100 text-emerald-700' : 
+              project.status === 'Arquivado' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'
+            }`}>
+              {project.status}
+            </span>
+          </div>
+          <h3 className="text-xl font-bold text-[#002776] mb-3 leading-tight">
+            {project.title}
+          </h3>
+          <p className="text-slate-600 text-sm line-clamp-3 mb-4">
+            {project.summary}
+          </p>
+        </div>
+        <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+          <span className="text-xs text-slate-400 font-medium">Ano: {project.year}</span>
+          <button className="text-[#002776] font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
+            Ver detalhes <ArrowRight size={14} />
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  const news = item as News;
+  return (
+    <motion.div 
+      whileHover={{ y: -5 }}
+      className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-100 flex flex-col h-full"
+    >
+      <div className="relative h-48 overflow-hidden">
+        <img 
+          src={news.image} 
+          alt={news.title} 
+          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute top-4 left-4">
+          <span className="px-3 py-1 bg-[#ffdf00] text-[#002776] text-xs font-bold rounded-full uppercase tracking-wider shadow-sm">
+            {news.category}
+          </span>
+        </div>
+      </div>
+      <div className="p-6 flex-grow">
+        <div className="flex items-center gap-2 text-slate-400 text-xs mb-3">
+          <Calendar size={12} />
+          <span>{news.date}</span>
+        </div>
+        <h3 className="text-lg font-bold text-[#002776] mb-3 leading-tight line-clamp-2">
+          {news.title}
+        </h3>
+        <p className="text-slate-600 text-sm line-clamp-2">
+          {news.excerpt}
+        </p>
+      </div>
+      <div className="p-4 border-t border-slate-50">
+        <button className="text-[#005a1a] font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
+          Ler mais <ArrowRight size={14} />
+        </button>
+      </div>
+    </motion.div>
+  );
+};
+
+export default MandateCard;
