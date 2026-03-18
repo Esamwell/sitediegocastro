@@ -21,6 +21,7 @@ const Admin: React.FC = () => {
   const [videos, setVideos] = useState<any[]>([]);
   const [links, setLinks] = useState<any[]>([]);
   const [segments, setSegments] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   
   // Form States
@@ -87,6 +88,9 @@ const Admin: React.FC = () => {
 
       const { data: segmentsData } = await supabase.from('security_segments').select('*');
       if (segmentsData) setSegments(segmentsData);
+
+      const { data: projectsData } = await supabase.from('projects').select('*').order('year', { ascending: false });
+      if (projectsData) setProjects(projectsData);
     };
 
     fetchData();
@@ -95,12 +99,14 @@ const Admin: React.FC = () => {
     const videosSub = supabase.channel('videos-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, fetchData).subscribe();
     const linksSub = supabase.channel('links-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'drive_links' }, fetchData).subscribe();
     const segmentsSub = supabase.channel('segments-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'security_segments' }, fetchData).subscribe();
+    const projectsSub = supabase.channel('projects-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, fetchData).subscribe();
 
     return () => {
       supabase.removeChannel(newsSub);
       supabase.removeChannel(videosSub);
       supabase.removeChannel(linksSub);
       supabase.removeChannel(segmentsSub);
+      supabase.removeChannel(projectsSub);
     };
   }, [user]);
 
@@ -192,7 +198,7 @@ const Admin: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : 'drive_links';
+    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : 'drive_links';
     if (window.confirm("Tem certeza que deseja excluir?")) {
       try {
         await supabase.from(tableName).delete().eq('id', id);
@@ -259,6 +265,12 @@ const Admin: React.FC = () => {
             </button>
           ))}
             <button 
+              onClick={() => { setActiveTab('projects'); setIsEditing(null); setFormData({}); }}
+              className={`w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all ${activeTab === 'projects' ? 'bg-white text-[#002776]' : 'hover:bg-white/10 text-white/60'}`}
+            >
+              <LayoutDashboard size={20} /> Projetos
+            </button>
+            <button 
               onClick={() => { setActiveTab('segments'); setIsEditing(null); setFormData({}); }}
               className={`w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all ${activeTab === 'segments' ? 'bg-white text-[#002776]' : 'hover:bg-white/10 text-white/60'}`}
             >
@@ -285,15 +297,15 @@ const Admin: React.FC = () => {
         <header className="flex justify-between items-center mb-12">
           <div>
             <h2 className="text-4xl font-black text-[#002776] uppercase tracking-tight">
-              Gerenciar {activeTab === 'news' ? 'Notícias' : activeTab === 'videos' ? 'Vídeos' : 'Links'}
+              Gerenciar {activeTab === 'news' ? 'Notícias' : activeTab === 'videos' ? 'Vídeos' : activeTab === 'projects' ? 'Projetos' : activeTab === 'segments' ? 'Segmentações' : 'Links'}
             </h2>
             <p className="text-slate-400 font-medium">Atualize o conteúdo do portal em tempo real.</p>
           </div>
-          <button 
+            <button 
             onClick={() => { setIsEditing('new'); setFormData({}); }}
             className="bg-[#005a1a] text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:bg-[#004a15] transition-all shadow-xl shadow-emerald-100"
           >
-            <Plus size={24} /> Adicionar {activeTab === 'news' ? 'Notícia' : activeTab === 'videos' ? 'Vídeo' : 'Link'}
+            <Plus size={24} /> Adicionar {activeTab === 'news' ? 'Notícia' : activeTab === 'videos' ? 'Vídeo' : activeTab === 'projects' ? 'Projeto' : 'Link'}
           </button>
         </header>
 
@@ -423,6 +435,41 @@ const Admin: React.FC = () => {
                   </>
                 )}
 
+                {activeTab === 'projects' && (
+                  <>
+                    <input 
+                      type="text" placeholder="Título do Projeto" required
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                      value={formData.title || ''} onChange={e => setFormData({...formData, title: e.target.value})}
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <input 
+                        type="text" placeholder="Categoria (ex: Segurança)" required
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                        value={formData.category || ''} onChange={e => setFormData({...formData, category: e.target.value})}
+                      />
+                      <input 
+                        type="number" placeholder="Ano (ex: 2024)" required
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                        value={formData.year || ''} onChange={e => setFormData({...formData, year: parseInt(e.target.value)})}
+                      />
+                    </div>
+                    <select 
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                      value={formData.status || 'Em Tramitação'} onChange={e => setFormData({...formData, status: e.target.value})}
+                    >
+                      <option value="Em Tramitação">Em Tramitação</option>
+                      <option value="Aprovado">Aprovado</option>
+                      <option value="Arquivado">Arquivado</option>
+                    </select>
+                    <textarea 
+                      placeholder="Resumo do Projeto" required rows={4}
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                      value={formData.summary || ''} onChange={e => setFormData({...formData, summary: e.target.value})}
+                    />
+                  </>
+                )}
+
                 <button 
                   type="submit" 
                   disabled={isSaving}
@@ -475,6 +522,21 @@ const Admin: React.FC = () => {
               <div className="flex-1">
                 <h4 className="text-xl font-bold text-[#002776]">{item.name}</h4>
                 <div className="text-sm text-slate-400 font-medium truncate max-w-xs">{item.description}</div>
+              </div>
+              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={20} /></button>
+                <button onClick={() => handleDelete(item.id)} className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 size={20} /></button>
+              </div>
+            </div>
+          ))}
+
+          {activeTab === 'projects' && projects.map(item => (
+            <div key={item.id} className="bg-white p-6 rounded-3xl border border-slate-200 flex items-center gap-6 group hover:shadow-lg transition-all">
+              <div className="w-12 h-12 bg-[#005a1a]/10 text-[#005a1a] rounded-xl flex items-center justify-center font-bold">{item.year}</div>
+              <div className="flex-1">
+                <div className="text-xs font-bold text-[#005a1a] uppercase mb-1">{item.category} • {item.status}</div>
+                <h4 className="text-xl font-bold text-[#002776]">{item.title}</h4>
+                <div className="text-sm text-slate-400 font-medium truncate max-w-md">{item.summary}</div>
               </div>
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={20} /></button>

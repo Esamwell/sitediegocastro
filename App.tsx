@@ -22,12 +22,6 @@ import Admin from './src/Admin';
 import { Project, News, Video, SecuritySegment } from './types';
 
 // Mock Data
-const PROJECTS: Project[] = [
-  { id: '1', title: 'Proibição de Câmeras Corporais', category: 'Segurança', summary: 'PL n° 24.720/2023: Proíbe a instalação de câmeras corporais e instrumentos de vigilância na atividade policial.', status: 'Em Tramitação', year: 2023 },
-  { id: '2', title: 'Dia em Defesa da Vida', category: 'Vida', summary: 'PL 25.250/2025: Institui o Dia Estadual em Defesa da Vida e Contra o Aborto (22 de agosto).', status: 'Em Tramitação', year: 2025 },
-  { id: '3', title: 'Estatuto da Liberdade Cristã', category: 'Liberdade', summary: 'PL 25.704/2025: Assegura a liberdade de culto, imunidade tributária e proteção a templos.', status: 'Em Tramitação', year: 2025 },
-  { id: '4', title: 'Seminários Antidrogas', category: 'Educação', summary: 'Lei n° 14.862/2025: Estabelece seminários antidrogas obrigatórios em escolas estaduais.', status: 'Aprovado', year: 2025 },
-];
 
 const App: React.FC = () => {
   return (
@@ -46,7 +40,9 @@ const Home: React.FC = () => {
   const [news, setNews] = useState<News[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
   const [securitySegments, setSecuritySegments] = useState<SecuritySegment[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
+  const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
   const [driveLinks, setDriveLinks] = useState<Record<string, string>>({});
 
   const { scrollYProgress } = useScroll();
@@ -73,6 +69,10 @@ const Home: React.FC = () => {
       // Security Segments
       const { data: segmentsData } = await supabase.from('security_segments').select('*');
       if (segmentsData) setSecuritySegments(segmentsData);
+
+      // Projects
+      const { data: projectsData } = await supabase.from('projects').select('*').order('year', { ascending: false });
+      if (projectsData) setProjects(projectsData);
     };
 
     fetchData();
@@ -82,12 +82,14 @@ const Home: React.FC = () => {
     const videosSub = supabase.channel('videos-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, fetchData).subscribe();
     const linksSub = supabase.channel('links-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'drive_links' }, fetchData).subscribe();
     const segmentsSub = supabase.channel('segments-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'security_segments' }, fetchData).subscribe();
+    const projectsSub = supabase.channel('projects-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, fetchData).subscribe();
 
     return () => {
       supabase.removeChannel(newsSub);
       supabase.removeChannel(videosSub);
       supabase.removeChannel(linksSub);
       supabase.removeChannel(segmentsSub);
+      supabase.removeChannel(projectsSub);
     };
   }, []);
 
@@ -331,15 +333,21 @@ const Home: React.FC = () => {
                 Recordista de Projetos de Lei na Assembleia Legislativa da Bahia. Atuamos com transparência e coragem em defesa dos interesses do povo baiano.
               </p>
             </div>
-            <button className="flex items-center gap-2 text-[#002776] font-bold hover:gap-4 transition-all">
+            <button 
+              onClick={() => setIsProjectsModalOpen(true)}
+              className="flex items-center gap-2 text-[#002776] font-bold hover:gap-4 transition-all"
+            >
               Ver todos os projetos <ArrowRight size={20} />
             </button>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {PROJECTS.map((project) => (
+            {projects.slice(0, 4).map((project) => (
               <MandateCard key={project.id} item={project} type="project" />
             ))}
+            {projects.length === 0 && (
+              <div className="col-span-full text-center py-12 text-slate-400 font-medium">Nenhum projeto cadastrado.</div>
+            )}
           </div>
 
           <div className="mt-20 grid md:grid-cols-2 gap-8">
@@ -947,6 +955,38 @@ const Home: React.FC = () => {
                 </Link>
               )) : (
                 <p className="text-slate-400 italic text-sm">Nenhuma segmentação cadastrada ainda.</p>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Projects Modal */}
+      {isProjectsModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#002776]/80 backdrop-blur-xl">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-[2.5rem] p-8 md:p-12 max-w-5xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
+          >
+            <button
+              onClick={() => setIsProjectsModalOpen(false)}
+              className="absolute top-8 right-8 text-slate-400 hover:text-[#002776] transition-colors"
+            >
+              <X size={32} />
+            </button>
+
+            <div className="mb-12">
+              <span className="text-[#005a1a] font-bold uppercase tracking-[0.3em] text-xs mb-2 block">Acervo Legislativo</span>
+              <h2 className="text-3xl md:text-5xl font-black text-[#002776] uppercase">Todos os Projetos</h2>
+              <p className="text-slate-500 mt-2 font-medium">Confira o histórico completo de ações do mandato.</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.length > 0 ? projects.map((project) => (
+                <MandateCard key={project.id} item={project} type="project" />
+              )) : (
+                <p className="col-span-full py-20 text-center text-slate-400 italic">Nenhum projeto encontrado.</p>
               )}
             </div>
           </motion.div>
