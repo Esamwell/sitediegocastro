@@ -103,7 +103,7 @@ const Portal: React.FC = () => {
           <div className="flex items-center">
             <button onClick={() => scrollToSection('início')} className="hover:opacity-80 transition-opacity">
               <img 
-                src="/logo-diego-castro-verde.png" 
+                src="/logo diego castro verde.png" 
                 alt="Diego Castro" 
                 className="h-20 w-auto"
                 referrerPolicy="no-referrer"
@@ -147,7 +147,7 @@ const Portal: React.FC = () => {
             <div className="flex justify-between items-center mb-12">
               <div className="flex items-center">
                 <img 
-                  src="/logo-diego-castro-verde.png" 
+                  src="/logo diego castro verde.png" 
                   alt="Diego Castro" 
                   className="h-16 w-auto"
                   referrerPolicy="no-referrer"

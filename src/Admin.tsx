@@ -162,7 +162,7 @@ const Admin: React.FC = () => {
       {/* Sidebar */}
       <aside className="w-80 bg-[#002776] text-white p-8 flex flex-col">
         <div className="mb-12">
-          <img src="/logo diego castro verde.png" className="h-16 brightness-0 invert" alt="Logo" />
+          <img src="/logo diego castro.png" className="h-16" alt="Logo" />
           <div className="mt-4 text-xs font-bold text-white/40 uppercase tracking-widest">Mandato Diego Castro</div>
         </div>
 
