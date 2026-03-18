@@ -549,7 +549,7 @@ const Portal: React.FC = () => {
 
       {/* DIEGO E BOLSONARO */}
       <section id="bolsonaro" className="py-24 px-6 bg-slate-900 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
+        <div className="absolute inset-0 w-full h-full opacity-10 pointer-events-none">
           <img 
             src="/fotos-diego/bolsonaro.jpg" 
             className="w-full h-full object-cover"
@@ -579,9 +579,6 @@ const Portal: React.FC = () => {
                 <div className="text-white/60 text-xs font-bold uppercase tracking-widest">Voz da Direita</div>
               </div>
             </div>
-            <button className="bg-[#ffdf00] text-[#002776] px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition-all flex items-center gap-3">
-              Ver Galeria com Bolsonaro <ChevronRight size={20} />
-            </button>
           </div>
         </div>
       </section>
