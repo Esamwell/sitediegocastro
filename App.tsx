@@ -416,7 +416,7 @@ const Portal: React.FC = () => {
       <section id="segurança" className="relative py-24 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-[#002776] z-0">
           <img 
-            src="/fotos-diego/20240702_093537.jpg" 
+            src="/fotos-diego/diego-3.jpeg" 
             className="w-full h-full object-cover opacity-20 mix-blend-overlay"
             alt="Segurança"
             referrerPolicy="no-referrer"
@@ -551,7 +551,7 @@ const Portal: React.FC = () => {
       <section id="bolsonaro" className="py-24 px-6 bg-slate-900 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
           <img 
-            src="https://images.unsplash.com/photo-1541872703-74c5e443d1f9?auto=format&fit=crop&q=80" 
+            src="/fotos-diego/bolsonaro.jpg" 
             className="w-full h-full object-cover"
             alt="Bolsonaro"
             referrerPolicy="no-referrer"
@@ -618,7 +618,7 @@ const Portal: React.FC = () => {
             
             <div className="lg:col-span-2 relative aspect-[4/3] bg-slate-100 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl">
               <img 
-                src="https://images.unsplash.com/photo-1596438459194-f275f413d6ff?auto=format&fit=crop&q=80" 
+                src="/fotos-diego/diego-6.jpeg" 
                 className="w-full h-full object-cover opacity-80"
                 alt="Mapa Bahia"
                 referrerPolicy="no-referrer"
