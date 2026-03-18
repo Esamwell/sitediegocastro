@@ -8,41 +8,76 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { 
   Shield, Users, Heart, Flag, BookOpen, Briefcase, 
   MapPin, Calendar, Play, ChevronRight, Menu, X, 
-  Instagram, Youtube, Twitter, Facebook, MessageCircle,
+  Instagram, Twitter, Facebook, MessageCircle,
   FileText, Download, Newspaper, Info, Phone, Mail,
   ArrowRight, CheckCircle2, Search, TrendingUp
 } from 'lucide-react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { db } from './src/firebase';
 import PatrioticBackground from './components/PatrioticBackground';
 import ImpactText from './components/ImpactText';
 import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
+import Admin from './src/Admin';
 import { Project, News, Video } from './types';
 
 // Mock Data
 const PROJECTS: Project[] = [
-  { id: '1', title: 'Valorização da Polícia Militar', category: 'Segurança', summary: 'Projeto que visa o reajuste salarial e melhores condições de trabalho para os heróis da nossa PM.', status: 'Em Tramitação', year: 2024 },
-  { id: '2', title: 'Proteção da Infância nas Escolas', category: 'Família', summary: 'Garantia de que conteúdos ideológicos não entrem nas salas de aula dos nossos filhos.', status: 'Aprovado', year: 2023 },
-  { id: '3', title: 'Liberdade Religiosa Plena', category: 'Liberdade', summary: 'Proteção de templos e igrejas contra qualquer tipo de perseguição ou fechamento arbitrário.', status: 'Aprovado', year: 2023 },
-  { id: '4', title: 'Combate ao Crime Organizado', category: 'Segurança', summary: 'Endurecimento de penas para líderes de facções criminosas que atuam na Bahia.', status: 'Em Tramitação', year: 2024 },
-];
-
-const NEWS: News[] = [
-  { id: '1', title: 'Diego Castro fiscaliza hospital no interior da Bahia', date: '15 Mar 2024', excerpt: 'O deputado encontrou irregularidades na gestão de recursos e cobrou providências imediatas do governo.', image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80', category: 'Fiscalização' },
-  { id: '2', title: 'Grande encontro com lideranças em Feira de Santana', date: '12 Mar 2024', excerpt: 'Milhares de pessoas se reuniram para ouvir as propostas de Diego Castro para a região.', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80', category: 'Agenda' },
-  { id: '3', title: 'Aprovado projeto de apoio ao produtor rural', date: '10 Mar 2024', excerpt: 'Nova lei garante menos burocracia para quem produz e gera empregos no campo.', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80', category: 'Mandato' },
-];
-
-const VIDEOS: Video[] = [
-  { id: '1', title: 'Discurso na Assembleia sobre Segurança', thumbnail: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80', category: 'Discurso', url: '#', duration: '12:45' },
-  { id: '2', title: 'Denúncia: O descaso com as estradas baianas', thumbnail: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80', category: 'Denúncia', url: '#', duration: '08:20' },
-  { id: '3', title: 'Entrevista exclusiva para a TV Bahia', thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80', category: 'Entrevista', url: '#', duration: '25:15' },
+  { id: '1', title: 'Proibição de Câmeras Corporais', category: 'Segurança', summary: 'PL n° 24.720/2023: Proíbe a instalação de câmeras corporais e instrumentos de vigilância na atividade policial.', status: 'Em Tramitação', year: 2023 },
+  { id: '2', title: 'Dia em Defesa da Vida', category: 'Vida', summary: 'PL 25.250/2025: Institui o Dia Estadual em Defesa da Vida e Contra o Aborto (22 de agosto).', status: 'Em Tramitação', year: 2025 },
+  { id: '3', title: 'Estatuto da Liberdade Cristã', category: 'Liberdade', summary: 'PL 25.704/2025: Assegura a liberdade de culto, imunidade tributária e proteção a templos.', status: 'Em Tramitação', year: 2025 },
+  { id: '4', title: 'Seminários Antidrogas', category: 'Educação', summary: 'Lei n° 14.862/2025: Estabelece seminários antidrogas obrigatórios em escolas estaduais.', status: 'Aprovado', year: 2025 },
 ];
 
 const App: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Portal />} />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+const Portal: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [news, setNews] = useState<News[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [driveLinks, setDriveLinks] = useState<Record<string, string>>({});
+  
   const { scrollYProgress } = useScroll();
-  const opacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.1], [1, 0.95]);
+  const opacity = useScroll(); // Placeholder for scroll logic if needed
+
+  useEffect(() => {
+    const qNews = query(collection(db, 'news'), orderBy('createdAt', 'desc'));
+    const unsubNews = onSnapshot(qNews, (snap) => {
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as News));
+      setNews(data.length > 0 ? data : []);
+    });
+
+    const qVideos = query(collection(db, 'videos'), orderBy('createdAt', 'desc'));
+    const unsubVideos = onSnapshot(qVideos, (snap) => {
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Video));
+      setVideos(data.length > 0 ? data : []);
+    });
+
+    const unsubLinks = onSnapshot(collection(db, 'driveLinks'), (snap) => {
+      const links: Record<string, string> = {};
+      snap.docs.forEach(d => {
+        const data = d.data();
+        links[data.key] = data.url;
+      });
+      setDriveLinks(links);
+    });
+
+    return () => {
+      unsubNews();
+      unsubVideos();
+      unsubLinks();
+    };
+  }, []);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -55,6 +90,8 @@ const App: React.FC = () => {
     }
   };
 
+  const getDriveLink = (key: string, defaultUrl: string = '#') => driveLinks[key] || defaultUrl;
+
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <CustomCursor />
@@ -62,24 +99,24 @@ const App: React.FC = () => {
       
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-28 flex items-center justify-between">
           <div className="flex items-center">
             <button onClick={() => scrollToSection('início')} className="hover:opacity-80 transition-opacity">
               <img 
-                src="/logo diego castro verde.png" 
+                src="/logo-diego-castro-verde.png" 
                 alt="Diego Castro" 
-                className="h-12 w-auto"
+                className="h-20 w-auto"
                 referrerPolicy="no-referrer"
               />
             </button>
           </div>
 
           <div className="hidden lg:flex items-center gap-8">
-            {['Início', 'Quem é', 'Mandato', 'Bahia', 'Notícias', 'Contato'].map((item) => (
+            {['Início', 'Quem é', 'Mandato', 'Bahia', 'Segurança', 'Notícias', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
               <button 
                 key={item}
                 onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
-                className="text-sm font-bold text-slate-600 hover:text-[#002776] transition-colors uppercase tracking-wider"
+                className="text-[10px] font-bold text-slate-600 hover:text-[#002776] transition-colors uppercase tracking-wider"
               >
                 {item}
               </button>
@@ -110,9 +147,9 @@ const App: React.FC = () => {
             <div className="flex justify-between items-center mb-12">
               <div className="flex items-center">
                 <img 
-                  src="/logo diego castro verde.png" 
+                  src="/logo-diego-castro-verde.png" 
                   alt="Diego Castro" 
-                  className="h-10 w-auto"
+                  className="h-16 w-auto"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -121,28 +158,27 @@ const App: React.FC = () => {
               </button>
             </div>
             <div className="flex flex-col gap-6">
-              {['Início', 'Quem é', 'Mandato', 'Bahia', 'Notícias', 'Contato'].map((item) => (
+              {['Início', 'Quem é', 'Mandato', 'Bahia', 'Segurança', 'Notícias', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
                 <button 
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
-                  className="text-3xl font-heading font-black text-[#002776] text-left uppercase"
+                  className="text-2xl font-heading font-black text-[#002776] text-left uppercase"
                 >
                   {item}
                 </button>
               ))}
             </div>
             <div className="mt-auto pt-12 border-t border-slate-100 flex gap-6">
-              <Instagram className="text-[#002776]" />
-              <Twitter className="text-[#002776]" />
-              <Youtube className="text-[#002776]" />
-              <Facebook className="text-[#002776]" />
+              <a href="https://www.instagram.com/diegocastroba/" target="_blank" rel="noopener noreferrer"><Instagram className="text-[#002776]" /></a>
+              <a href="https://x.com/diegocastroba" target="_blank" rel="noopener noreferrer"><Twitter className="text-[#002776]" /></a>
+              <a href="https://www.facebook.com/DiegoCastroBA/" target="_blank" rel="noopener noreferrer"><Facebook className="text-[#002776]" /></a>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* HERO SECTION */}
-      <section id="início" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-6 overflow-hidden">
+      <section id="início" className="relative pt-40 pb-20 lg:pt-56 lg:pb-32 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
@@ -157,7 +193,7 @@ const App: React.FC = () => {
               DEFESA DA <span className="text-[#005a1a]">BAHIA</span>, VALORES DA <span className="text-[#002776]">FAMÍLIA</span>.
             </h1>
             <p className="text-lg lg:text-xl text-slate-600 mb-10 max-w-xl leading-relaxed">
-              Trabalhando incansavelmente por uma Bahia mais segura, livre e próspera. Diego Castro é a voz da direita na Assembleia Legislativa.
+              Recordista de Projetos de Lei e o deputado que mais investe na Segurança Pública da Bahia. Diego Castro é o guardião dos valores conservadores na ALBA.
             </p>
             <div className="flex flex-wrap gap-4">
               <button className="bg-[#002776] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#001a4d] transition-all shadow-xl shadow-blue-200 flex items-center gap-2">
@@ -178,7 +214,7 @@ const App: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-[#005a1a] to-[#002776] rounded-3xl rotate-6 opacity-10" />
               <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl overflow-hidden -rotate-3 border-4 border-white">
                 <img 
-                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80" 
+                  src="/fotos-diego/diego-1.jpeg" 
                   alt="Diego Castro" 
                   className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                   referrerPolicy="no-referrer"
@@ -200,9 +236,9 @@ const App: React.FC = () => {
       <section className="bg-[#002776] py-12 px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
-            { label: 'Projetos de Lei', value: '150+' },
+            { label: 'Projetos de Lei', value: 'Recordista' },
             { label: 'Cidades Visitadas', value: '200+' },
-            { label: 'Emendas Destinadas', value: 'R$ 15M' },
+            { label: 'Emendas Segurança', value: 'R$ 2,5M' },
             { label: 'Fiscalizações', value: '80+' },
           ].map((stat, i) => (
             <div key={i} className="text-center">
@@ -221,17 +257,17 @@ const App: React.FC = () => {
               <ImpactText text="QUEM É DIEGO CASTRO" color="blue" className="text-4xl lg:text-6xl mb-8" />
               <div className="space-y-6 text-slate-600 text-lg leading-relaxed">
                 <p>
-                  Advogado, pai de família e cristão, Diego Castro iniciou sua trajetória política movido pelo desejo de ver uma Bahia livre da corrupção e do descaso com a segurança pública.
+                  Conservador baiano, advogado e cristão, Diego Castro é o atual Presidente da Comissão de Direitos Humanos e Segurança Pública da Assembleia Legislativa da Bahia.
                 </p>
                 <p>
-                  Com uma carreira sólida no direito, Diego sempre defendeu as liberdades individuais e o direito à propriedade. Sua entrada na política foi uma resposta ao clamor de milhares de baianos que não se sentiam representados.
+                  Fiel defensor das bandeiras do ex-presidente Jair Bolsonaro, Diego pauta seu mandato na defesa intransigente da vida, da família e da liberdade religiosa, sendo a voz da direita na Bahia.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
                   {[
-                    { icon: <Shield size={20} />, text: 'Defesa da Segurança' },
-                    { icon: <Heart size={20} />, text: 'Valores Cristãos' },
-                    { icon: <Users size={20} />, text: 'Apoio à Família' },
-                    { icon: <Flag size={20} />, text: 'Liberdade Econômica' },
+                    { icon: <Shield size={20} />, text: 'Segurança Pública' },
+                    { icon: <Heart size={20} />, text: 'Família e Vida' },
+                    { icon: <Users size={20} />, text: 'Fé e Liberdade' },
+                    { icon: <Flag size={20} />, text: 'Agro e Propriedade' },
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl">
                       <div className="text-[#005a1a]">{item.icon}</div>
@@ -243,12 +279,30 @@ const App: React.FC = () => {
             </div>
             <div className="order-1 lg:order-2 relative">
               <img 
-                src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80" 
+                src="/fotos-diego/diego-2.jpeg" 
                 className="rounded-3xl shadow-2xl"
                 alt="Trajetória"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute -top-10 -left-10 w-40 h-40 bg-brazil-green/10 rounded-full blur-3xl" />
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-brazil-green/10 rounded-full blur-3xl" />
+              
+              {/* Timeline Overlay */}
+              <div className="mt-12 bg-slate-50 p-8 rounded-3xl border border-slate-200">
+                <h4 className="text-[#002776] font-black text-xl mb-6 uppercase tracking-tight">TRAJETÓRIA</h4>
+                <div className="space-y-6">
+                  {[
+                    { year: '2018', event: 'Fundação do Movimento Conservador na Bahia' },
+                    { year: '2020', event: 'Destaque na defesa da liberdade durante a pandemia' },
+                    { year: '2022', event: 'Eleito Deputado Estadual com votação expressiva' },
+                    { year: '2023', event: 'Presidente da Comissão de Segurança Pública' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex gap-4">
+                      <div className="font-black text-[#005a1a] text-sm shrink-0">{item.year}</div>
+                      <div className="text-slate-600 text-sm font-medium">{item.event}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -260,7 +314,10 @@ const App: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div>
               <span className="text-[#005a1a] font-bold uppercase tracking-[0.3em] text-xs mb-4 block">Ações Legislativas</span>
-              <ImpactText text="O NOSSO MANDATO" color="blue" className="text-4xl lg:text-6xl" />
+              <ImpactText text="MANDATO PELA BAHIA" color="blue" className="text-4xl lg:text-6xl" />
+              <p className="mt-4 text-slate-600 max-w-2xl">
+                Recordista de Projetos de Lei na Assembleia Legislativa da Bahia. Atuamos com transparência e coragem em defesa dos interesses do povo baiano.
+              </p>
             </div>
             <button className="flex items-center gap-2 text-[#002776] font-bold hover:gap-4 transition-all">
               Ver todos os projetos <ArrowRight size={20} />
@@ -272,14 +329,94 @@ const App: React.FC = () => {
               <MandateCard key={project.id} item={project} type="project" />
             ))}
           </div>
+
+          <div className="mt-20 grid md:grid-cols-2 gap-8">
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex gap-6 items-start">
+              <div className="w-16 h-16 bg-[#005a1a]/10 rounded-2xl flex items-center justify-center text-[#005a1a] shrink-0">
+                <Flag size={32} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-[#002776] mb-3 uppercase tracking-tight">CPI do MST e Invasão Zero</h3>
+                <p className="text-slate-600 leading-relaxed">
+                  Único deputado estadual presente nas diligências da CPI do MST na Bahia. Alinhado ao movimento Invasão Zero em defesa intransigente da propriedade privada e do agronegócio baiano.
+                </p>
+              </div>
+            </div>
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex gap-6 items-start">
+              <div className="w-16 h-16 bg-[#002776]/10 rounded-2xl flex items-center justify-center text-[#002776] shrink-0">
+                <BookOpen size={32} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-[#002776] mb-3 uppercase tracking-tight">Liberdade Econômica</h3>
+                <p className="text-slate-600 leading-relaxed">
+                  Autor do Marco Estadual da Liberdade Econômica. Defensor da redução do ICMS e da desburocratização para quem produz e gera empregos na nossa Bahia.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* EMENDAS E FISCALIZAÇÃO */}
+          <div className="mt-12 grid lg:grid-cols-2 gap-8">
+            <div className="bg-[#002776] p-10 rounded-[2.5rem] text-white overflow-hidden relative">
+              <div className="relative z-10">
+                <h3 className="text-3xl font-heading font-black mb-6 uppercase">Emendas Parlamentares</h3>
+                <div className="space-y-4 mb-8">
+                  {[
+                    { area: 'Segurança Pública', val: 'R$ 2.450.000' },
+                    { area: 'Saúde', val: 'R$ 1.200.000' },
+                    { area: 'Educação', val: 'R$ 850.000' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex justify-between items-center border-b border-white/10 pb-4">
+                      <span className="text-white/60 font-bold uppercase text-xs tracking-widest">{item.area}</span>
+                      <span className="text-[#ffdf00] font-black text-xl">{item.val}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-white/60 text-sm leading-relaxed mb-8">
+                  Recursos destinados diretamente para as cidades baianas, com foco em viaturas, equipamentos médicos e melhorias em escolas.
+                </p>
+                <button className="bg-white text-[#002776] px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#ffdf00] transition-all">
+                  Ver Mapa de Ações
+                </button>
+              </div>
+              <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
+            </div>
+
+            <div className="bg-white p-10 rounded-[2.5rem] border border-slate-200 shadow-xl relative overflow-hidden">
+              <div className="relative z-10">
+                <h3 className="text-3xl font-heading font-black text-[#002776] mb-6 uppercase">Fiscalização e Denúncias</h3>
+                <div className="space-y-6 mb-8">
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-600 shrink-0">
+                      <Search size={20} />
+                    </div>
+                    <p className="text-slate-600 text-sm font-medium">Fiscalização rigorosa em hospitais regionais e obras paralisadas pelo governo estadual.</p>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-600 shrink-0">
+                      <Info size={20} />
+                    </div>
+                    <p className="text-slate-600 text-sm font-medium">Denúncia de irregularidades na gestão de recursos da segurança pública e sistema prisional.</p>
+                  </div>
+                </div>
+                <div className="p-6 bg-slate-50 rounded-2xl border-l-4 border-red-600 mb-8">
+                  <p className="text-slate-900 font-bold italic">"O deputado que não fiscaliza, não representa. Meu compromisso é com a verdade e com o dinheiro do povo."</p>
+                </div>
+                <button className="bg-[#002776] text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#001a4d] transition-all">
+                  Relatório de Fiscalização
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
       {/* SEGURANÇA PÚBLICA - DESTAQUE */}
-      <section className="relative py-24 px-6 overflow-hidden">
+      <section id="segurança" className="relative py-24 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-[#002776] z-0">
           <img 
-            src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&q=80" 
+            src="/fotos-diego/20240702_093537.jpg" 
             className="w-full h-full object-cover opacity-20 mix-blend-overlay"
             alt="Segurança"
             referrerPolicy="no-referrer"
@@ -291,22 +428,211 @@ const App: React.FC = () => {
               SEGURANÇA PÚBLICA É A NOSSA <span className="text-[#ffdf00]">PRIORIDADE</span>.
             </h2>
             <p className="text-xl text-white/80 mb-12 leading-relaxed">
-              Não descansaremos enquanto a Bahia não for um lugar seguro para se viver. Defendemos nossas polícias e combatemos o crime com rigor.
+              Como Presidente da Comissão de Segurança, Diego destinou quase R$ 2,5 milhões para viaturas, armamentos e tecnologia. Luta pela blindagem da frota e pelo Sistema de Apoio à Vítima (SAV).
             </p>
             <div className="flex flex-wrap gap-6">
               <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
                 <CheckCircle2 className="text-[#ffdf00]" size={32} />
                 <div>
-                  <div className="text-white font-bold">Apoio à PM</div>
-                  <div className="text-white/60 text-sm">Equipamentos e salários</div>
+                  <div className="text-white font-bold">Proteção Policial</div>
+                  <div className="text-white/60 text-sm">Contra câmeras corporais</div>
                 </div>
               </div>
               <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
                 <CheckCircle2 className="text-[#ffdf00]" size={32} />
                 <div>
-                  <div className="text-white font-bold">Polícia Penal</div>
-                  <div className="text-white/60 text-sm">Reconhecimento e valorização</div>
+                  <div className="text-white font-bold">Apoio Jurídico</div>
+                  <div className="text-white/60 text-sm">Assistência gratuita aos heróis</div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* DEFESA DA FAMÍLIA E DA FÉ */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="relative">
+              <img 
+                src="/fotos-diego/diego-4.jpeg" 
+                className="rounded-3xl shadow-2xl"
+                alt="Família e Fé"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#ffdf00]/10 rounded-full blur-3xl" />
+            </div>
+            <div>
+              <ImpactText text="FAMÍLIA E FÉ" color="blue" className="text-4xl lg:text-6xl mb-8" />
+              <div className="space-y-8">
+                <div className="flex gap-6">
+                  <div className="w-12 h-12 bg-[#005a1a]/10 rounded-xl flex items-center justify-center text-[#005a1a] shrink-0">
+                    <Heart size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">Defesa da Vida</h3>
+                    <p className="text-slate-600">Autor do PL 25.250/2025, que institui o Dia Estadual Contra o Aborto. Atuamos contra a ideologia de gênero e pela proteção da infância nas escolas.</p>
+                  </div>
+                </div>
+                <div className="flex gap-6">
+                  <div className="w-12 h-12 bg-[#002776]/10 rounded-xl flex items-center justify-center text-[#002776] shrink-0">
+                    <Shield size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">Estatuto da Liberdade Cristã</h3>
+                    <p className="text-slate-600">Garantia de liberdade de culto e proteção aos templos. Diego Castro é o anteparo contra projetos que ferem a liberdade religiosa na Bahia.</p>
+                  </div>
+                </div>
+                <div className="flex gap-6">
+                  <div className="w-12 h-12 bg-[#ffdf00]/10 rounded-xl flex items-center justify-center text-[#002776] shrink-0">
+                    <Users size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">Proteção da Juventude</h3>
+                    <p className="text-slate-600">Lei n° 14.862/2025: Seminários antidrogas em escolas estaduais. Proibição de músicas com apologia ao crime em ambiente escolar.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* DEFESA DO AGRO E PROPRIEDADE */}
+      <section className="py-24 px-6 bg-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="order-2 lg:order-1">
+              <ImpactText text="AGRO E PROPRIEDADE" color="blue" className="text-4xl lg:text-6xl mb-8" />
+              <div className="space-y-8">
+                <div className="flex gap-6">
+                  <div className="w-12 h-12 bg-[#005a1a]/10 rounded-xl flex items-center justify-center text-[#005a1a] shrink-0">
+                    <Flag size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">Invasão Zero</h3>
+                    <p className="text-slate-600">Alinhado ao movimento Invasão Zero, Diego Castro defende o direito sagrado à propriedade privada e combate as invasões de terra na Bahia.</p>
+                  </div>
+                </div>
+                <div className="flex gap-6">
+                  <div className="w-12 h-12 bg-[#002776]/10 rounded-xl flex items-center justify-center text-[#002776] shrink-0">
+                    <TrendingUp size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">CPI do MST</h3>
+                    <p className="text-slate-600">Único deputado estadual da Bahia a participar ativamente das diligências da CPI do MST, fiscalizando e denunciando abusos no campo.</p>
+                  </div>
+                </div>
+                <div className="flex gap-6">
+                  <div className="w-12 h-12 bg-[#ffdf00]/10 rounded-xl flex items-center justify-center text-[#002776] shrink-0">
+                    <Briefcase size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">Liberdade Econômica</h3>
+                    <p className="text-slate-600">Autor do Marco Estadual da Liberdade Econômica. Trabalhamos pela redução do ICMS e pelo fim da burocracia estatal.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2 relative">
+              <img 
+                src="/fotos-diego/diego-5.jpeg" 
+                className="rounded-3xl shadow-2xl"
+                alt="Agronegócio"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* DIEGO E BOLSONARO */}
+      <section id="bolsonaro" className="py-24 px-6 bg-slate-900 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
+          <img 
+            src="https://images.unsplash.com/photo-1541872703-74c5e443d1f9?auto=format&fit=crop&q=80" 
+            className="w-full h-full object-cover"
+            alt="Bolsonaro"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#ffdf00]/20 rounded-full mb-6">
+              <Flag size={16} className="text-[#ffdf00]" />
+              <span className="text-xs font-bold text-[#ffdf00] uppercase tracking-widest">Alinhamento Total</span>
+            </div>
+            <h2 className="text-4xl lg:text-7xl font-heading font-black text-white mb-8 leading-tight">
+              DIEGO CASTRO E <span className="text-[#ffdf00]">BOLSONARO</span>
+            </h2>
+            <p className="text-xl text-white/70 mb-10 leading-relaxed">
+              O representante oficial das pautas conservadoras de Jair Bolsonaro na Bahia. Defesa da liberdade, da pátria e dos valores cristãos em cada ação do mandato.
+            </p>
+            <div className="grid grid-cols-2 gap-6 mb-12">
+              <div className="p-6 bg-white/5 border border-white/10 rounded-2xl">
+                <div className="text-[#ffdf00] font-black text-2xl mb-2">100%</div>
+                <div className="text-white/60 text-xs font-bold uppercase tracking-widest">Lealdade às Pautas</div>
+              </div>
+              <div className="p-6 bg-white/5 border border-white/10 rounded-2xl">
+                <div className="text-[#ffdf00] font-black text-2xl mb-2">BAHIA</div>
+                <div className="text-white/60 text-xs font-bold uppercase tracking-widest">Voz da Direita</div>
+              </div>
+            </div>
+            <button className="bg-[#ffdf00] text-[#002776] px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition-all flex items-center gap-3">
+              Ver Galeria com Bolsonaro <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* DIEGO PELA BAHIA */}
+      <section id="bahia" className="py-24 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <ImpactText text="DIEGO PELA BAHIA" color="blue" className="text-4xl lg:text-6xl mb-4" />
+            <p className="text-slate-500 font-medium">Presença constante em todas as regiões do nosso estado</p>
+          </div>
+          
+          <div className="grid lg:grid-cols-3 gap-12 items-center">
+            <div className="space-y-8">
+              <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100">
+                <h4 className="text-[#002776] font-black text-xl mb-4 uppercase">Agenda no Interior</h4>
+                <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                  Mais de 200 cidades visitadas. Diego Castro não fica apenas no gabinete; ele percorre a Bahia para ouvir as demandas reais da população.
+                </p>
+                <div className="flex items-center gap-3 text-[#005a1a] font-bold text-sm">
+                  <MapPin size={18} /> <span>Oeste, Norte, Sul e Recôncavo</span>
+                </div>
+              </div>
+              <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100">
+                <h4 className="text-[#002776] font-black text-xl mb-4 uppercase">Encontro com Lideranças</h4>
+                <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                  Fortalecimento da base conservadora em cada município, unindo forças para transformar a realidade da Bahia.
+                </p>
+                <div className="flex items-center gap-3 text-[#005a1a] font-bold text-sm">
+                  <Users size={18} /> <span>União e Propósito</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="lg:col-span-2 relative aspect-[4/3] bg-slate-100 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl">
+              <img 
+                src="https://images.unsplash.com/photo-1596438459194-f275f413d6ff?auto=format&fit=crop&q=80" 
+                className="w-full h-full object-cover opacity-80"
+                alt="Mapa Bahia"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#002776]/80 to-transparent flex items-end p-12">
+                <div className="text-white">
+                  <div className="text-5xl font-black mb-2">200+</div>
+                  <div className="text-sm font-bold uppercase tracking-[0.3em]">Cidades Atendidas</div>
+                </div>
+              </div>
+              {/* Interactive Map Placeholder */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div className="w-4 h-4 bg-[#ffdf00] rounded-full animate-ping" />
+                <div className="w-4 h-4 bg-[#ffdf00] rounded-full absolute top-0" />
               </div>
             </div>
           </div>
@@ -322,9 +648,11 @@ const App: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {NEWS.map((item) => (
+            {news.length > 0 ? news.map((item) => (
               <MandateCard key={item.id} item={item} type="news" />
-            ))}
+            )) : (
+              <div className="col-span-3 text-center py-12 text-slate-400 font-medium">Nenhuma notícia cadastrada.</div>
+            )}
           </div>
         </div>
       </section>
@@ -334,13 +662,10 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-black">VÍDEOS RECENTES</h2>
-            <button className="bg-white/10 hover:bg-white/20 p-4 rounded-full transition-all">
-              <Youtube size={24} />
-            </button>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {VIDEOS.map((video) => (
+            {videos.length > 0 ? videos.map((video) => (
               <div key={video.id} className="group cursor-pointer">
                 <div className="relative aspect-video rounded-2xl overflow-hidden mb-4">
                   <img 
@@ -354,17 +679,69 @@ const App: React.FC = () => {
                       <Play fill="currentColor" size={24} />
                     </div>
                   </div>
-                  <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-[#002776] text-white text-[10px] font-bold rounded-full uppercase tracking-widest">
-                      {video.category}
-                    </span>
-                  </div>
                 </div>
                 <h3 className="font-bold text-lg leading-tight group-hover:text-[#ffdf00] transition-colors">
                   {video.title}
                 </h3>
               </div>
-            ))}
+            )) : (
+              <div className="col-span-3 text-center py-12 text-white/40 font-medium">Nenhum vídeo cadastrado.</div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* IMPRENSA E ARQUIVOS */}
+      <section id="imprensa" className="py-24 px-6 bg-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div>
+              <ImpactText text="ÁREA DA IMPRENSA" color="blue" className="text-4xl lg:text-5xl mb-8" />
+              <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                <p className="text-slate-600 mb-8 leading-relaxed">
+                  Espaço dedicado a jornalistas e veículos de comunicação. Aqui você encontra releases, fotos oficiais em alta resolução e contatos da assessoria.
+                </p>
+                <div className="space-y-4">
+                  <a href={getDriveLink('releases')} target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-all group">
+                    <span className="font-bold text-slate-700">Releases Oficiais</span>
+                    <Download size={20} className="text-[#002776] group-hover:translate-y-1 transition-transform" />
+                  </a>
+                  <a href={getDriveLink('fotos_alta')} target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-all group">
+                    <span className="font-bold text-slate-700">Fotos em Alta Resolução</span>
+                    <Download size={20} className="text-[#002776] group-hover:translate-y-1 transition-transform" />
+                  </a>
+                  <a href={getDriveLink('biografia')} target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-all group">
+                    <span className="font-bold text-slate-700">Biografia para Imprensa</span>
+                    <Download size={20} className="text-[#002776] group-hover:translate-y-1 transition-transform" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <ImpactText text="ARQUIVOS E DISCURSOS" color="blue" className="text-4xl lg:text-5xl mb-8" />
+              <div className="bg-[#005a1a] p-8 rounded-3xl text-white relative overflow-hidden">
+                <div className="relative z-10">
+                  <p className="text-white/80 mb-8 leading-relaxed">
+                    Biblioteca digital do mandato. Acesse relatórios de atividades, discursos na íntegra e documentos legislativos importantes.
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-white/10 rounded-2xl border border-white/20">
+                      <div className="font-black text-2xl mb-1">500+</div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">Documentos</div>
+                    </div>
+                    <div className="p-4 bg-white/10 rounded-2xl border border-white/20">
+                      <div className="font-black text-2xl mb-1">120+</div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">Discursos</div>
+                    </div>
+                  </div>
+                  <a href={getDriveLink('biblioteca')} target="_blank" rel="noopener noreferrer" className="mt-8 block text-center w-full bg-[#ffdf00] text-[#002776] py-4 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-white transition-all">
+                    Acessar Biblioteca
+                  </a>
+                </div>
+                <BookOpen className="absolute -bottom-10 -right-10 w-40 h-40 text-white/5" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -380,15 +757,15 @@ const App: React.FC = () => {
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { icon: <FileText />, label: 'Panfletos' },
-              { icon: <Download />, label: 'Artes Sociais' },
-              { icon: <Play />, label: 'Vídeos Curtos' },
-              { icon: <Newspaper />, label: 'Informativos' },
+              { icon: <FileText />, label: 'Panfletos', key: 'panfletos' },
+              { icon: <Download />, label: 'Artes Sociais', key: 'artes' },
+              { icon: <Play />, label: 'Vídeos Curtos', key: 'videos_curtos' },
+              { icon: <Newspaper />, label: 'Informativos', key: 'informativos' },
             ].map((item, i) => (
-              <button key={i} className="bg-white/10 hover:bg-white/20 border border-white/30 p-8 rounded-2xl flex flex-col items-center gap-4 transition-all group">
+              <a key={i} href={getDriveLink(item.key)} target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 border border-white/30 p-8 rounded-2xl flex flex-col items-center gap-4 transition-all group">
                 <div className="text-[#ffdf00] group-hover:scale-110 transition-transform">{item.icon}</div>
                 <span className="text-white font-bold uppercase tracking-widest text-xs">{item.label}</span>
-              </button>
+              </a>
             ))}
           </div>
         </div>
@@ -409,7 +786,7 @@ const App: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-sm text-slate-400 font-bold uppercase">Telefone</div>
-                  <div className="text-lg font-bold text-slate-900">(71) 3115-7000</div>
+                  <a href="tel:+5571999832548" className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">+55 71 99983-2548</a>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -427,7 +804,7 @@ const App: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-sm text-slate-400 font-bold uppercase">WhatsApp</div>
-                  <div className="text-lg font-bold text-slate-900">(71) 99999-9999</div>
+                  <a href="https://wa.me/5571999832548" target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-slate-900 hover:text-[#005a1a] transition-colors">+55 71 99983-2548</a>
                 </div>
               </div>
             </div>
@@ -475,18 +852,17 @@ const App: React.FC = () => {
                 <img 
                   src="/logo diego castro.png" 
                   alt="Diego Castro" 
-                  className="h-14 w-auto"
+                  className="h-24 w-auto"
                   referrerPolicy="no-referrer"
                 />
               </div>
               <p className="text-white/50 text-sm leading-relaxed">
-                Um mandato a serviço da Bahia, pautado na ética, na transparência e na defesa intransigente dos valores conservadores.
+                Deputado Estadual Diego Castro. Recordista de Projetos de Lei e defensor dos valores conservadores na Assembleia Legislativa da Bahia.
               </p>
               <div className="flex gap-4">
-                <a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002776] transition-all"><Instagram size={18} /></a>
-                <a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002776] transition-all"><Twitter size={18} /></a>
-                <a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002776] transition-all"><Youtube size={18} /></a>
-                <a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002776] transition-all"><Facebook size={18} /></a>
+                <a href="https://www.instagram.com/diegocastroba/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002776] transition-all"><Instagram size={18} /></a>
+                <a href="https://x.com/diegocastroba" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002776] transition-all"><Twitter size={18} /></a>
+                <a href="https://www.facebook.com/DiegoCastroBA/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002776] transition-all"><Facebook size={18} /></a>
               </div>
             </div>
 
@@ -523,6 +899,7 @@ const App: React.FC = () => {
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">
             <span>© 2024 Diego Castro. Todos os direitos reservados.</span>
             <div className="flex gap-8">
+              <Link to="/admin" className="hover:text-white transition-colors">Painel Admin</Link>
               <a href="#" className="hover:text-white transition-colors">Privacidade</a>
               <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
             </div>

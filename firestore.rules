@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: news
+    // Fields: title (string), date (string), excerpt (string), category (string), image (string), createdAt (timestamp)
+    //
+    // Collection: videos
+    // Fields: title (string), url (string), thumbnail (string), createdAt (timestamp)
+    //
+    // Collection: driveLinks
+    // Fields: key (string), label (string), url (string)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+             (request.auth.token.email == "contatosa2marketing@gmail.com" && request.auth.token.email_verified == true);
+    }
+
+    function isValidNews(data) {
+      return data.keys().hasAll(['title', 'date', 'excerpt', 'category', 'image']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.date is string &&
+             data.excerpt is string && data.excerpt.size() < 500 &&
+             data.category is string &&
+             data.image is string;
+    }
+
+    function isValidVideo(data) {
+      return data.keys().hasAll(['title', 'url', 'thumbnail']) &&
+             data.title is string && data.title.size() > 0 &&
+             data.url is string &&
+             data.thumbnail is string;
+    }
+
+    function isValidDriveLink(data) {
+      return data.keys().hasAll(['key', 'label', 'url']) &&
+             data.key is string &&
+             data.label is string &&
+             data.url is string;
+    }
+
+    // Rules
+    match /news/{newsId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidNews(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /videos/{videoId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidVideo(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /driveLinks/{linkId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidDriveLink(request.resource.data);
+      allow delete: if isAdmin();
+    }
+  }
+}
