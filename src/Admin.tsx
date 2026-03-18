@@ -13,6 +13,11 @@ const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'news' | 'videos' | 'links'>('news');
   
+  // Auth States
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [loginError, setLoginError] = useState<string | null>(null);
+
   // Data States
   const [news, setNews] = useState<any[]>([]);
   const [videos, setVideos] = useState<any[]>([]);
@@ -63,16 +68,26 @@ const Admin: React.FC = () => {
     };
   }, [user]);
 
-  const handleLogin = async () => {
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setLoginError(null);
     try {
-      await supabase.auth.signInWithOAuth({ 
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/admin'
-        }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: authEmail,
+        password: authPassword,
       });
-    } catch (error) {
-      console.error("Login failed", error);
+      
+      if (error) throw error;
+      
+      if (data.user?.email !== ADMIN_EMAIL) {
+        await supabase.auth.signOut();
+        setLoginError("Acesso restrito apenas ao administrador.");
+      }
+    } catch (error: any) {
+      setLoginError(error.message || "Erro ao realizar login.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -145,12 +160,26 @@ const Admin: React.FC = () => {
           <img src="/logo diego castro verde.png" className="h-24 mx-auto mb-8" alt="Logo" />
           <h1 className="text-3xl font-black text-[#002776] mb-4 uppercase">Painel Admin</h1>
           <p className="text-slate-500 mb-10">Acesso restrito para gestão do portal do mandato.</p>
-          <button 
-            onClick={handleLogin}
-            className="w-full bg-[#005a1a] text-white py-4 rounded-2xl font-bold text-lg hover:bg-[#004a15] transition-all flex items-center justify-center gap-3"
-          >
-            Entrar com Google
-          </button>
+          
+          <form onSubmit={handleEmailLogin} className="space-y-4">
+            <input 
+              type="email" placeholder="E-mail" required
+              className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+              value={authEmail} onChange={e => setAuthEmail(e.target.value)}
+            />
+            <input 
+              type="password" placeholder="Senha" required
+              className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+              value={authPassword} onChange={e => setAuthPassword(e.target.value)}
+            />
+            {loginError && <p className="text-red-500 text-sm font-bold">{loginError}</p>}
+            <button 
+              type="submit" disabled={loading}
+              className="w-full bg-[#005a1a] text-white py-4 rounded-2xl font-bold text-lg hover:bg-[#004a15] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
+          </form>
         </div>
       </div>
     );
