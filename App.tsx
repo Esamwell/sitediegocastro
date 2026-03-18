@@ -5,9 +5,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { 
-  Shield, Users, Heart, Flag, BookOpen, Briefcase, 
-  MapPin, Calendar, Play, ChevronRight, Menu, X, 
+import {
+  Shield, Users, Heart, Flag, BookOpen, Briefcase,
+  MapPin, Calendar, Play, ChevronRight, Menu, X,
   Instagram, Twitter, Facebook, MessageCircle,
   FileText, Download, Newspaper, Info, Phone, Mail,
   ArrowRight, CheckCircle2, Search, TrendingUp
@@ -46,7 +46,7 @@ const Portal: React.FC = () => {
   const [news, setNews] = useState<News[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
   const [driveLinks, setDriveLinks] = useState<Record<string, string>>({});
-  
+
   const { scrollYProgress } = useScroll();
   const opacity = useScroll(); // Placeholder for scroll logic if needed
 
@@ -96,15 +96,15 @@ const Portal: React.FC = () => {
     <div className="relative min-h-screen overflow-x-hidden">
       <CustomCursor />
       <PatrioticBackground />
-      
+
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 h-28 flex items-center justify-between">
           <div className="flex items-center">
             <button onClick={() => scrollToSection('início')} className="hover:opacity-80 transition-opacity">
-              <img 
-                src="/logo diego castro verde.png" 
-                alt="Diego Castro" 
+              <img
+                src="/logo diego castro verde.png"
+                alt="Diego Castro"
                 className="h-20 w-auto"
                 referrerPolicy="no-referrer"
               />
@@ -113,7 +113,7 @@ const Portal: React.FC = () => {
 
           <div className="hidden lg:flex items-center gap-8">
             {['Início', 'Quem é', 'Mandato', 'Bahia', 'Segurança', 'Notícias', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
-              <button 
+              <button
                 key={item}
                 onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
                 className="text-[10px] font-bold text-slate-600 hover:text-[#002776] transition-colors uppercase tracking-wider"
@@ -121,7 +121,7 @@ const Portal: React.FC = () => {
                 {item}
               </button>
             ))}
-            <button 
+            <button
               onClick={() => scrollToSection('contato')}
               className="bg-[#005a1a] text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-[#004a15] transition-all shadow-lg shadow-emerald-200"
             >
@@ -138,7 +138,7 @@ const Portal: React.FC = () => {
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
@@ -146,9 +146,9 @@ const Portal: React.FC = () => {
           >
             <div className="flex justify-between items-center mb-12">
               <div className="flex items-center">
-                <img 
-                  src="/logo diego castro verde.png" 
-                  alt="Diego Castro" 
+                <img
+                  src="/logo diego castro verde.png"
+                  alt="Diego Castro"
                   className="h-16 w-auto"
                   referrerPolicy="no-referrer"
                 />
@@ -159,7 +159,7 @@ const Portal: React.FC = () => {
             </div>
             <div className="flex flex-col gap-6">
               {['Início', 'Quem é', 'Mandato', 'Bahia', 'Segurança', 'Notícias', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
-                <button 
+                <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
                   className="text-2xl font-heading font-black text-[#002776] text-left uppercase"
@@ -180,7 +180,7 @@ const Portal: React.FC = () => {
       {/* HERO SECTION */}
       <section id="início" className="relative pt-40 pb-20 lg:pt-56 lg:pb-32 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             className="relative z-10"
@@ -205,7 +205,7 @@ const Portal: React.FC = () => {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             className="relative"
@@ -213,9 +213,9 @@ const Portal: React.FC = () => {
             <div className="relative aspect-square max-w-lg mx-auto">
               <div className="absolute inset-0 bg-gradient-to-br from-[#005a1a] to-[#002776] rounded-3xl rotate-6 opacity-10" />
               <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl overflow-hidden -rotate-3 border-4 border-white">
-                <img 
-                  src="/fotos-diego/diego-1.jpeg" 
-                  alt="Diego Castro" 
+                <img
+                  src="/fotos-diego/diego-1.jpeg"
+                  alt="Diego Castro"
                   className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                   referrerPolicy="no-referrer"
                 />
@@ -278,14 +278,14 @@ const Portal: React.FC = () => {
               </div>
             </div>
             <div className="order-1 lg:order-2 relative">
-              <img 
-                src="/fotos-diego/diego-2.jpeg" 
+              <img
+                src="/fotos-diego/diego-2.jpeg"
                 className="rounded-3xl shadow-2xl"
                 alt="Trajetória"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-brazil-green/10 rounded-full blur-3xl" />
-              
+
               {/* Timeline Overlay */}
               <div className="mt-12 bg-slate-50 p-8 rounded-3xl border border-slate-200">
                 <h4 className="text-[#002776] font-black text-xl mb-6 uppercase tracking-tight">TRAJETÓRIA</h4>
@@ -415,8 +415,8 @@ const Portal: React.FC = () => {
       {/* SEGURANÇA PÚBLICA - DESTAQUE */}
       <section id="segurança" className="relative py-24 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-[#002776] z-0">
-          <img 
-            src="/fotos-diego/diego-3.jpeg" 
+          <img
+            src="/fotos-diego/diego-3.jpeg"
             className="w-full h-full object-cover opacity-20 mix-blend-overlay"
             alt="Segurança"
             referrerPolicy="no-referrer"
@@ -455,8 +455,8 @@ const Portal: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
-              <img 
-                src="/fotos-diego/diego-4.jpeg" 
+              <img
+                src="/fotos-diego/diego-4.jpeg"
                 className="rounded-3xl shadow-2xl"
                 alt="Família e Fé"
                 referrerPolicy="no-referrer"
@@ -536,8 +536,8 @@ const Portal: React.FC = () => {
               </div>
             </div>
             <div className="order-1 lg:order-2 relative">
-              <img 
-                src="/fotos-diego/diego-5.jpeg" 
+              <img
+                src="/fotos-diego/diego-5.jpeg"
                 className="rounded-3xl shadow-2xl"
                 alt="Agronegócio"
                 referrerPolicy="no-referrer"
@@ -550,8 +550,8 @@ const Portal: React.FC = () => {
       {/* DIEGO E BOLSONARO */}
       <section id="bolsonaro" className="py-24 px-6 bg-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 w-full h-full opacity-10 pointer-events-none">
-          <img 
-            src="/fotos-diego/bolsonaro.jpg" 
+          <img
+            src="/fotos-diego/bolsonaro.jpg"
             className="w-full h-full object-cover"
             alt="Bolsonaro"
             referrerPolicy="no-referrer"
@@ -590,7 +590,7 @@ const Portal: React.FC = () => {
             <ImpactText text="DIEGO PELA BAHIA" color="blue" className="text-4xl lg:text-6xl mb-4" />
             <p className="text-slate-500 font-medium">Presença constante em todas as regiões do nosso estado</p>
           </div>
-          
+
           <div className="grid lg:grid-cols-3 gap-12 items-center">
             <div className="space-y-8">
               <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100">
@@ -612,10 +612,10 @@ const Portal: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="lg:col-span-2 relative aspect-[4/3] bg-slate-100 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl">
-              <img 
-                src="/fotos-diego/diego-6.jpeg" 
+              <img
+                src="/fotos-diego/diego-6.jpeg"
                 className="w-full h-full object-cover opacity-80"
                 alt="Mapa Bahia"
                 referrerPolicy="no-referrer"
@@ -665,9 +665,9 @@ const Portal: React.FC = () => {
             {videos.length > 0 ? videos.map((video) => (
               <div key={video.id} className="group cursor-pointer">
                 <div className="relative aspect-video rounded-2xl overflow-hidden mb-4">
-                  <img 
-                    src={video.thumbnail} 
-                    alt={video.title} 
+                  <img
+                    src={video.thumbnail}
+                    alt={video.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                   />
@@ -846,9 +846,9 @@ const Portal: React.FC = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <div className="space-y-6">
               <div className="flex items-center">
-                <img 
-                  src="/logo diego castro.png" 
-                  alt="Diego Castro" 
+                <img
+                  src="/logo diego castro.png"
+                  alt="Diego Castro"
                   className="h-24 w-auto"
                   referrerPolicy="no-referrer"
                 />
@@ -894,7 +894,7 @@ const Portal: React.FC = () => {
           </div>
 
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">
-            <span>© 2024 Diego Castro. Todos os direitos reservados.</span>
+            <span>© 2026 Diego Castro. Todos os direitos reservados.</span>
             <div className="flex gap-8">
               <Link to="/admin" className="hover:text-white transition-colors">Painel Admin</Link>
               <a href="#" className="hover:text-white transition-colors">Privacidade</a>
