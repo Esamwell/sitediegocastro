@@ -63,33 +63,15 @@ const App: React.FC = () => {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="relative flex items-center">
-              <div className="flex flex-col items-start">
-                <span className="text-[8px] font-black text-[#ffdf00] leading-none ml-1 mb-0.5 uppercase">Doutor</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-heading font-black text-[#005a1a] leading-none tracking-tighter text-2xl">Diego</span>
-                  <div className="relative w-8 h-8 flex items-center justify-center">
-                    <Heart className="text-[#ffdf00] fill-[#ffdf00]" size={32} />
-                    <div className="absolute inset-0 flex items-center justify-center p-1.5">
-                      <div className="w-full h-full rounded-full overflow-hidden border border-white/20 bg-white flex flex-col">
-                        <div className="h-1/3 bg-[#002776] relative">
-                          <div className="absolute left-1 top-0.5 w-2 h-2 bg-white flex items-center justify-center">
-                            <div className="w-1 h-1 bg-[#002776] rotate-45" />
-                          </div>
-                        </div>
-                        <div className="h-1/3 bg-white" />
-                        <div className="h-1/3 bg-[#cc0000]" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-heading font-black text-[#005a1a] leading-none tracking-tighter text-2xl">Castro</span>
-                    <span className="text-[7px] font-bold text-[#005a1a] tracking-[0.3em] uppercase mt-1">Deputado Estadual</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center">
+            <button onClick={() => scrollToSection('início')} className="hover:opacity-80 transition-opacity">
+              <img 
+                src="/logo diego castro verde.png" 
+                alt="Diego Castro" 
+                className="h-12 w-auto"
+                referrerPolicy="no-referrer"
+              />
+            </button>
           </div>
 
           <div className="hidden lg:flex items-center gap-8">
@@ -126,7 +108,14 @@ const App: React.FC = () => {
             className="fixed inset-0 z-[60] bg-white p-8 flex flex-col"
           >
             <div className="flex justify-between items-center mb-12">
-              <div className="w-10 h-10 bg-[#002776] rounded-lg flex items-center justify-center text-white font-black text-xl">DC</div>
+              <div className="flex items-center">
+                <img 
+                  src="/logo diego castro verde.png" 
+                  alt="Diego Castro" 
+                  className="h-10 w-auto"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
               <button onClick={() => setMobileMenuOpen(false)} className="text-slate-900">
                 <X size={32} />
               </button>
@@ -482,29 +471,13 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <div className="space-y-6">
-              <div className="flex flex-col items-start">
-                <span className="text-[8px] font-black text-[#ffdf00] leading-none ml-1 mb-0.5 uppercase">Doutor</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-heading font-black text-[#005a1a] leading-none tracking-tighter text-2xl">Diego</span>
-                  <div className="relative w-8 h-8 flex items-center justify-center">
-                    <Heart className="text-[#ffdf00] fill-[#ffdf00]" size={32} />
-                    <div className="absolute inset-0 flex items-center justify-center p-1.5">
-                      <div className="w-full h-full rounded-full overflow-hidden border border-white/20 bg-white flex flex-col">
-                        <div className="h-1/3 bg-[#002776] relative">
-                          <div className="absolute left-1 top-0.5 w-2 h-2 bg-white flex items-center justify-center">
-                            <div className="w-1 h-1 bg-[#002776] rotate-45" />
-                          </div>
-                        </div>
-                        <div className="h-1/3 bg-white" />
-                        <div className="h-1/3 bg-[#cc0000]" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-heading font-black text-[#005a1a] leading-none tracking-tighter text-2xl">Castro</span>
-                    <span className="text-[7px] font-bold text-[#005a1a] tracking-[0.3em] uppercase mt-1">Deputado Estadual</span>
-                  </div>
-                </div>
+              <div className="flex items-center">
+                <img 
+                  src="/logo diego castro.png" 
+                  alt="Diego Castro" 
+                  className="h-14 w-auto"
+                  referrerPolicy="no-referrer"
+                />
               </div>
               <p className="text-white/50 text-sm leading-relaxed">
                 Um mandato a serviço da Bahia, pautado na ética, na transparência e na defesa intransigente dos valores conservadores.
