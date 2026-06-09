@@ -19,6 +19,7 @@ import ImpactText from './components/ImpactText';
 import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
 import Admin from './src/Admin';
+import HistoriaPage from './components/HistoriaPage';
 import { Project, News, Video, SecuritySegment } from './types';
 
 // Mock Data
@@ -28,6 +29,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/historia" element={<HistoriaPage />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/seguranca/:id" element={<SecuritySegmentPage />} />
       </Routes>
@@ -289,6 +291,12 @@ const Home: React.FC = () => {
                     </div>
                   ))}
                 </div>
+                <Link
+                  to="/historia"
+                  className="inline-flex items-center gap-2 bg-[#002776] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#001a4d] transition-all shadow-xl shadow-blue-200 mt-8"
+                >
+                  Conheça minha história <ArrowRight size={20} />
+                </Link>
               </div>
             </div>
             <div className="order-1 lg:order-2 relative">
