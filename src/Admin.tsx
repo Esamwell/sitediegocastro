@@ -173,11 +173,49 @@ const Admin: React.FC = () => {
     
     let finalData = { ...formData };
     
-    if (activeTab === 'videos' && finalData.url && !finalData.thumbnail) {
-      const videoId = extractYoutubeId(finalData.url);
-      if (videoId) {
-        finalData.thumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    // Filtrar apenas os campos válidos para cada tabela
+    if (activeTab === 'news') {
+      finalData = {
+        title: finalData.title,
+        date: finalData.date,
+        category: finalData.category,
+        image: finalData.image,
+        excerpt: finalData.excerpt,
+        full_content: finalData.full_content,
+      };
+    } else if (activeTab === 'videos') {
+      finalData = {
+        title: finalData.title,
+        url: finalData.url,
+        thumbnail: finalData.thumbnail,
+        category: finalData.category,
+      };
+      if (finalData.url && !finalData.thumbnail) {
+        const videoId = extractYoutubeId(finalData.url);
+        if (videoId) {
+          finalData.thumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+        }
       }
+    } else if (activeTab === 'projects') {
+      finalData = {
+        title: finalData.title,
+        category: finalData.category,
+        year: finalData.year,
+        status: finalData.status,
+        summary: finalData.summary,
+      };
+    } else if (activeTab === 'segments') {
+      finalData = {
+        name: finalData.name,
+        description: finalData.description,
+        full_content: finalData.full_content,
+        image: finalData.image,
+      };
+    } else if (activeTab === 'links') {
+      finalData = {
+        key: finalData.key,
+        url: finalData.url,
+      };
     }
 
     try {
