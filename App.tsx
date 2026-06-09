@@ -109,7 +109,12 @@ const Home: React.FC = () => {
     }
   };
 
-  const getDriveLink = (key: string, defaultUrl: string = '#') => driveLinks[key] || defaultUrl;
+  const defaultDriveLinks: Record<string, string> = {
+    artes: 'https://drive.google.com/drive/folders/1e7G0uY712o1cZkH1TZ1E7MC0rxRJ44wQ?usp=sharing',
+    informativos: 'https://drive.google.com/drive/folders/192oDLOEbIsaUQlnxAtDDM2YFBufW7MG2?usp=drive_link',
+    panfletos: 'https://drive.google.com/drive/folders/1BN7G53mMWVYPI310Cqn7NgvwJ4PL2G8C?usp=drive_link',
+  };
+  const getDriveLink = (key: string, defaultUrl: string = '#') => driveLinks[key] || defaultDriveLinks[key] || defaultUrl;
 
   const extractYoutubeId = (url: string) => {
     const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
@@ -771,16 +776,6 @@ const Home: React.FC = () => {
                   <p className="text-white/80 mb-8 leading-relaxed">
                     Biblioteca digital do mandato. Acesse relatórios de atividades, discursos na íntegra e documentos legislativos importantes.
                   </p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-white/10 rounded-2xl border border-white/20">
-                      <div className="font-black text-2xl mb-1">500+</div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">Documentos</div>
-                    </div>
-                    <div className="p-4 bg-white/10 rounded-2xl border border-white/20">
-                      <div className="font-black text-2xl mb-1">120+</div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">Discursos</div>
-                    </div>
-                  </div>
                   <a href={getDriveLink('biblioteca')} target="_blank" rel="noopener noreferrer" className="mt-8 block text-center w-full bg-[#ffdf00] text-[#002776] py-4 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-white transition-all">
                     Acessar Biblioteca
                   </a>
