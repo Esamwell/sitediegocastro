@@ -46,6 +46,7 @@ const Home: React.FC = () => {
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
   const [selectedNews, setSelectedNews] = useState<News | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [driveLinks, setDriveLinks] = useState<Record<string, string>>({});
 
   const { scrollYProgress } = useScroll();
@@ -108,6 +109,12 @@ const Home: React.FC = () => {
   };
 
   const getDriveLink = (key: string, defaultUrl: string = '#') => driveLinks[key] || defaultUrl;
+
+  const extractYoutubeId = (url: string) => {
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const match = url?.match(regExp);
+    return (match && match[7].length === 11) ? match[7] : null;
+  };
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
@@ -703,7 +710,7 @@ const Home: React.FC = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {videos.length > 0 ? videos.map((video) => (
-              <div key={video.id} className="group cursor-pointer">
+              <div key={video.id} className="group cursor-pointer" onClick={() => setSelectedVideo(video)}>
                 <div className="relative aspect-video rounded-2xl overflow-hidden mb-4">
                   <img
                     src={video.thumbnail}
@@ -1087,6 +1094,41 @@ const Home: React.FC = () => {
                   <ArrowLeft size={18} /> Voltar
                 </button>
               </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Video Modal */}
+      {selectedVideo && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-[2rem] max-w-4xl w-full shadow-2xl relative overflow-hidden"
+          >
+            <button
+              onClick={() => setSelectedVideo(null)}
+              className="absolute top-4 right-4 z-10 bg-black/50 backdrop-blur-sm p-3 rounded-full text-white hover:bg-black/70 transition-colors"
+            >
+              <X size={24} />
+            </button>
+
+            <div className="aspect-video w-full">
+              <iframe
+                src={`https://www.youtube.com/embed/${extractYoutubeId(selectedVideo.url)}`}
+                title={selectedVideo.title}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-[#002776]">{selectedVideo.title}</h3>
+              {selectedVideo.category && (
+                <span className="text-sm text-slate-400 font-medium">{selectedVideo.category}</span>
+              )}
             </div>
           </motion.div>
         </div>
