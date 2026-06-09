@@ -350,7 +350,7 @@ const Home: React.FC = () => {
                 Recordista de Projetos de Lei na Assembleia Legislativa da Bahia. Atuamos com transparência e coragem em defesa dos interesses do povo baiano.
               </p>
             </div>
-            <button 
+            <button
               onClick={() => setIsProjectsModalOpen(true)}
               className="flex items-center gap-2 text-[#002776] font-bold hover:gap-4 transition-all"
             >
@@ -805,7 +805,7 @@ const Home: React.FC = () => {
             {[
               { icon: <FileText />, label: 'Panfletos', key: 'panfletos' },
               { icon: <Download />, label: 'Artes Sociais', key: 'artes' },
-              { icon: <Play />, label: 'Vídeos Curtos', key: 'videos_curtos' },
+              { icon: <Play />, label: 'Denúncias', key: 'videos_curtos' },
               { icon: <Newspaper />, label: 'Informativos', key: 'informativos' },
             ].map((item, i) => (
               <a key={i} href={getDriveLink(item.key)} target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 border border-white/30 p-8 rounded-2xl flex flex-col items-center gap-4 transition-all group">
@@ -1155,10 +1155,9 @@ const Home: React.FC = () => {
                 <span className="px-4 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">
                   {selectedProject.category}
                 </span>
-                <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                  selectedProject.status === 'Aprovado' ? 'bg-emerald-100 text-emerald-700' : 
-                  selectedProject.status === 'Arquivado' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'
-                }`}>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full ${selectedProject.status === 'Aprovado' ? 'bg-emerald-100 text-emerald-700' :
+                    selectedProject.status === 'Arquivado' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'
+                  }`}>
                   {selectedProject.status}
                 </span>
                 <span className="text-slate-400 text-sm font-medium">Ano: {selectedProject.year}</span>
