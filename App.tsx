@@ -802,11 +802,12 @@ const Home: React.FC = () => {
             <div className="space-y-6">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-[#002776]">
-                  <Phone size={24} />
+                  <MapPin size={24} />
                 </div>
                 <div>
-                  <div className="text-sm text-slate-400 font-bold uppercase">Telefone</div>
-                  <a href="tel:+5571999832548" className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">+55 71 99983-2548</a>
+                  <div className="text-sm text-slate-400 font-bold uppercase">Endereço</div>
+                  <div className="text-sm font-bold text-slate-900">Prédio Anexo, Gabinete 102, Wilson Lins</div>
+                  <div className="text-sm text-slate-500">Assembleia Legislativa da Bahia (CAB)</div>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -815,7 +816,18 @@ const Home: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-sm text-slate-400 font-bold uppercase">E-mail</div>
-                  <div className="text-lg font-bold text-slate-900">contato@diegocastro.com.br</div>
+                  <a href="mailto:dep.drdiegocastro@alba.ba.gov.br" className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">dep.drdiegocastro@alba.ba.gov.br</a>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-[#002776]">
+                  <Phone size={24} />
+                </div>
+                <div>
+                  <div className="text-sm text-slate-400 font-bold uppercase">Telefones</div>
+                  <a href="tel:+557131157253" className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">71 3115-7253</a>
+                  <span className="text-slate-400 mx-2">/</span>
+                  <a href="tel:+5571999832548" className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">71 9 9983-2548</a>
                 </div>
               </div>
               <div className="flex items-center gap-4">
