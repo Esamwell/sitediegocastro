@@ -9,7 +9,7 @@ import {
 const Admin: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'news' | 'videos' | 'links' | 'segments'>('news');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'news' | 'videos' | 'links' | 'segments' | 'projects'>('dashboard');
   
   // Auth States
   const [authEmail, setAuthEmail] = useState('');
@@ -369,6 +369,7 @@ const Admin: React.FC = () => {
 
         <nav className="flex-1 px-3 space-y-1 relative z-10">
           {[
+            { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
             { id: 'news', label: 'Notícias', icon: <Newspaper size={18} /> },
             { id: 'videos', label: 'Vídeos', icon: <Video size={18} /> },
             { id: 'projects', label: 'Projetos', icon: <LayoutDashboard size={18} /> },
@@ -402,7 +403,7 @@ const Admin: React.FC = () => {
         <header className="bg-white border-b border-slate-200 px-8 py-5 flex justify-between items-center sticky top-0 z-30">
           <div>
             <h1 className="text-xl font-black text-[#002776] uppercase tracking-tight">
-              {activeTab === 'news' ? 'Notícias' : activeTab === 'videos' ? 'Vídeos' : activeTab === 'projects' ? 'Projetos' : activeTab === 'segments' ? 'Segmentações' : 'Drive Links'}
+              {activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'news' ? 'Notícias' : activeTab === 'videos' ? 'Vídeos' : activeTab === 'projects' ? 'Projetos' : activeTab === 'segments' ? 'Segmentações' : 'Drive Links'}
             </h1>
             <p className="text-slate-400 text-xs font-medium mt-0.5">Gerenciar conteúdo do portal</p>
           </div>
@@ -415,64 +416,143 @@ const Admin: React.FC = () => {
         </header>
 
         <div className="p-8">
-          {/* Stats Row */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-            <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                  <Newspaper size={20} className="text-blue-500" />
+          {/* Dashboard View */}
+          {activeTab === 'dashboard' && (
+            <>
+              <div className="mb-8">
+                <h2 className="text-2xl font-black text-[#002776] uppercase tracking-tight">Visão Geral</h2>
+                <p className="text-slate-400 text-sm font-medium mt-1">Todos os contadores do portal</p>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+                <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                      <Newspaper size={20} className="text-blue-500" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-black text-[#002776]">{news.length}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Notícias</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-black text-[#002776]">{news.length}</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Notícias</p>
+                <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
+                      <Video size={20} className="text-red-500" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-black text-[#002776]">{videos.length}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vídeos</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
+                      <LayoutDashboard size={20} className="text-emerald-500" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-black text-[#002776]">{projects.length}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Projetos</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center">
+                      <Shield size={20} className="text-violet-500" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-black text-[#002776]">{segments.length}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Segmentos</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
+                      <LinkIcon size={20} className="text-amber-500" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-black text-[#002776]">{links.length}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Drive Links</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
-                  <Video size={20} className="text-red-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-black text-[#002776]">{videos.length}</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vídeos</p>
-                </div>
+            </>
+          )}
+
+          {/* Individual Page Counters */}
+          {activeTab === 'news' && (
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                <Newspaper size={24} className="text-blue-500" />
+              </div>
+              <div>
+                <p className="text-3xl font-black text-[#002776]">{news.length}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  {news.length === 1 ? 'notícia cadastrada' : 'notícias cadastradas'}
+                </p>
               </div>
             </div>
-            <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
-                  <LayoutDashboard size={20} className="text-emerald-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-black text-[#002776]">{projects.length}</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Projetos</p>
-                </div>
+          )}
+
+          {activeTab === 'videos' && (
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+                <Video size={24} className="text-red-500" />
+              </div>
+              <div>
+                <p className="text-3xl font-black text-[#002776]">{videos.length}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  {videos.length === 1 ? 'vídeo cadastrado' : 'vídeos cadastrados'}
+                </p>
               </div>
             </div>
-            <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center">
-                  <Shield size={20} className="text-violet-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-black text-[#002776]">{segments.length}</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Segmentos</p>
-                </div>
+          )}
+
+          {activeTab === 'projects' && (
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                <LayoutDashboard size={24} className="text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-3xl font-black text-[#002776]">{projects.length}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  {projects.length === 1 ? 'projeto cadastrado' : 'projetos cadastrados'}
+                </p>
               </div>
             </div>
-            <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
-                  <LinkIcon size={20} className="text-amber-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-black text-[#002776]">{links.length}</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Drive Links</p>
-                </div>
+          )}
+
+          {activeTab === 'segments' && (
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center">
+                <Shield size={24} className="text-violet-500" />
+              </div>
+              <div>
+                <p className="text-3xl font-black text-[#002776]">{segments.length}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  {segments.length === 1 ? 'segmentação cadastrada' : 'segmentações cadastradas'}
+                </p>
               </div>
             </div>
-          </div>
+          )}
+
+          {activeTab === 'links' && (
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+                <LinkIcon size={24} className="text-amber-500" />
+              </div>
+              <div>
+                <p className="text-3xl font-black text-[#002776]">{links.length}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  {links.length === 1 ? 'link cadastrado' : 'links cadastrados'}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Form Modal */}
           {isEditing && (
@@ -734,7 +814,8 @@ const Admin: React.FC = () => {
             </div>
           )}
 
-          {/* Content Card */}
+          {/* Content Card - Only show when not on Dashboard */}
+          {activeTab !== 'dashboard' && (
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             {/* List View */}
             {activeTab === 'news' && news.map(item => (
@@ -813,6 +894,7 @@ const Admin: React.FC = () => {
               </div>
             ))}
           </div>
+          )}
         </div>
       </main>
     </div>
