@@ -369,11 +369,11 @@ const Admin: React.FC = () => {
 
         <nav className="flex-1 px-3 space-y-1 relative z-10">
           {[
-            { id: 'news', label: 'Notícias', icon: <Newspaper size={18} />, count: news.length },
-            { id: 'videos', label: 'Vídeos', icon: <Video size={18} />, count: videos.length },
-            { id: 'projects', label: 'Projetos', icon: <LayoutDashboard size={18} />, count: projects.length },
-            { id: 'segments', label: 'Segurança', icon: <Shield size={18} />, count: segments.length },
-            { id: 'links', label: 'Drive Links', icon: <LinkIcon size={18} />, count: links.length },
+            { id: 'news', label: 'Notícias', icon: <Newspaper size={18} /> },
+            { id: 'videos', label: 'Vídeos', icon: <Video size={18} /> },
+            { id: 'projects', label: 'Projetos', icon: <LayoutDashboard size={18} /> },
+            { id: 'segments', label: 'Segmentações', icon: <Shield size={18} /> },
+            { id: 'links', label: 'Drive Links', icon: <LinkIcon size={18} /> },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -382,9 +382,6 @@ const Admin: React.FC = () => {
             >
               {tab.icon}
               <span className="flex-1 text-left">{tab.label}</span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${activeTab === tab.id ? 'bg-[#002776] text-white' : 'bg-white/10 text-white/40'}`}>
-                {tab.count}
-              </span>
             </button>
           ))}
         </nav>
@@ -405,7 +402,7 @@ const Admin: React.FC = () => {
         <header className="bg-white border-b border-slate-200 px-8 py-5 flex justify-between items-center sticky top-0 z-30">
           <div>
             <h1 className="text-xl font-black text-[#002776] uppercase tracking-tight">
-              {activeTab === 'news' ? 'Notícias' : activeTab === 'videos' ? 'Vídeos' : activeTab === 'projects' ? 'Projetos' : activeTab === 'segments' ? 'Segurança' : 'Drive Links'}
+              {activeTab === 'news' ? 'Notícias' : activeTab === 'videos' ? 'Vídeos' : activeTab === 'projects' ? 'Projetos' : activeTab === 'segments' ? 'Segmentações' : 'Drive Links'}
             </h1>
             <p className="text-slate-400 text-xs font-medium mt-0.5">Gerenciar conteúdo do portal</p>
           </div>
