@@ -54,6 +54,10 @@ const Home: React.FC = () => {
   const opacity = useScroll(); // Placeholder for scroll logic if needed
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       // News
       const { data: newsData } = await supabase.from('news').select('*').order('created_at', { ascending: false });

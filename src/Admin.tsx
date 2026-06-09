@@ -416,7 +416,7 @@ const Admin: React.FC = () => {
 
         <div className="p-8">
           {/* Stats Row */}
-          <div className="grid grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
@@ -458,6 +458,17 @@ const Admin: React.FC = () => {
                 <div>
                   <p className="text-2xl font-black text-[#002776]">{segments.length}</p>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Segmentos</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
+                  <LinkIcon size={20} className="text-amber-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-[#002776]">{links.length}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Drive Links</p>
                 </div>
               </div>
             </div>
