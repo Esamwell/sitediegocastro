@@ -219,11 +219,44 @@ const Admin: React.FC = () => {
     }
 
     try {
-      const { error } = isEditing && isEditing !== 'new'
-        ? await supabase.from(tableName).update(finalData).eq('id', isEditing)
-        : await supabase.from(tableName).insert([finalData]);
-
-      if (error) throw error;
+      let result;
+      
+      if (isEditing && isEditing !== 'new') {
+        result = await supabase.from(tableName).update(finalData).eq('id', isEditing);
+        if (result.error) throw result.error;
+        
+        // Atualizar estado local (edição)
+        if (tableName === 'news') {
+          setNews(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
+        } else if (tableName === 'videos') {
+          setVideos(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
+        } else if (tableName === 'projects') {
+          setProjects(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
+        } else if (tableName === 'security_segments') {
+          setSegments(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
+        } else if (tableName === 'drive_links') {
+          setLinks(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
+        }
+      } else {
+        result = await supabase.from(tableName).insert([finalData]).select();
+        if (result.error) throw result.error;
+        
+        // Atualizar estado local (novo item)
+        const newItem = result.data?.[0];
+        if (newItem) {
+          if (tableName === 'news') {
+            setNews(prev => [newItem, ...prev]);
+          } else if (tableName === 'videos') {
+            setVideos(prev => [newItem, ...prev]);
+          } else if (tableName === 'projects') {
+            setProjects(prev => [newItem, ...prev]);
+          } else if (tableName === 'security_segments') {
+            setSegments(prev => [newItem, ...prev]);
+          } else if (tableName === 'drive_links') {
+            setLinks(prev => [...prev, newItem]);
+          }
+        }
+      }
 
       setIsEditing(null);
       setFormData({});
@@ -239,7 +272,21 @@ const Admin: React.FC = () => {
     const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : 'drive_links';
     if (window.confirm("Tem certeza que deseja excluir?")) {
       try {
-        await supabase.from(tableName).delete().eq('id', id);
+        const { error } = await supabase.from(tableName).delete().eq('id', id);
+        if (error) throw error;
+        
+        // Atualizar estado local
+        if (tableName === 'news') {
+          setNews(prev => prev.filter(item => item.id !== id));
+        } else if (tableName === 'videos') {
+          setVideos(prev => prev.filter(item => item.id !== id));
+        } else if (tableName === 'projects') {
+          setProjects(prev => prev.filter(item => item.id !== id));
+        } else if (tableName === 'security_segments') {
+          setSegments(prev => prev.filter(item => item.id !== id));
+        } else if (tableName === 'drive_links') {
+          setLinks(prev => prev.filter(item => item.id !== id));
+        }
       } catch (error) {
         console.error("Error deleting document", error);
       }
