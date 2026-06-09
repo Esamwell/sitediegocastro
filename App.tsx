@@ -1074,16 +1074,9 @@ const Home: React.FC = () => {
               </h2>
 
               <div className="prose prose-lg prose-slate max-w-none">
-                {selectedNews.full_content ? (
-                  <div className="text-slate-600 leading-relaxed whitespace-pre-line">
-                    {selectedNews.full_content}
-                  </div>
-                ) : (
-                  <div className="text-slate-600 leading-relaxed">
-                    <p className="text-lg mb-4">{selectedNews.excerpt}</p>
-                    <p className="text-slate-400 italic">Conteúdo completo não disponível.</p>
-                  </div>
-                )}
+                <div className="text-slate-600 leading-relaxed whitespace-pre-line">
+                  {selectedNews.full_content || selectedNews.excerpt}
+                </div>
               </div>
 
               <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap gap-4">
