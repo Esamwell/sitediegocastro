@@ -7,9 +7,10 @@ interface CardProps {
   item: Project | News;
   type: 'project' | 'news';
   onNewsClick?: (news: News) => void;
+  onProjectClick?: (project: Project) => void;
 }
 
-const MandateCard: React.FC<CardProps> = ({ item, type, onNewsClick }) => {
+const MandateCard: React.FC<CardProps> = ({ item, type, onNewsClick, onProjectClick }) => {
   if (type === 'project') {
     const project = item as Project;
     return (
@@ -38,7 +39,10 @@ const MandateCard: React.FC<CardProps> = ({ item, type, onNewsClick }) => {
         </div>
         <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
           <span className="text-xs text-slate-400 font-medium">Ano: {project.year}</span>
-          <button className="text-[#002776] font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
+          <button 
+            onClick={() => onProjectClick?.(project)}
+            className="text-[#002776] font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all"
+          >
             Ver detalhes <ArrowRight size={14} />
           </button>
         </div>

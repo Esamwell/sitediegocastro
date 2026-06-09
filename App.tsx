@@ -47,6 +47,7 @@ const Home: React.FC = () => {
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
   const [selectedNews, setSelectedNews] = useState<News | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [driveLinks, setDriveLinks] = useState<Record<string, string>>({});
 
   const { scrollYProgress } = useScroll();
@@ -359,7 +360,7 @@ const Home: React.FC = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {projects.slice(0, 4).map((project) => (
-              <MandateCard key={project.id} item={project} type="project" />
+              <MandateCard key={project.id} item={project} type="project" onProjectClick={setSelectedProject} />
             ))}
             {projects.length === 0 && (
               <div className="col-span-full text-center py-12 text-slate-400 font-medium">Nenhum projeto cadastrado.</div>
@@ -1029,7 +1030,7 @@ const Home: React.FC = () => {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {projects.length > 0 ? projects.map((project) => (
-                <MandateCard key={project.id} item={project} type="project" />
+                <MandateCard key={project.id} item={project} type="project" onProjectClick={(p) => { setSelectedProject(p); setIsProjectsModalOpen(false); }} />
               )) : (
                 <p className="col-span-full py-20 text-center text-slate-400 italic">Nenhum projeto encontrado.</p>
               )}
@@ -1129,6 +1130,58 @@ const Home: React.FC = () => {
               {selectedVideo.category && (
                 <span className="text-sm text-slate-400 font-medium">{selectedVideo.category}</span>
               )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Project Detail Modal */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#002776]/80 backdrop-blur-xl">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-[2.5rem] max-w-2xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
+          >
+            <button
+              onClick={() => setSelectedProject(null)}
+              className="absolute top-6 right-6 z-10 bg-slate-100 p-3 rounded-full text-slate-400 hover:text-[#002776] hover:bg-slate-200 transition-colors"
+            >
+              <X size={24} />
+            </button>
+
+            <div className="p-8 lg:p-12">
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <span className="px-4 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">
+                  {selectedProject.category}
+                </span>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                  selectedProject.status === 'Aprovado' ? 'bg-emerald-100 text-emerald-700' : 
+                  selectedProject.status === 'Arquivado' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'
+                }`}>
+                  {selectedProject.status}
+                </span>
+                <span className="text-slate-400 text-sm font-medium">Ano: {selectedProject.year}</span>
+              </div>
+
+              <h2 className="text-2xl lg:text-3xl font-black text-[#002776] mb-6 leading-tight">
+                {selectedProject.title}
+              </h2>
+
+              <div className="prose prose-lg prose-slate max-w-none">
+                <div className="text-slate-600 leading-relaxed whitespace-pre-line text-lg">
+                  {selectedProject.summary}
+                </div>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-slate-100">
+                <button
+                  onClick={() => setSelectedProject(null)}
+                  className="flex items-center gap-2 text-[#002776] font-bold hover:gap-3 transition-all"
+                >
+                  <ArrowLeft size={18} /> Voltar
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>
