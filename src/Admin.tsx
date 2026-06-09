@@ -169,7 +169,7 @@ const Admin: React.FC = () => {
     if (isSaving) return;
     setIsSaving(true);
 
-    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : 'drive_links';
+    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : 'drive_links';
     
     let finalData = { ...formData };
     
@@ -362,6 +362,14 @@ const Admin: React.FC = () => {
                       </div>
                       {formData.image && <img src={formData.image} className="h-20 rounded-xl border" alt="Preview" />}
                     </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase">Conteúdo Completo (opcional)</label>
+                      <textarea 
+                        placeholder="Texto completo da notícia (aparece ao clicar em 'Ler mais')" rows={6}
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                        value={formData.full_content || ''} onChange={e => setFormData({...formData, full_content: e.target.value})}
+                      />
+                    </div>
                   </>
                 )}
 
@@ -470,6 +478,24 @@ const Admin: React.FC = () => {
                   </>
                 )}
 
+                {activeTab === 'links' && (
+                  <>
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 mb-4">
+                      <p className="text-sm text-slate-500">Chaves disponíveis: <strong>releases</strong>, <strong>fotos_alta</strong>, <strong>biografia</strong>, <strong>biblioteca</strong>, <strong>panfletos</strong>, <strong>artes</strong>, <strong>videos_curtos</strong>, <strong>informativos</strong></p>
+                    </div>
+                    <input 
+                      type="text" placeholder="Chave (ex: releases)" required
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                      value={formData.key || ''} onChange={e => setFormData({...formData, key: e.target.value})}
+                    />
+                    <input 
+                      type="url" placeholder="URL do Google Drive" required
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl"
+                      value={formData.url || ''} onChange={e => setFormData({...formData, url: e.target.value})}
+                    />
+                  </>
+                )}
+
                 <button 
                   type="submit" 
                   disabled={isSaving}
@@ -549,7 +575,7 @@ const Admin: React.FC = () => {
             <div key={item.id} className="bg-white p-6 rounded-3xl border border-slate-200 flex items-center gap-6 group hover:shadow-lg transition-all">
               <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><LinkIcon size={24} /></div>
               <div className="flex-1">
-                <h4 className="text-xl font-bold text-[#002776]">{item.label}</h4>
+                <h4 className="text-xl font-bold text-[#002776]">{item.key}</h4>
                 <div className="text-xs text-slate-400 font-medium truncate max-w-xs">{item.url}</div>
               </div>
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

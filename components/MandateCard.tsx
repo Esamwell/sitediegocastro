@@ -6,9 +6,10 @@ import { ArrowRight, Calendar } from 'lucide-react';
 interface CardProps {
   item: Project | News;
   type: 'project' | 'news';
+  onNewsClick?: (news: News) => void;
 }
 
-const MandateCard: React.FC<CardProps> = ({ item, type }) => {
+const MandateCard: React.FC<CardProps> = ({ item, type, onNewsClick }) => {
   if (type === 'project') {
     const project = item as Project;
     return (
@@ -77,7 +78,10 @@ const MandateCard: React.FC<CardProps> = ({ item, type }) => {
         </p>
       </div>
       <div className="p-4 border-t border-slate-50">
-        <button className="text-[#005a1a] font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
+        <button 
+          onClick={() => onNewsClick?.(news)}
+          className="text-[#005a1a] font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all"
+        >
           Ler mais <ArrowRight size={14} />
         </button>
       </div>

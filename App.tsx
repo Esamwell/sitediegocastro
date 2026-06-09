@@ -45,6 +45,7 @@ const Home: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
+  const [selectedNews, setSelectedNews] = useState<News | null>(null);
   const [driveLinks, setDriveLinks] = useState<Record<string, string>>({});
 
   const { scrollYProgress } = useScroll();
@@ -661,14 +662,31 @@ const Home: React.FC = () => {
       {/* NOTÍCIAS */}
       <section id="notícias" className="py-24 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <ImpactText text="ÚLTIMAS NOTÍCIAS" color="blue" className="text-4xl lg:text-6xl mb-4" />
-            <p className="text-slate-500 font-medium">Acompanhe o dia a dia do deputado Diego Castro</p>
+          <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
+            <div className="text-center md:text-left">
+              <ImpactText text="ÚLTIMAS NOTÍCIAS" color="blue" className="text-4xl lg:text-6xl mb-4" />
+              <p className="text-slate-500 font-medium">Acompanhe o dia a dia do deputado Diego Castro</p>
+            </div>
+            {news.length > 3 && (
+              <button
+                onClick={() => {
+                  const el = document.getElementById('notícias');
+                  if (el) {
+                    const allNews = [...news];
+                    setNews(allNews);
+                    el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="flex items-center gap-2 text-[#002776] font-bold hover:gap-4 transition-all whitespace-nowrap"
+              >
+                Ver todas as notícias <ArrowRight size={20} />
+              </button>
+            )}
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {news.length > 0 ? news.map((item) => (
-              <MandateCard key={item.id} item={item} type="news" />
+            {news.length > 0 ? news.slice(0, 6).map((item) => (
+              <MandateCard key={item.id} item={item} type="news" onNewsClick={setSelectedNews} />
             )) : (
               <div className="col-span-3 text-center py-12 text-slate-400 font-medium">Nenhuma notícia cadastrada.</div>
             )}
@@ -1008,6 +1026,74 @@ const Home: React.FC = () => {
               )) : (
                 <p className="col-span-full py-20 text-center text-slate-400 italic">Nenhum projeto encontrado.</p>
               )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* News Detail Modal */}
+      {selectedNews && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#002776]/80 backdrop-blur-xl">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-[2.5rem] max-w-3xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
+          >
+            <button
+              onClick={() => setSelectedNews(null)}
+              className="absolute top-6 right-6 z-10 bg-white/80 backdrop-blur-sm p-3 rounded-full text-slate-400 hover:text-[#002776] transition-colors shadow-lg"
+            >
+              <X size={24} />
+            </button>
+
+            {selectedNews.image && (
+              <div className="relative h-64 lg:h-80 overflow-hidden rounded-t-[2.5rem]">
+                <img
+                  src={selectedNews.image}
+                  alt={selectedNews.title}
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <span className="px-3 py-1 bg-[#ffdf00] text-[#002776] text-xs font-bold rounded-full uppercase tracking-wider">
+                    {selectedNews.category}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="p-8 lg:p-12">
+              <div className="flex items-center gap-2 text-slate-400 text-sm mb-4">
+                <Calendar size={14} />
+                <span>{selectedNews.date}</span>
+              </div>
+
+              <h2 className="text-2xl lg:text-4xl font-black text-[#002776] mb-6 leading-tight">
+                {selectedNews.title}
+              </h2>
+
+              <div className="prose prose-lg prose-slate max-w-none">
+                {selectedNews.full_content ? (
+                  <div className="text-slate-600 leading-relaxed whitespace-pre-line">
+                    {selectedNews.full_content}
+                  </div>
+                ) : (
+                  <div className="text-slate-600 leading-relaxed">
+                    <p className="text-lg mb-4">{selectedNews.excerpt}</p>
+                    <p className="text-slate-400 italic">Conteúdo completo não disponível.</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap gap-4">
+                <button
+                  onClick={() => setSelectedNews(null)}
+                  className="flex items-center gap-2 text-[#002776] font-bold hover:gap-3 transition-all"
+                >
+                  <ArrowLeft size={18} /> Voltar
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>

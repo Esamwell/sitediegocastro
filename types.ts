@@ -19,6 +19,7 @@ export interface News {
   category: string;
   image: string;
   excerpt: string;
+  full_content?: string;
 }
 
 export interface Video {
