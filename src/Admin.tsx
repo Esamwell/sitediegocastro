@@ -3,7 +3,7 @@ import { supabase } from './supabaseClient';
 import { 
   Plus, Trash2, Edit2, Save, X, LogOut, 
   Newspaper, Video, Link as LinkIcon, ExternalLink,
-  ChevronRight, LayoutDashboard, Settings, Shield
+  ChevronRight, LayoutDashboard, Settings, Shield, Upload
 } from 'lucide-react';
 
 const Admin: React.FC = () => {
@@ -27,6 +27,9 @@ const Admin: React.FC = () => {
   // Form States
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
+  const [bulkImportData, setBulkImportData] = useState('');
+  const [bulkImportError, setBulkImportError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -293,6 +296,38 @@ const Admin: React.FC = () => {
     }
   };
 
+  const handleBulkImport = async () => {
+    setBulkImportError(null);
+    try {
+      const parsed = JSON.parse(bulkImportData);
+      if (!Array.isArray(parsed)) {
+        setBulkImportError('O dados devem ser um array JSON.');
+        return;
+      }
+
+      const projectsToImport = parsed.map((item: any) => ({
+        title: item.title || item.titulo || '',
+        category: item.category || item.categoria || '',
+        year: item.year || item.ano || new Date().getFullYear(),
+        status: item.status || 'Em Tramitação',
+        summary: item.summary || item.resumo || '',
+      }));
+
+      const { data, error } = await supabase.from('projects').insert(projectsToImport).select();
+      if (error) throw error;
+
+      if (data) {
+        setProjects(prev => [...data, ...prev]);
+      }
+
+      setIsBulkImportOpen(false);
+      setBulkImportData('');
+      alert(`${projectsToImport.length} projetos importados com sucesso!`);
+    } catch (error: any) {
+      setBulkImportError('Erro ao processar JSON: ' + (error.message || 'Formato inválido'));
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900">
@@ -513,16 +548,24 @@ const Admin: React.FC = () => {
           )}
 
           {activeTab === 'projects' && (
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                <LayoutDashboard size={24} className="text-emerald-500" />
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                  <LayoutDashboard size={24} className="text-emerald-500" />
+                </div>
+                <div>
+                  <p className="text-3xl font-black text-[#002776]">{projects.length}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    {projects.length === 1 ? 'projeto cadastrado' : 'projetos cadastrados'}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-3xl font-black text-[#002776]">{projects.length}</p>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  {projects.length === 1 ? 'projeto cadastrado' : 'projetos cadastrados'}
-                </p>
-              </div>
+              <button
+                onClick={() => setIsBulkImportOpen(true)}
+                className="flex items-center gap-2 bg-[#002776] text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-[#001a4d] transition-all"
+              >
+                <Upload size={16} /> Importar em Lote
+              </button>
             </div>
           )}
 
@@ -550,6 +593,81 @@ const Admin: React.FC = () => {
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   {links.length === 1 ? 'link cadastrado' : 'links cadastrados'}
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* Bulk Import Modal */}
+          {isBulkImportOpen && (
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+              <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl max-h-[95vh] overflow-y-auto relative">
+                {/* Modal Header */}
+                <div className="bg-gradient-to-r from-[#002776] to-[#001a52] px-8 py-6 rounded-t-2xl flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-black text-white uppercase tracking-tight">
+                      Importar Projetos em Lote
+                    </h3>
+                    <p className="text-white/40 text-xs font-medium mt-0.5">
+                      Cole o JSON com os projetos
+                    </p>
+                  </div>
+                  <button onClick={() => setIsBulkImportOpen(false)} className="text-white/40 hover:text-white transition-colors p-1">
+                    <X size={24} />
+                  </button>
+                </div>
+
+                {/* Modal Body */}
+                <div className="p-8">
+                  <div className="mb-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <p className="text-xs text-blue-600 font-medium">
+                      <strong>Formato esperado:</strong> Array de objetos com: title, category, year, status, summary
+                    </p>
+                    <pre className="mt-2 text-[10px] text-blue-500 bg-white p-2 rounded-lg overflow-x-auto">
+{`[
+  {
+    "title": "Nome do Projeto",
+    "category": "Segurança",
+    "year": 2024,
+    "status": "Em Tramitação",
+    "summary": "Resumo do projeto"
+  }
+]`}
+                    </pre>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">JSON dos Projetos</label>
+                    <textarea
+                      rows={12}
+                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all resize-none font-mono"
+                      placeholder='[{"title": "Projeto 1", "category": "Segurança", "year": 2024, "status": "Em Tramitação", "summary": "Resumo"}]'
+                      value={bulkImportData}
+                      onChange={e => setBulkImportData(e.target.value)}
+                    />
+                  </div>
+
+                  {bulkImportError && (
+                    <div className="mb-4 p-3 bg-red-50 rounded-xl border border-red-100">
+                      <p className="text-xs text-red-600 font-medium">{bulkImportError}</p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setIsBulkImportOpen(false)}
+                      className="flex-1 py-3 rounded-xl font-bold text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleBulkImport}
+                      disabled={!bulkImportData.trim()}
+                      className="flex-1 py-3 rounded-xl font-bold text-sm bg-[#002776] text-white hover:bg-[#001a4d] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      <Upload size={16} /> Importar Projetos
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
