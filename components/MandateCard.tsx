@@ -19,18 +19,19 @@ const MandateCard: React.FC<CardProps> = ({ item, type, onNewsClick, onProjectCl
         className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-100 flex flex-col h-full"
       >
         <div className="p-6 flex-grow">
-          <div className="flex justify-between items-start mb-4">
-            <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="px-3 py-1.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full uppercase tracking-wider leading-tight">
               {project.category}
             </span>
-            <span className={`text-xs font-bold px-2 py-1 rounded ${
+            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full leading-tight ${
               project.status === 'Aprovado' ? 'bg-emerald-100 text-emerald-700' : 
-              project.status === 'Arquivado' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'
+              project.status === 'Arquivado' ? 'bg-rose-100 text-rose-700' :
+              project.status === 'Selo Diego Castro' ? 'bg-blue-100 text-blue-700' : 'bg-blue-100 text-blue-700'
             }`}>
               {project.status}
             </span>
           </div>
-          <h3 className="text-xl font-bold text-[#002776] mb-3 leading-tight">
+          <h3 className="text-lg font-bold text-[#002776] mb-3 leading-tight line-clamp-3">
             {project.title}
           </h3>
           <p className="text-slate-600 text-sm line-clamp-3 mb-4">
