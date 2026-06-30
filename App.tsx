@@ -258,7 +258,7 @@ const Home: React.FC = () => {
               <div className="absolute -bottom-6 -right-6 bg-[#ffdf00] p-6 rounded-2xl shadow-xl border-4 border-white rotate-6">
                 <div className="text-center">
                   <div className="text-3xl font-black text-[#002776]">100%</div>
-                  <div className="text-[10px] font-bold text-[#002776] uppercase tracking-tighter">Fiel aos Valores</div>
+                  <div className="text-[10px] font-bold text-[#002776] uppercase tracking-tighter">Pelo Povo Baiano</div>
                 </div>
               </div>
             </div>
