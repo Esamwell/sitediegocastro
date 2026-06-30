@@ -230,10 +230,10 @@ const Home: React.FC = () => {
               Recordista de Projetos de Lei e o deputado que mais investe na Segurança Pública da Bahia. Diego Castro é o guardião dos valores conservadores na ALBA.
             </p>
             <div className="flex flex-wrap gap-4">
-              <button className="bg-[#002776] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#001a4d] transition-all shadow-xl shadow-blue-200 flex items-center gap-2">
+              <button onClick={() => scrollToSection('mandato')} className="bg-[#002776] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#001a4d] transition-all shadow-xl shadow-blue-200 flex items-center gap-2">
                 Conheça o Mandato <ArrowRight size={20} />
               </button>
-              <button className="bg-white text-[#002776] border-2 border-[#002776] px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all">
+              <button onClick={() => setIsProjectsModalOpen(true)} className="bg-white text-[#002776] border-2 border-[#002776] px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all">
                 Ver Projetos
               </button>
             </div>
