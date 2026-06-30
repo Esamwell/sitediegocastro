@@ -486,7 +486,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* DEFESA DA FAMÍLIA E DA FÉ */}
-      <section className="py-24 px-6 bg-white">
+      <section id="familia" className="py-24 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
@@ -932,10 +932,10 @@ const Home: React.FC = () => {
             <div>
               <h4 className="font-bold uppercase tracking-widest text-sm mb-8 text-[#ffdf00]">Temas</h4>
               <ul className="space-y-4 text-sm text-white/60">
-                <li><a href="#" className="hover:text-white transition-colors">Segurança Pública</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Família e Infância</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Liberdade Religiosa</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Educação</a></li>
+                <li><button onClick={() => scrollToSection('segurança')} className="hover:text-white transition-colors">Segurança Pública</button></li>
+                <li><button onClick={() => scrollToSection('familia')} className="hover:text-white transition-colors">Família e Infância</button></li>
+                <li><button onClick={() => scrollToSection('familia')} className="hover:text-white transition-colors">Liberdade Religiosa</button></li>
+                <li><button onClick={() => scrollToSection('familia')} className="hover:text-white transition-colors">Educação</button></li>
               </ul>
             </div>
 
@@ -953,8 +953,8 @@ const Home: React.FC = () => {
             <span>© 2026 Diego Castro. Todos os direitos reservados | Desenvolvido por <a href="https://www.sa2marketing.com.br" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Agência SA2 Marketing</a></span>
             <div className="flex gap-8">
               <Link to="/admin" className="hover:text-white transition-colors">Painel Admin</Link>
-              <a href="#" className="hover:text-white transition-colors">Privacidade</a>
-              <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
+              <button onClick={() => alert('Página em construção')} className="hover:text-white transition-colors">Privacidade</button>
+              <button onClick={() => alert('Página em construção')} className="hover:text-white transition-colors">Termos de Uso</button>
             </div>
           </div>
         </div>
