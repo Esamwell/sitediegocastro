@@ -421,9 +421,7 @@ const Home: React.FC = () => {
                 <p className="text-white/60 text-sm leading-relaxed mb-8">
                   Recursos destinados diretamente para as cidades baianas, com foco em viaturas, equipamentos médicos e melhorias em escolas.
                 </p>
-                <button className="bg-white text-[#002776] px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#ffdf00] transition-all">
-                  Ver Mapa de Ações
-                </button>
+
               </div>
               <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
             </div>
@@ -448,9 +446,7 @@ const Home: React.FC = () => {
                 <div className="p-6 bg-slate-50 rounded-2xl border-l-4 border-red-600 mb-8">
                   <p className="text-slate-900 font-bold italic">"O deputado que não fiscaliza, não representa. Meu compromisso é com a verdade e com o dinheiro do povo."</p>
                 </div>
-                <button className="bg-[#002776] text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#001a4d] transition-all">
-                  Relatório de Fiscalização
-                </button>
+
               </div>
             </div>
           </div>
