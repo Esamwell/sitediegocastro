@@ -221,7 +221,7 @@ const Home: React.FC = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#ffdf00]/20 rounded-full mb-6">
               <TrendingUp size={16} className="text-[#002776]" />
-              <span className="text-xs font-bold text-[#002776] uppercase tracking-widest">Compromisso com a Bahia</span>
+              <span className="text-xs font-bold text-[#002776] uppercase tracking-widest">100% Bolsonaro</span>
             </div>
             <h1 className="text-5xl lg:text-8xl font-heading font-black text-[#002776] leading-[0.9] mb-8 uppercase">
               A voz que o sistema quer calar
@@ -1154,7 +1154,7 @@ const Home: React.FC = () => {
                   {selectedProject.category}
                 </span>
                 <span className={`text-xs font-bold px-3 py-1 rounded-full ${selectedProject.status === 'Aprovado' ? 'bg-emerald-100 text-emerald-700' :
-                    selectedProject.status === 'Arquivado' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'
+                  selectedProject.status === 'Arquivado' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'
                   }`}>
                   {selectedProject.status}
                 </span>
