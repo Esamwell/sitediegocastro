@@ -1090,7 +1090,18 @@ const Admin: React.FC = () => {
                               <input type="file" className="hidden" accept="image/*" onChange={e => handleFileChange(e, 'value')} />
                             </label>
                           </div>
-                          {formData.value && <img src={formData.value} className="h-24 rounded-xl border border-slate-200 object-cover mt-2" alt="Preview" />}
+                          {formData.value && (
+                            <div className="mt-3">
+                              <img 
+                                src={formData.value} 
+                                className="h-32 w-auto max-w-full rounded-xl border border-slate-200 object-cover" 
+                                alt="Preview"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x200?text=Imagem+N%C3%A3o+Encontrada';
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div>

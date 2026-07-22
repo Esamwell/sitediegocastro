@@ -258,31 +258,7 @@ const HistoriaPage: React.FC = () => {
         </div>
       </section>
 
-      {/* FOTO DE CAPA */}
-      <section className="px-6 pb-16">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="relative rounded-[2.5rem] overflow-hidden shadow-2xl"
-          >
-            <img
-              src={getSetting('historia_cover_image', '/diego e bs/diego jovem com bolsonaro.png')}
-              alt="Trajetória de Diego Castro"
-              className="w-full h-[30rem] lg:h-[40rem] object-cover object-top"
-              referrerPolicy="no-referrer"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#002776]/60 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
-              <div className="text-white">
-                <div className="text-sm font-bold uppercase tracking-[0.3em] mb-2 opacity-80">{getSetting('historia_cover_badge', 'Deputado Estadual')}</div>
-                <div className="text-3xl lg:text-5xl font-heading font-black">{getSetting('historia_cover_title', 'DIEGO CASTRO BARBOSA')}</div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+
 
       {/* TRAJETÓRIA CRONOLÓGICA */}
       <section className="py-16 px-6 bg-white">
@@ -352,59 +328,7 @@ const HistoriaPage: React.FC = () => {
          </div>
       </section>
 
-      {/* MANDATO NA ASSEMBLEIA */}
-      <section className="py-16 px-6 bg-white">
-        <div className="max-w-5xl mx-auto text-center">
-          <ImpactText text={getSetting('historia_assembly_title', 'NA ASSEMBLEIA LEGISLATIVA')} color="blue" className="text-3xl lg:text-5xl mb-12" />
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 shadow-sm text-left">
-              <h3 className="text-xl font-bold text-[#002776] mb-6">{getSetting('historia_assembly_subtitle', 'Atuação nas Comissões')}</h3>
-              <div className="space-y-4">
-                {comissoes.map((item, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-xl">
-                    <CheckCircle2 size={18} className="text-[#005a1a] shrink-0" />
-                    <div className="flex-1">
-                      <span className="text-[#002776] font-bold text-sm">{item.cargo}</span>
-                      <span className="text-slate-400 mx-2">—</span>
-                      <span className="text-slate-600 text-sm">{item.comissao}</span>
-                    </div>
-                    <span className="text-slate-400 text-xs font-bold shrink-0">{item.ano}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* PRESENÇA DIGITAL E Encerramento */}
-      <section className="py-16 px-6 bg-[#005a1a]">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl lg:text-5xl font-heading font-black text-white mb-6" dangerouslySetInnerHTML={{ __html: getSetting('historia_closing_title', 'UMA NOVA GERAÇÃO DE <span class="text-[#ffdf00]">POLÍTICOS</span>') }}>
-          </h2>
-          <p className="text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
-            {getSetting('historia_closing_text', 'Com perfil combativo, técnico e ligado aos valores da família, da fé cristã e do trabalho, o deputado Diego Castro representa uma nova geração de políticos conservadores na Bahia. Sua trajetória, desde os projetos sociais no Cabula até o Parlamento baiano, reflete o compromisso com a defesa das liberdades, da moralidade pública e da transformação da política estadual.')}
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {[
-              { icon: <Heart size={28} />, label: getSetting('historia_closing_label_1', 'Fé Cristã') },
-              { icon: <Shield size={28} />, label: getSetting('historia_closing_label_2', 'Liberdade') },
-              { icon: <Flag size={28} />, label: getSetting('historia_closing_label_3', 'Transformação') },
-            ].map((item, i) => (
-              <div key={i} className="bg-white/10 border border-white/20 p-6 rounded-2xl flex flex-col items-center gap-3">
-                <div className="text-[#ffdf00]">{item.icon}</div>
-                <span className="text-white font-bold uppercase tracking-widest text-xs">{item.label}</span>
-              </div>
-            ))}
-          </div>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 bg-[#ffdf00] text-[#002776] px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition-all shadow-xl"
-          >
-            <ArrowLeft size={20} /> Voltar ao Início
-          </Link>
-        </div>
-      </section>
 
       {/* FOOTER */}
       <footer className="bg-slate-900 text-white py-12 px-6">
