@@ -503,7 +503,7 @@ const Home: React.FC = () => {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
               <img
-                src="/fotos-diego/diego-4.jpeg"
+                src={getSetting('familia_image', '/fotos-diego/diego-4.jpeg')}
                 className="rounded-3xl shadow-2xl"
                 alt="Família e Fé"
                 referrerPolicy="no-referrer"
@@ -511,15 +511,15 @@ const Home: React.FC = () => {
               <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#ffdf00]/10 rounded-full blur-3xl" />
             </div>
             <div>
-              <ImpactText text="FAMÍLIA E FÉ" color="blue" className="text-4xl lg:text-6xl mb-8" />
+              <ImpactText text={getSetting('familia_title', 'FAMÍLIA E FÉ')} color="blue" className="text-4xl lg:text-6xl mb-8" />
               <div className="space-y-8">
                 <div className="flex gap-6">
                   <div className="w-12 h-12 bg-[#005a1a]/10 rounded-xl flex items-center justify-center text-[#005a1a] shrink-0">
                     <Heart size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#002776] mb-2">Defesa da Vida</h3>
-                    <p className="text-slate-600">Autor do PL 25.250/2025, que institui o Dia Estadual Contra o Aborto. Atuamos contra a ideologia de gênero e pela proteção da infância nas escolas.</p>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">{getSetting('familia_item_1_title', 'Defesa da Vida')}</h3>
+                    <p className="text-slate-600">{getSetting('familia_item_1_text', 'Autor do PL 25.250/2025, que institui o Dia Estadual Contra o Aborto. Atuamos contra a ideologia de gênero e pela proteção da infância nas escolas.')}</p>
                   </div>
                 </div>
                 <div className="flex gap-6">
@@ -527,8 +527,8 @@ const Home: React.FC = () => {
                     <Shield size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#002776] mb-2">Estatuto da Liberdade Cristã</h3>
-                    <p className="text-slate-600">Garantia de liberdade de culto e proteção aos templos. Diego Castro é o anteparo contra projetos que ferem a liberdade religiosa na Bahia.</p>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">{getSetting('familia_item_2_title', 'Estatuto da Liberdade Cristã')}</h3>
+                    <p className="text-slate-600">{getSetting('familia_item_2_text', 'Garantia de liberdade de culto e proteção aos templos. Diego Castro é o anteparo contra projetos que ferem a liberdade religiosa na Bahia.')}</p>
                   </div>
                 </div>
                 <div className="flex gap-6">
@@ -536,8 +536,8 @@ const Home: React.FC = () => {
                     <Users size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#002776] mb-2">Proteção da Juventude</h3>
-                    <p className="text-slate-600">Lei n° 14.862/2025: Seminários antidrogas em escolas estaduais. Proibição de músicas com apologia ao crime em ambiente escolar.</p>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">{getSetting('familia_item_3_title', 'Proteção da Juventude')}</h3>
+                    <p className="text-slate-600">{getSetting('familia_item_3_text', 'Lei n° 14.862/2025: Seminários antidrogas em escolas estaduais. Proibição de músicas com apologia ao crime em ambiente escolar.')}</p>
                   </div>
                 </div>
               </div>
@@ -551,15 +551,15 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1">
-              <ImpactText text="AGRO E PROPRIEDADE" color="blue" className="text-4xl lg:text-6xl mb-8" />
+              <ImpactText text={getSetting('agro_title', 'AGRO E PROPRIEDADE')} color="blue" className="text-4xl lg:text-6xl mb-8" />
               <div className="space-y-8">
                 <div className="flex gap-6">
                   <div className="w-12 h-12 bg-[#005a1a]/10 rounded-xl flex items-center justify-center text-[#005a1a] shrink-0">
                     <Flag size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#002776] mb-2">Invasão Zero</h3>
-                    <p className="text-slate-600">Alinhado ao movimento Invasão Zero, Diego Castro defende o direito sagrado à propriedade privada e combate as invasões de terra na Bahia.</p>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">{getSetting('agro_item_1_title', 'Invasão Zero')}</h3>
+                    <p className="text-slate-600">{getSetting('agro_item_1_text', 'Alinhado ao movimento Invasão Zero, Diego Castro defende o direito sagrado à propriedade privada e combate as invasões de terra na Bahia.')}</p>
                   </div>
                 </div>
                 <div className="flex gap-6">
@@ -567,8 +567,8 @@ const Home: React.FC = () => {
                     <TrendingUp size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#002776] mb-2">CPI do MST</h3>
-                    <p className="text-slate-600">Único deputado estadual da Bahia a participar ativamente das diligências da CPI do MST, fiscalizando e denunciando abusos no campo.</p>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">{getSetting('agro_item_2_title', 'CPI do MST')}</h3>
+                    <p className="text-slate-600">{getSetting('agro_item_2_text', 'Único deputado estadual da Bahia a participar ativamente das diligências da CPI do MST, fiscalizando e denunciando abusos no campo.')}</p>
                   </div>
                 </div>
                 <div className="flex gap-6">
@@ -576,15 +576,15 @@ const Home: React.FC = () => {
                     <Briefcase size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#002776] mb-2">Liberdade Econômica</h3>
-                    <p className="text-slate-600">Autor do Marco Estadual da Liberdade Econômica. Trabalhamos pela redução do ICMS e pelo fim da burocracia estatal.</p>
+                    <h3 className="text-xl font-bold text-[#002776] mb-2">{getSetting('agro_item_3_title', 'Liberdade Econômica')}</h3>
+                    <p className="text-slate-600">{getSetting('agro_item_3_text', 'Autor do Marco Estadual da Liberdade Econômica. Trabalhamos pela redução do ICMS e pelo fim da burocracia estatal.')}</p>
                   </div>
                 </div>
               </div>
             </div>
             <div className="order-1 lg:order-2 relative">
               <img
-                src="/fotos-diego/diego-5.jpeg"
+                src={getSetting('agro_image', '/fotos-diego/diego-5.jpeg')}
                 className="rounded-3xl shadow-2xl"
                 alt="Agronegócio"
                 referrerPolicy="no-referrer"
@@ -687,8 +687,8 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
             <div className="text-center md:text-left">
-              <ImpactText text="ÚLTIMAS NOTÍCIAS" color="blue" className="text-4xl lg:text-6xl mb-4" />
-              <p className="text-slate-500 font-medium">Acompanhe o dia a dia do deputado Diego Castro</p>
+              <ImpactText text={getSetting('noticias_title', 'ÚLTIMAS NOTÍCIAS')} color="blue" className="text-4xl lg:text-6xl mb-4" />
+              <p className="text-slate-500 font-medium">{getSetting('noticias_subtitle', 'Acompanhe o dia a dia do deputado Diego Castro')}</p>
             </div>
             {news.length > 3 && (
               <button
@@ -721,7 +721,7 @@ const Home: React.FC = () => {
       <section id="vídeos" className="py-24 px-6 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-heading font-black">VÍDEOS RECENTES</h2>
+            <h2 className="text-3xl lg:text-5xl font-heading font-black">{getSetting('videos_title', 'VÍDEOS RECENTES')}</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -757,10 +757,10 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12">
             <div>
-              <ImpactText text="ÁREA DA IMPRENSA" color="blue" className="text-4xl lg:text-5xl mb-8" />
+              <ImpactText text={getSetting('imprensa_title', 'ÁREA DA IMPRENSA')} color="blue" className="text-4xl lg:text-5xl mb-8" />
               <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
                 <p className="text-slate-600 mb-8 leading-relaxed">
-                  Espaço dedicado a jornalistas e veículos de comunicação. Aqui você encontra releases, fotos oficiais em alta resolução e contatos da assessoria.
+                  {getSetting('imprensa_text', 'Espaço dedicado a jornalistas e veículos de comunicação. Aqui você encontra releases, fotos oficiais em alta resolução e contatos da assessoria.')}
                 </p>
                 <div className="space-y-4">
                   <a href={getDriveLink('releases')} target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-all group">
@@ -780,14 +780,14 @@ const Home: React.FC = () => {
             </div>
 
             <div>
-              <ImpactText text="ARQUIVOS E DISCURSOS" color="blue" className="text-4xl lg:text-5xl mb-8" />
+              <ImpactText text={getSetting('arquivos_title', 'ARQUIVOS E DISCURSOS')} color="blue" className="text-4xl lg:text-5xl mb-8" />
               <div className="bg-[#005a1a] p-8 rounded-3xl text-white relative overflow-hidden">
                 <div className="relative z-10">
                   <p className="text-white/80 mb-8 leading-relaxed">
-                    Biblioteca digital do mandato. Acesse relatórios de atividades, discursos na íntegra e documentos legislativos importantes.
+                    {getSetting('arquivos_text', 'Biblioteca digital do mandato. Acesse relatórios de atividades, discursos na íntegra e documentos legislativos importantes.')}
                   </p>
                   <a href={getDriveLink('biblioteca')} target="_blank" rel="noopener noreferrer" className="mt-8 block text-center w-full bg-[#ffdf00] text-[#002776] py-4 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-white transition-all">
-                    Acessar Biblioteca
+                    {getSetting('arquivos_btn', 'Acessar Biblioteca')}
                   </a>
                 </div>
                 <BookOpen className="absolute -bottom-10 -right-10 w-40 h-40 text-white/5" />
@@ -801,10 +801,10 @@ const Home: React.FC = () => {
       <section className="py-24 px-6 bg-[#005a1a]">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-4xl lg:text-6xl font-heading font-black text-white mb-8">
-            BAIXE E <span className="text-[#ffdf00]">COMPARTILHE</span>
+            {getSetting('downloads_title_1', 'BAIXE E ')} <span className="text-[#ffdf00]">{getSetting('downloads_title_2', 'COMPARTILHE')}</span>
           </h2>
           <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto">
-            Seja um multiplicador da nossa mensagem. Baixe materiais oficiais para suas redes sociais e ajude a espalhar a verdade.
+            {getSetting('downloads_subtitle', 'Seja um multiplicador da nossa mensagem. Baixe materiais oficiais para suas redes sociais e ajude a espalhar a verdade.')}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
@@ -826,9 +826,9 @@ const Home: React.FC = () => {
       <section id="contato" className="py-24 px-6 bg-white">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16">
           <div>
-            <ImpactText text="FALE CONOSCO" color="blue" className="text-4xl lg:text-6xl mb-8" />
+            <ImpactText text={getSetting('contato_title', 'FALE CONOSCO')} color="blue" className="text-4xl lg:text-6xl mb-8" />
             <p className="text-slate-600 text-lg mb-12">
-              Sua opinião é fundamental para o nosso mandato. Entre em contato para enviar sugestões, denúncias ou tirar dúvidas.
+              {getSetting('contato_subtitle', 'Sua opinião é fundamental para o nosso mandato. Entre em contato para enviar sugestões, denúncias ou tirar dúvidas.')}
             </p>
             <div className="space-y-6">
               <div className="flex items-center gap-4">
@@ -837,8 +837,8 @@ const Home: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-sm text-slate-400 font-bold uppercase">Endereço</div>
-                  <div className="text-sm font-bold text-slate-900">Prédio Anexo, Gabinete 102, Wilson Lins</div>
-                  <div className="text-sm text-slate-500">Assembleia Legislativa da Bahia (CAB)</div>
+                  <div className="text-sm font-bold text-slate-900">{getSetting('contato_address_1', 'Prédio Anexo, Gabinete 102, Wilson Lins')}</div>
+                  <div className="text-sm text-slate-500">{getSetting('contato_address_2', 'Assembleia Legislativa da Bahia (CAB)')}</div>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -847,7 +847,7 @@ const Home: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-sm text-slate-400 font-bold uppercase">E-mail</div>
-                  <a href="mailto:dep.drdiegocastro@alba.ba.gov.br" className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">dep.drdiegocastro@alba.ba.gov.br</a>
+                  <a href={`mailto:${getSetting('contato_email', 'dep.drdiegocastro@alba.ba.gov.br')}`} className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">{getSetting('contato_email', 'dep.drdiegocastro@alba.ba.gov.br')}</a>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -856,9 +856,9 @@ const Home: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-sm text-slate-400 font-bold uppercase">Telefones</div>
-                  <a href="tel:+557131157253" className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">71 3115-7253</a>
+                  <a href={`tel:+55${getSetting('contato_phone_1', '71 3115-7253').replace(/\D/g, '')}`} className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">{getSetting('contato_phone_1', '71 3115-7253')}</a>
                   <span className="text-slate-400 mx-2">/</span>
-                  <a href="tel:+5571999832548" className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">71 9 9983-2548</a>
+                  <a href={`tel:+55${getSetting('contato_phone_2', '71 9 9983-2548').replace(/\D/g, '')}`} className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">{getSetting('contato_phone_2', '71 9 9983-2548')}</a>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -867,7 +867,7 @@ const Home: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-sm text-slate-400 font-bold uppercase">WhatsApp</div>
-                  <a href="https://wa.me/5571999832548" target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-slate-900 hover:text-[#005a1a] transition-colors">+55 71 99983-2548</a>
+                  <a href={`https://wa.me/55${getSetting('contato_phone_2', '71 9 9983-2548').replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-slate-900 hover:text-[#005a1a] transition-colors">+55 {getSetting('contato_phone_2', '71 9 9983-2548')}</a>
                 </div>
               </div>
             </div>

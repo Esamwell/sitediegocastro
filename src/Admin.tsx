@@ -26,22 +26,105 @@ const Admin: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   // Friendly Labels for Settings
-  const SETTING_LABELS: Record<string, { label: string; desc: string }> = {
-    'hero_title': { label: 'Título Principal (Home)', desc: 'O título grande que aparece no topo da página inicial.' },
-    'hero_subtitle': { label: 'Subtítulo (Home)', desc: 'O texto menor abaixo do título na página inicial.' },
-    'hero_badge': { label: 'Tagline/Badge (Home)', desc: 'O textinho que fica acima do título principal.' },
-    'hero_image': { label: 'Imagem Principal (Home)', desc: 'A foto grande do Diego Castro na capa.' },
-    'bolsonaro_image': { label: 'Selo Bolsonaro (Home)', desc: 'A imagem redonda com o presidente Bolsonaro.' },
-    'about_title': { label: 'Título da Seção Sobre (Home)', desc: 'O título da seção que resume a história.' },
-    'about_text': { label: 'Texto da Seção Sobre (Home)', desc: 'O texto que conta o resumo da história.' },
-    'about_image': { label: 'Imagem da Seção Sobre (Home)', desc: 'A foto principal da seção sobre.' },
-    'about_image_secondary': { label: 'Imagem Secundária da Seção Sobre (Home)', desc: 'A foto menor da seção sobre.' },
-    'historia_hero_title': { label: 'Título Principal (Página História)', desc: 'O título grande no topo da página de História.' },
-    'historia_hero_subtitle': { label: 'Subtítulo (Página História)', desc: 'O texto abaixo do título principal da página de História.' },
-    'historia_hero_image': { label: 'Imagem de Capa (Página História)', desc: 'A imagem de fundo no topo da página de História.' },
-    'historia_main_text': { label: 'Texto de Introdução (Página História)', desc: 'O primeiro texto grande que conta a história.' },
-    'historia_timeline_title': { label: 'Título da Linha do Tempo (História)', desc: 'O título antes das datas importantes.' },
-    'historia_mission_title': { label: 'Título da Missão (História)', desc: 'O título da seção de Missão e Valores.' },
+  const SETTING_LABELS: Record<string, { label: string; desc: string; section: string }> = {
+    'hero_title': { label: 'Título Principal', desc: 'O título grande que aparece no topo da página inicial.', section: 'Página Inicial - Capa' },
+    'hero_subtitle': { label: 'Subtítulo', desc: 'O texto menor abaixo do título na página inicial.', section: 'Página Inicial - Capa' },
+    'hero_badge': { label: 'Tagline/Badge', desc: 'O textinho que fica acima do título principal.', section: 'Página Inicial - Capa' },
+    'hero_image': { label: 'Imagem Principal', desc: 'A foto grande do Diego Castro na capa.', section: 'Página Inicial - Capa' },
+    'hero_badge_2_value': { label: 'Selo Flutuante - Valor', desc: 'Valor do selo (ex: 100%).', section: 'Página Inicial - Capa' },
+    'hero_badge_2_label': { label: 'Selo Flutuante - Texto', desc: 'Texto do selo (ex: Bolsonaro).', section: 'Página Inicial - Capa' },
+
+    'stats_1_label': { label: 'Estatística 1 - Rótulo', desc: 'Ex: Recordista de Projetos', section: 'Página Inicial - Estatísticas' },
+    'stats_1_value': { label: 'Estatística 1 - Valor', desc: 'Ex: 170+', section: 'Página Inicial - Estatísticas' },
+    'stats_2_label': { label: 'Estatística 2 - Rótulo', desc: '', section: 'Página Inicial - Estatísticas' },
+    'stats_2_value': { label: 'Estatística 2 - Valor', desc: '', section: 'Página Inicial - Estatísticas' },
+    'stats_3_label': { label: 'Estatística 3 - Rótulo', desc: '', section: 'Página Inicial - Estatísticas' },
+    'stats_3_value': { label: 'Estatística 3 - Valor', desc: '', section: 'Página Inicial - Estatísticas' },
+    'stats_4_label': { label: 'Estatística 4 - Rótulo', desc: '', section: 'Página Inicial - Estatísticas' },
+    'stats_4_value': { label: 'Estatística 4 - Valor', desc: '', section: 'Página Inicial - Estatísticas' },
+
+    'about_title': { label: 'Título da Seção', desc: 'O título da seção que resume a história.', section: 'Página Inicial - Sobre o Diego' },
+    'about_text_1': { label: 'Texto da Seção 1', desc: 'Primeiro parágrafo do sobre.', section: 'Página Inicial - Sobre o Diego' },
+    'about_text_2': { label: 'Texto da Seção 2', desc: 'Segundo parágrafo do sobre.', section: 'Página Inicial - Sobre o Diego' },
+    'about_image': { label: 'Imagem Principal', desc: 'A foto principal da seção sobre.', section: 'Página Inicial - Sobre o Diego' },
+    'about_image_secondary': { label: 'Imagem Secundária', desc: 'A foto menor da seção sobre.', section: 'Página Inicial - Sobre o Diego' },
+    
+    'mandato_badge': { label: 'Tagline', desc: 'Ex: Ações Legislativas', section: 'Página Inicial - Mandato' },
+    'mandato_title': { label: 'Título Principal', desc: 'Título da seção de mandato.', section: 'Página Inicial - Mandato' },
+    'mandato_subtitle': { label: 'Subtítulo', desc: 'Texto descritivo abaixo do título.', section: 'Página Inicial - Mandato' },
+
+    'bahia_title': { label: 'Título', desc: 'Ex: DIEGO PELA BAHIA', section: 'Página Inicial - Bahia' },
+    'bahia_subtitle': { label: 'Subtítulo', desc: '', section: 'Página Inicial - Bahia' },
+    'bahia_item_1_title': { label: 'Card 1 - Título', desc: '', section: 'Página Inicial - Bahia' },
+    'bahia_item_1_text': { label: 'Card 1 - Texto', desc: '', section: 'Página Inicial - Bahia' },
+    'bahia_item_1_footer': { label: 'Card 1 - Rodapé', desc: '', section: 'Página Inicial - Bahia' },
+    'bahia_item_2_title': { label: 'Card 2 - Título', desc: '', section: 'Página Inicial - Bahia' },
+    'bahia_item_2_text': { label: 'Card 2 - Texto', desc: '', section: 'Página Inicial - Bahia' },
+    'bahia_item_2_footer': { label: 'Card 2 - Rodapé', desc: '', section: 'Página Inicial - Bahia' },
+    'bahia_image': { label: 'Imagem de Fundo', desc: '', section: 'Página Inicial - Bahia' },
+    'bahia_image_stats_value': { label: 'Imagem Estatística - Valor', desc: '', section: 'Página Inicial - Bahia' },
+    'bahia_image_stats_label': { label: 'Imagem Estatística - Rótulo', desc: '', section: 'Página Inicial - Bahia' },
+
+    'seguranca_image': { label: 'Imagem de Fundo', desc: '', section: 'Página Inicial - Segurança' },
+    'seguranca_title': { label: 'Título', desc: '', section: 'Página Inicial - Segurança' },
+    'seguranca_subtitle': { label: 'Subtítulo', desc: '', section: 'Página Inicial - Segurança' },
+
+    'noticias_title': { label: 'Título', desc: '', section: 'Página Inicial - Notícias' },
+    'noticias_subtitle': { label: 'Subtítulo', desc: '', section: 'Página Inicial - Notícias' },
+
+    'bolsonaro_image': { label: 'Imagem de Fundo', desc: 'A imagem grande ao fundo.', section: 'Página Inicial - Bolsonaro' },
+    'bolsonaro_badge': { label: 'Tagline', desc: '', section: 'Página Inicial - Bolsonaro' },
+    'bolsonaro_title': { label: 'Título', desc: '', section: 'Página Inicial - Bolsonaro' },
+    'bolsonaro_subtitle': { label: 'Subtítulo', desc: '', section: 'Página Inicial - Bolsonaro' },
+    'bolsonaro_stats_1_value': { label: 'Estatística 1 - Valor', desc: '', section: 'Página Inicial - Bolsonaro' },
+    'bolsonaro_stats_1_label': { label: 'Estatística 1 - Rótulo', desc: '', section: 'Página Inicial - Bolsonaro' },
+    'bolsonaro_stats_2_value': { label: 'Estatística 2 - Valor', desc: '', section: 'Página Inicial - Bolsonaro' },
+    'bolsonaro_stats_2_label': { label: 'Estatística 2 - Rótulo', desc: '', section: 'Página Inicial - Bolsonaro' },
+
+    'imprensa_title': { label: 'Título', desc: '', section: 'Página Inicial - Imprensa e Arquivos' },
+    'imprensa_text': { label: 'Texto da Imprensa', desc: '', section: 'Página Inicial - Imprensa e Arquivos' },
+    'arquivos_title': { label: 'Título Arquivos', desc: '', section: 'Página Inicial - Imprensa e Arquivos' },
+    'arquivos_text': { label: 'Texto Arquivos', desc: '', section: 'Página Inicial - Imprensa e Arquivos' },
+    'arquivos_btn': { label: 'Botão Arquivos', desc: '', section: 'Página Inicial - Imprensa e Arquivos' },
+
+    'contato_title': { label: 'Título', desc: '', section: 'Página Inicial - Contato' },
+    'contato_subtitle': { label: 'Subtítulo', desc: '', section: 'Página Inicial - Contato' },
+    'contato_address_1': { label: 'Endereço (Linha 1)', desc: '', section: 'Página Inicial - Contato' },
+    'contato_address_2': { label: 'Endereço (Linha 2)', desc: '', section: 'Página Inicial - Contato' },
+    'contato_email': { label: 'E-mail', desc: '', section: 'Página Inicial - Contato' },
+    'contato_phone_1': { label: 'Telefone 1', desc: '', section: 'Página Inicial - Contato' },
+    'contato_phone_2': { label: 'Telefone 2 (WhatsApp)', desc: '', section: 'Página Inicial - Contato' },
+
+    'videos_title': { label: 'Título', desc: '', section: 'Página Inicial - Vídeos' },
+
+    'downloads_title_1': { label: 'Título (Parte 1)', desc: '', section: 'Página Inicial - Downloads' },
+    'downloads_title_2': { label: 'Título (Parte Destaque)', desc: '', section: 'Página Inicial - Downloads' },
+    'downloads_subtitle': { label: 'Subtítulo', desc: '', section: 'Página Inicial - Downloads' },
+
+    'familia_image': { label: 'Imagem', desc: '', section: 'Página Inicial - Família e Fé' },
+    'familia_title': { label: 'Título', desc: '', section: 'Página Inicial - Família e Fé' },
+    'familia_item_1_title': { label: 'Item 1 - Título', desc: '', section: 'Página Inicial - Família e Fé' },
+    'familia_item_1_text': { label: 'Item 1 - Texto', desc: '', section: 'Página Inicial - Família e Fé' },
+    'familia_item_2_title': { label: 'Item 2 - Título', desc: '', section: 'Página Inicial - Família e Fé' },
+    'familia_item_2_text': { label: 'Item 2 - Texto', desc: '', section: 'Página Inicial - Família e Fé' },
+    'familia_item_3_title': { label: 'Item 3 - Título', desc: '', section: 'Página Inicial - Família e Fé' },
+    'familia_item_3_text': { label: 'Item 3 - Texto', desc: '', section: 'Página Inicial - Família e Fé' },
+
+    'agro_image': { label: 'Imagem', desc: '', section: 'Página Inicial - Agro e Propriedade' },
+    'agro_title': { label: 'Título', desc: '', section: 'Página Inicial - Agro e Propriedade' },
+    'agro_item_1_title': { label: 'Item 1 - Título', desc: '', section: 'Página Inicial - Agro e Propriedade' },
+    'agro_item_1_text': { label: 'Item 1 - Texto', desc: '', section: 'Página Inicial - Agro e Propriedade' },
+    'agro_item_2_title': { label: 'Item 2 - Título', desc: '', section: 'Página Inicial - Agro e Propriedade' },
+    'agro_item_2_text': { label: 'Item 2 - Texto', desc: '', section: 'Página Inicial - Agro e Propriedade' },
+    'agro_item_3_title': { label: 'Item 3 - Título', desc: '', section: 'Página Inicial - Agro e Propriedade' },
+    'agro_item_3_text': { label: 'Item 3 - Texto', desc: '', section: 'Página Inicial - Agro e Propriedade' },
+
+    'historia_hero_title': { label: 'Título Principal', desc: 'O título grande no topo da página de História.', section: 'Página História - Cabeçalho' },
+    'historia_hero_subtitle': { label: 'Subtítulo', desc: 'O texto abaixo do título principal da página de História.', section: 'Página História - Cabeçalho' },
+    'historia_hero_image': { label: 'Imagem de Capa', desc: 'A imagem de fundo no topo da página de História.', section: 'Página História - Cabeçalho' },
+    'historia_main_text': { label: 'Texto de Introdução', desc: 'O primeiro texto grande que conta a história.', section: 'Página História - Conteúdo' },
+    'historia_timeline_title': { label: 'Título da Linha do Tempo', desc: 'O título antes das datas importantes.', section: 'Página História - Conteúdo' },
+    'historia_mission_title': { label: 'Título da Missão', desc: 'O título da seção de Missão e Valores.', section: 'Página História - Conteúdo' },
   };
   
   // Form States
@@ -255,7 +338,11 @@ const Admin: React.FC = () => {
       let result;
       
       if (isEditing && isEditing !== 'new') {
-        result = await supabase.from(tableName).update(finalData).eq('id', isEditing);
+        if (tableName === 'site_settings') {
+          result = await supabase.from(tableName).update(finalData).eq('key', isEditing);
+        } else {
+          result = await supabase.from(tableName).update(finalData).eq('id', isEditing);
+        }
         if (result.error) throw result.error;
         
         // Atualizar estado local (edição)
@@ -268,7 +355,7 @@ const Admin: React.FC = () => {
         } else if (tableName === 'security_segments') {
           setSegments(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
         } else if (tableName === 'site_settings') {
-          setSettings(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
+          setSettings(prev => prev.map(item => item.key === isEditing ? { ...item, ...finalData } : item));
         } else if (tableName === 'drive_links') {
           setLinks(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
         }
@@ -309,7 +396,14 @@ const Admin: React.FC = () => {
     const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : activeTab === 'settings' ? 'site_settings' : 'drive_links';
     if (window.confirm("Tem certeza que deseja excluir?")) {
       try {
-        const { error } = await supabase.from(tableName).delete().eq('id', id);
+        let error;
+        if (tableName === 'site_settings') {
+          const res = await supabase.from(tableName).delete().eq('key', id);
+          error = res.error;
+        } else {
+          const res = await supabase.from(tableName).delete().eq('id', id);
+          error = res.error;
+        }
         if (error) throw error;
         
         // Atualizar estado local
@@ -322,7 +416,7 @@ const Admin: React.FC = () => {
         } else if (tableName === 'security_segments') {
           setSegments(prev => prev.filter(item => item.id !== id));
         } else if (tableName === 'site_settings') {
-          setSettings(prev => prev.filter(item => item.id !== id));
+          setSettings(prev => prev.filter(item => item.key !== id));
         } else if (tableName === 'drive_links') {
           setLinks(prev => prev.filter(item => item.id !== id));
         }
@@ -1091,24 +1185,45 @@ const Admin: React.FC = () => {
               </div>
             ))}
 
-            {activeTab === 'settings' && settings.map(item => (
-              <div key={item.id} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
-                <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0"><Settings size={18} /></div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-bold text-[#002776]">
-                    {SETTING_LABELS[item.key]?.label || item.key}
-                  </h4>
-                  {SETTING_LABELS[item.key]?.desc && (
-                    <p className="text-xs text-slate-500 mt-0.5 mb-1">{SETTING_LABELS[item.key].desc}</p>
-                  )}
-                  <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{item.value}</p>
-                </div>
-                <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
-                  <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
-                </div>
+            {activeTab === 'settings' && (
+              <div className="space-y-6">
+                {Object.entries(settings.reduce((acc, item) => {
+                  const section = SETTING_LABELS[item.key]?.section || 'Outras Configurações';
+                  if (!acc[section]) acc[section] = [];
+                  acc[section].push(item);
+                  return acc;
+                }, {} as Record<string, any[]>)).map(([sectionName, sectionItems]) => (
+                  <div key={sectionName} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+                    <div className="bg-gradient-to-r from-slate-50 to-white px-6 py-4 border-b border-slate-200">
+                      <h3 className="text-sm font-black text-[#002776] uppercase tracking-wider flex items-center gap-2">
+                        <LayoutDashboard size={16} className="text-[#002776]/60" />
+                        {sectionName}
+                      </h3>
+                    </div>
+                    <div>
+                      {sectionItems.map(item => (
+                        <div key={item.key} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
+                          <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0"><Settings size={18} /></div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-bold text-[#002776]">
+                              {SETTING_LABELS[item.key]?.label || item.key}
+                            </h4>
+                            {SETTING_LABELS[item.key]?.desc && (
+                              <p className="text-xs text-slate-500 mt-0.5 mb-1">{SETTING_LABELS[item.key].desc}</p>
+                            )}
+                            <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{item.value}</p>
+                          </div>
+                          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.key); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
+                            <button onClick={() => handleDelete(item.key)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
           )}
         </div>
