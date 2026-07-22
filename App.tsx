@@ -250,7 +250,7 @@ const Home: React.FC = () => {
                 <img
                   src="/diego e bs/principal.png"
                   alt="Diego Castro"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-700"
                   referrerPolicy="no-referrer"
                 />
               </div>
