@@ -24,6 +24,25 @@ const Admin: React.FC = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [settings, setSettings] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Friendly Labels for Settings
+  const SETTING_LABELS: Record<string, { label: string; desc: string }> = {
+    'hero_title': { label: 'Título Principal (Home)', desc: 'O título grande que aparece no topo da página inicial.' },
+    'hero_subtitle': { label: 'Subtítulo (Home)', desc: 'O texto menor abaixo do título na página inicial.' },
+    'hero_badge': { label: 'Tagline/Badge (Home)', desc: 'O textinho que fica acima do título principal.' },
+    'hero_image': { label: 'Imagem Principal (Home)', desc: 'A foto grande do Diego Castro na capa.' },
+    'bolsonaro_image': { label: 'Selo Bolsonaro (Home)', desc: 'A imagem redonda com o presidente Bolsonaro.' },
+    'about_title': { label: 'Título da Seção Sobre (Home)', desc: 'O título da seção que resume a história.' },
+    'about_text': { label: 'Texto da Seção Sobre (Home)', desc: 'O texto que conta o resumo da história.' },
+    'about_image': { label: 'Imagem da Seção Sobre (Home)', desc: 'A foto principal da seção sobre.' },
+    'about_image_secondary': { label: 'Imagem Secundária da Seção Sobre (Home)', desc: 'A foto menor da seção sobre.' },
+    'historia_hero_title': { label: 'Título Principal (Página História)', desc: 'O título grande no topo da página de História.' },
+    'historia_hero_subtitle': { label: 'Subtítulo (Página História)', desc: 'O texto abaixo do título principal da página de História.' },
+    'historia_hero_image': { label: 'Imagem de Capa (Página História)', desc: 'A imagem de fundo no topo da página de História.' },
+    'historia_main_text': { label: 'Texto de Introdução (Página História)', desc: 'O primeiro texto grande que conta a história.' },
+    'historia_timeline_title': { label: 'Título da Linha do Tempo (História)', desc: 'O título antes das datas importantes.' },
+    'historia_mission_title': { label: 'Título da Missão (História)', desc: 'O título da seção de Missão e Valores.' },
+  };
   
   // Form States
   const [isEditing, setIsEditing] = useState<string | null>(null);
@@ -949,18 +968,22 @@ const Admin: React.FC = () => {
                   {activeTab === 'settings' && (
                     <>
                       <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 mb-4">
-                        <p className="text-xs text-blue-600"><strong>Cuidado:</strong> Não altere as chaves a menos que saiba o que está fazendo. Altere apenas os valores.</p>
+                        <p className="text-xs text-blue-600"><strong>Dica:</strong> Altere os valores abaixo. Se for texto, pode colar normalmente. Se for imagem, cole o link da imagem.</p>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Chave Identificadora</label>
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Configuração</label>
                         <input 
-                          type="text" placeholder="ex: hero_title" required
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all"
-                          value={formData.key || ''} onChange={e => setFormData({...formData, key: e.target.value})}
+                          type="text" placeholder="ex: hero_title" required disabled={!!isEditing}
+                          className={`w-full p-3 border rounded-xl text-sm font-bold transition-all ${isEditing ? 'bg-slate-100 border-slate-200 text-slate-600 cursor-not-allowed' : 'bg-slate-50 border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776]'}`}
+                          value={isEditing && SETTING_LABELS[formData.key]?.label ? SETTING_LABELS[formData.key].label : (formData.key || '')} 
+                          onChange={e => !isEditing && setFormData({...formData, key: e.target.value})}
                         />
+                        {isEditing && SETTING_LABELS[formData.key] && (
+                          <p className="text-xs text-slate-500 mt-1.5">{SETTING_LABELS[formData.key].desc}</p>
+                        )}
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Valor</label>
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 mt-4">Conteúdo / Valor</label>
                         <textarea 
                           placeholder="Texto ou URL da imagem" required rows={5}
                           className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all resize-none"
@@ -990,7 +1013,7 @@ const Admin: React.FC = () => {
 
           {/* Content Card - Only show when not on Dashboard */}
           {activeTab !== 'dashboard' && (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8 scroll-mt-24" id="form-container">
             {/* List View */}
             {activeTab === 'news' && news.map(item => (
               <div key={item.id} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
@@ -1003,7 +1026,7 @@ const Admin: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
+                  <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
                   <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
                 </div>
               </div>
@@ -1017,7 +1040,7 @@ const Admin: React.FC = () => {
                   <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{item.url}</p>
                 </div>
                 <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
+                  <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
                   <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
                 </div>
               </div>
@@ -1031,7 +1054,7 @@ const Admin: React.FC = () => {
                   <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{item.description}</p>
                 </div>
                 <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
+                  <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
                   <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
                 </div>
               </div>
@@ -1048,7 +1071,7 @@ const Admin: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
+                  <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
                   <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
                 </div>
               </div>
@@ -1062,7 +1085,7 @@ const Admin: React.FC = () => {
                   <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{item.url}</p>
                 </div>
                 <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
+                  <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
                   <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
                 </div>
               </div>
@@ -1072,11 +1095,16 @@ const Admin: React.FC = () => {
               <div key={item.id} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
                 <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0"><Settings size={18} /></div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-bold text-[#002776]">{item.key}</h4>
+                  <h4 className="text-sm font-bold text-[#002776]">
+                    {SETTING_LABELS[item.key]?.label || item.key}
+                  </h4>
+                  {SETTING_LABELS[item.key]?.desc && (
+                    <p className="text-xs text-slate-500 mt-0.5 mb-1">{SETTING_LABELS[item.key].desc}</p>
+                  )}
                   <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{item.value}</p>
                 </div>
                 <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
+                  <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
                   <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
                 </div>
               </div>
