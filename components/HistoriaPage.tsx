@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import PatrioticBackground from './PatrioticBackground';
 import ImpactText from './ImpactText';
+import { supabase } from '../src/supabaseClient';
 
 const renderText = (text: string) => {
   const parts = text.split(/(Jair Bolsonaro|Bolsonaro)/g);
@@ -23,7 +24,7 @@ const renderText = (text: string) => {
   );
 };
 
-const timeline = [
+const defaultTimeline = [
   {
     year: '1992',
     paragraphs: ['Nasceu em Salvador, no bairro do Cabula, em 14 de setembro.']
@@ -188,6 +189,28 @@ const comissoes = [
 ];
 
 const HistoriaPage: React.FC = () => {
+  const [settings, setSettings] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const fetchSettings = async () => {
+      const { data } = await supabase.from('site_settings').select('*');
+      if (data) {
+        const settingsMap: Record<string, string> = {};
+        data.forEach(s => { settingsMap[s.key] = s.value; });
+        setSettings(settingsMap);
+      }
+    };
+    fetchSettings();
+
+    const sub = supabase.channel('historia-settings-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, fetchSettings).subscribe();
+    return () => { supabase.removeChannel(sub); };
+  }, []);
+
+  const getSetting = (key: string, defaultVal: string) => settings[key] || defaultVal;
+  
+  const parsedTimeline = settings['historia_timeline'] ? JSON.parse(settings['historia_timeline']) : defaultTimeline;
+
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <PatrioticBackground />
@@ -224,13 +247,12 @@ const HistoriaPage: React.FC = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#ffdf00]/20 rounded-full mb-6">
               <Calendar size={16} className="text-[#002776]" />
-              <span className="text-xs font-bold text-[#002776] uppercase tracking-widest">Desde 1992</span>
+              <span className="text-xs font-bold text-[#002776] uppercase tracking-widest">{getSetting('historia_badge', 'Desde 1992')}</span>
             </div>
-            <h1 className="text-4xl lg:text-7xl font-heading font-black text-[#002776] leading-[0.9] mb-6">
-              MINHA <span className="text-[#005a1a]">HISTÓRIA</span>
+            <h1 className="text-4xl lg:text-7xl font-heading font-black text-[#002776] leading-[0.9] mb-6" dangerouslySetInnerHTML={{ __html: getSetting('historia_title', 'MINHA <span class="text-[#005a1a]">HISTÓRIA</span>') }}>
             </h1>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Da infância no Cabula ao Parlamento baiano — conheça a trajetória de quem nunca parou de lutar pela Bahia.
+              {getSetting('historia_subtitle', 'Da infância no Cabula ao Parlamento baiano — conheça a trajetória de quem nunca parou de lutar pela Bahia.')}
             </p>
           </motion.div>
         </div>
@@ -246,7 +268,7 @@ const HistoriaPage: React.FC = () => {
             className="relative rounded-[2.5rem] overflow-hidden shadow-2xl"
           >
             <img
-              src="/diego e bs/diego jovem com bolsonaro.png"
+              src={getSetting('historia_cover_image', '/diego e bs/diego jovem com bolsonaro.png')}
               alt="Trajetória de Diego Castro"
               className="w-full h-[30rem] lg:h-[40rem] object-cover object-top"
               referrerPolicy="no-referrer"
@@ -254,8 +276,8 @@ const HistoriaPage: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-[#002776]/60 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
               <div className="text-white">
-                <div className="text-sm font-bold uppercase tracking-[0.3em] mb-2 opacity-80">Deputado Estadual</div>
-                <div className="text-3xl lg:text-5xl font-heading font-black">DIEGO CASTRO BARBOSA</div>
+                <div className="text-sm font-bold uppercase tracking-[0.3em] mb-2 opacity-80">{getSetting('historia_cover_badge', 'Deputado Estadual')}</div>
+                <div className="text-3xl lg:text-5xl font-heading font-black">{getSetting('historia_cover_title', 'DIEGO CASTRO BARBOSA')}</div>
               </div>
             </div>
           </motion.div>
@@ -266,13 +288,13 @@ const HistoriaPage: React.FC = () => {
       <section className="py-16 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <ImpactText text="TRAJETÓRIA" color="blue" className="text-3xl lg:text-5xl mb-4" />
-            <p className="text-slate-500 font-medium">Linha do tempo interativa e fatos organizados</p>
+            <ImpactText text={getSetting('historia_timeline_title', 'TRAJETÓRIA')} color="blue" className="text-3xl lg:text-5xl mb-4" />
+            <p className="text-slate-500 font-medium">{getSetting('historia_timeline_subtitle', 'Linha do tempo interativa e fatos organizados')}</p>
           </div>
           <div className="relative">
             <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-slate-200 hidden lg:block" />
             <div className="space-y-8">
-              {timeline.map((item, i) => (
+              {parsedTimeline.map((item: any, i: number) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, x: -30 }}
@@ -300,7 +322,7 @@ const HistoriaPage: React.FC = () => {
 
                     {item.links && item.links.length > 0 && (
                       <div className="mt-6 pt-6 border-t border-slate-200 flex flex-col gap-3">
-                        {item.links.map((link, idx) => (
+                        {item.links.map((link: any, idx: number) => (
                           <a 
                             key={idx} 
                             href={link.url} 
@@ -323,10 +345,8 @@ const HistoriaPage: React.FC = () => {
       <section className="py-16 px-6 bg-slate-50">
          <div className="max-w-4xl mx-auto bg-gradient-to-br from-[#002776] to-[#005a1a] rounded-3xl p-10 lg:p-16 text-white shadow-xl relative overflow-hidden">
             <div className="relative z-10">
-              <h3 className="text-3xl font-heading font-black mb-6 uppercase text-[#ffdf00]">Lealdade a Jair Bolsonaro</h3>
-              <p className="text-lg text-white/90 leading-relaxed">
-                A relação política de Diego Castro com {renderText('Jair Bolsonaro')} atravessa diferentes fases de sua trajetória. Desde a juventude, Diego defende publicamente as mesmas pautas conservadoras, participou das mobilizações que fortaleceram {renderText('Bolsonaro')} na Bahia e permaneceu ao seu lado nos momentos de maior pressão política.
-              </p>
+              <h3 className="text-3xl font-heading font-black mb-6 uppercase text-[#ffdf00]">{getSetting('historia_loyalty_title', 'Lealdade a Jair Bolsonaro')}</h3>
+              <p className="text-lg text-white/90 leading-relaxed" dangerouslySetInnerHTML={{ __html: getSetting('historia_loyalty_text', 'A relação política de Diego Castro com <span class="text-[#005a1a] font-bold">Jair Bolsonaro</span> atravessa diferentes fases de sua trajetória. Desde a juventude, Diego defende publicamente as mesmas pautas conservadoras, participou das mobilizações que fortaleceram <span class="text-[#005a1a] font-bold">Bolsonaro</span> na Bahia e permaneceu ao seu lado nos momentos de maior pressão política.') }} />
             </div>
             <Heart className="absolute -bottom-10 -right-10 w-64 h-64 text-white/5" />
          </div>
@@ -335,10 +355,10 @@ const HistoriaPage: React.FC = () => {
       {/* MANDATO NA ASSEMBLEIA */}
       <section className="py-16 px-6 bg-white">
         <div className="max-w-5xl mx-auto text-center">
-          <ImpactText text="NA ASSEMBLEIA LEGISLATIVA" color="blue" className="text-3xl lg:text-5xl mb-12" />
+          <ImpactText text={getSetting('historia_assembly_title', 'NA ASSEMBLEIA LEGISLATIVA')} color="blue" className="text-3xl lg:text-5xl mb-12" />
           <div className="max-w-3xl mx-auto">
             <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 shadow-sm text-left">
-              <h3 className="text-xl font-bold text-[#002776] mb-6">Atuação nas Comissões</h3>
+              <h3 className="text-xl font-bold text-[#002776] mb-6">{getSetting('historia_assembly_subtitle', 'Atuação nas Comissões')}</h3>
               <div className="space-y-4">
                 {comissoes.map((item, i) => (
                   <div key={i} className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-xl">
@@ -360,17 +380,16 @@ const HistoriaPage: React.FC = () => {
       {/* PRESENÇA DIGITAL E Encerramento */}
       <section className="py-16 px-6 bg-[#005a1a]">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl lg:text-5xl font-heading font-black text-white mb-6">
-            UMA NOVA GERAÇÃO DE <span className="text-[#ffdf00]">POLÍTICOS</span>
+          <h2 className="text-3xl lg:text-5xl font-heading font-black text-white mb-6" dangerouslySetInnerHTML={{ __html: getSetting('historia_closing_title', 'UMA NOVA GERAÇÃO DE <span class="text-[#ffdf00]">POLÍTICOS</span>') }}>
           </h2>
           <p className="text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Com perfil combativo, técnico e ligado aos valores da família, da fé cristã e do trabalho, o deputado Diego Castro representa uma nova geração de políticos conservadores na Bahia. Sua trajetória, desde os projetos sociais no Cabula até o Parlamento baiano, reflete o compromisso com a defesa das liberdades, da moralidade pública e da transformação da política estadual.
+            {getSetting('historia_closing_text', 'Com perfil combativo, técnico e ligado aos valores da família, da fé cristã e do trabalho, o deputado Diego Castro representa uma nova geração de políticos conservadores na Bahia. Sua trajetória, desde os projetos sociais no Cabula até o Parlamento baiano, reflete o compromisso com a defesa das liberdades, da moralidade pública e da transformação da política estadual.')}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {[
-              { icon: <Heart size={28} />, label: 'Fé Cristã' },
-              { icon: <Shield size={28} />, label: 'Liberdade' },
-              { icon: <Flag size={28} />, label: 'Transformação' },
+              { icon: <Heart size={28} />, label: getSetting('historia_closing_label_1', 'Fé Cristã') },
+              { icon: <Shield size={28} />, label: getSetting('historia_closing_label_2', 'Liberdade') },
+              { icon: <Flag size={28} />, label: getSetting('historia_closing_label_3', 'Transformação') },
             ].map((item, i) => (
               <div key={i} className="bg-white/10 border border-white/20 p-6 rounded-2xl flex flex-col items-center gap-3">
                 <div className="text-[#ffdf00]">{item.icon}</div>

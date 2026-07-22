@@ -20,7 +20,7 @@ import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
 import Admin from './src/Admin';
 import HistoriaPage from './components/HistoriaPage';
-import { Project, News, Video, SecuritySegment } from './types';
+import { Project, News, Video, SecuritySegment, SiteSetting } from './types';
 
 // Mock Data
 
@@ -49,6 +49,7 @@ const Home: React.FC = () => {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [driveLinks, setDriveLinks] = useState<Record<string, string>>({});
+  const [settings, setSettings] = useState<Record<string, string>>({});
 
   const { scrollYProgress } = useScroll();
   const opacity = useScroll(); // Placeholder for scroll logic if needed
@@ -82,6 +83,14 @@ const Home: React.FC = () => {
       // Projects
       const { data: projectsData } = await supabase.from('projects').select('*').order('year', { ascending: false });
       if (projectsData) setProjects(projectsData);
+      
+      // Site Settings
+      const { data: settingsData } = await supabase.from('site_settings').select('*');
+      if (settingsData) {
+        const settingsMap: Record<string, string> = {};
+        settingsData.forEach(s => { settingsMap[s.key] = s.value; });
+        setSettings(settingsMap);
+      }
     };
 
     fetchData();
@@ -92,6 +101,7 @@ const Home: React.FC = () => {
     const linksSub = supabase.channel('links-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'drive_links' }, fetchData).subscribe();
     const segmentsSub = supabase.channel('segments-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'security_segments' }, fetchData).subscribe();
     const projectsSub = supabase.channel('projects-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, fetchData).subscribe();
+    const settingsSub = supabase.channel('settings-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, fetchData).subscribe();
 
     return () => {
       supabase.removeChannel(newsSub);
@@ -99,6 +109,7 @@ const Home: React.FC = () => {
       supabase.removeChannel(linksSub);
       supabase.removeChannel(segmentsSub);
       supabase.removeChannel(projectsSub);
+      supabase.removeChannel(settingsSub);
     };
   }, []);
 
@@ -119,6 +130,7 @@ const Home: React.FC = () => {
     panfletos: 'https://drive.google.com/drive/folders/1BN7G53mMWVYPI310Cqn7NgvwJ4PL2G8C?usp=drive_link',
   };
   const getDriveLink = (key: string, defaultUrl: string = '#') => driveLinks[key] || defaultDriveLinks[key] || defaultUrl;
+  const getSetting = (key: string, defaultVal: string) => settings[key] || defaultVal;
 
   const extractYoutubeId = (url: string) => {
     const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
@@ -221,13 +233,13 @@ const Home: React.FC = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#ffdf00]/20 rounded-full mb-6">
               <TrendingUp size={16} className="text-[#002776]" />
-              <span className="text-xs font-bold text-[#002776] uppercase tracking-widest">100% Bolsonaro</span>
+              <span className="text-xs font-bold text-[#002776] uppercase tracking-widest">{getSetting('hero_badge', '100% Bolsonaro')}</span>
             </div>
             <h1 className="text-5xl lg:text-8xl font-heading font-black text-[#002776] leading-[0.9] mb-8 uppercase">
-              A voz que o sistema quer calar
+              {getSetting('hero_title', 'A voz que o sistema quer calar')}
             </h1>
             <p className="text-lg lg:text-xl text-slate-600 mb-10 max-w-xl leading-relaxed">
-              Recordista de Projetos de Lei e o deputado que mais investe na Segurança Pública da Bahia. Diego Castro é o guardião dos valores conservadores na ALBA.
+              {getSetting('hero_subtitle', 'Recordista de Projetos de Lei e o deputado que mais investe na Segurança Pública da Bahia. Diego Castro é o guardião dos valores conservadores na ALBA.')}
             </p>
             <div className="flex flex-wrap gap-4">
               <button onClick={() => scrollToSection('mandato')} className="bg-[#002776] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#001a4d] transition-all shadow-xl shadow-blue-200 flex items-center gap-2">
@@ -248,7 +260,7 @@ const Home: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-[#005a1a] to-[#002776] rounded-3xl rotate-6 opacity-10" />
               <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl overflow-hidden -rotate-3 border-4 border-white">
                 <img
-                  src="/diego e bs/principal.png"
+                  src={getSetting('hero_image', '/diego e bs/principal.png')}
                   alt="Diego Castro"
                   className="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-700"
                   referrerPolicy="no-referrer"
@@ -257,8 +269,8 @@ const Home: React.FC = () => {
               {/* Floating Badge */}
               <div className="absolute -bottom-6 -right-6 bg-[#ffdf00] p-6 rounded-2xl shadow-xl border-4 border-white rotate-6">
                 <div className="text-center">
-                  <div className="text-3xl font-black text-[#002776]">100%</div>
-                  <div className="text-sm font-black text-[#005a1a] uppercase tracking-tighter">Bolsonaro</div>
+                  <div className="text-3xl font-black text-[#002776]">{getSetting('hero_badge_2_value', '100%')}</div>
+                  <div className="text-sm font-black text-[#005a1a] uppercase tracking-tighter">{getSetting('hero_badge_2_label', 'Bolsonaro')}</div>
                 </div>
               </div>
             </div>
@@ -270,10 +282,10 @@ const Home: React.FC = () => {
       <section className="bg-[#002776] py-12 px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
-            { label: '170+ Proposições e 95 PLs', value: 'Recordista', hint: 'Fonte: site oficial do mandato' },
-            { label: 'Cidades Visitadas', value: 'Mais de 100' },
-            { label: 'Emendas Segurança', value: 'R$ 2,5M' },
-            { label: 'Fiscalizações', value: '80+' },
+            { label: getSetting('stats_1_label', '170+ Proposições e 95 PLs'), value: getSetting('stats_1_value', 'Recordista'), hint: 'Fonte: site oficial do mandato' },
+            { label: getSetting('stats_2_label', 'Cidades Visitadas'), value: getSetting('stats_2_value', 'Mais de 100') },
+            { label: getSetting('stats_3_label', 'Emendas Segurança'), value: getSetting('stats_3_value', 'R$ 2,5M') },
+            { label: getSetting('stats_4_label', 'Fiscalizações'), value: getSetting('stats_4_value', '80+') },
           ].map((stat, i) => (
             <div key={i} className="text-center flex flex-col items-center justify-center">
               <div className="text-3xl lg:text-5xl font-heading font-black text-[#ffdf00] mb-1">{stat.value}</div>
@@ -289,15 +301,13 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1">
-              <h2 className="text-4xl lg:text-5xl font-heading font-black text-[#002776] mb-8 uppercase leading-tight">
-                Fiel defensor do presidente <span className="text-[#005a1a]">Bolsonaro</span>
+              <h2 className="text-4xl lg:text-5xl font-heading font-black text-[#002776] mb-8 uppercase leading-tight" dangerouslySetInnerHTML={{__html: getSetting('about_title', 'Fiel defensor do presidente <span class="text-[#005a1a]">Bolsonaro</span>')}}>
               </h2>
               <div className="space-y-6 text-slate-600 text-lg leading-relaxed">
                 <p>
-                  Conservador baiano, advogado e cristão, Diego Castro é o atual Presidente da Comissão de Direitos Humanos e Segurança Pública da Assembleia Legislativa da Bahia.
+                  {getSetting('about_text_1', 'Conservador baiano, advogado e cristão, Diego Castro é o atual Presidente da Comissão de Direitos Humanos e Segurança Pública da Assembleia Legislativa da Bahia.')}
                 </p>
-                <p>
-                  Fiel defensor das bandeiras do ex-presidente <span className="text-[#005a1a] font-bold">Jair Bolsonaro</span>, Diego pauta seu mandato na defesa intransigente da vida, da família e da liberdade religiosa, sendo a voz da direita na Bahia.
+                <p dangerouslySetInnerHTML={{__html: getSetting('about_text_2', 'Fiel defensor das bandeiras do ex-presidente <span class="text-[#005a1a] font-bold">Jair Bolsonaro</span>, Diego pauta seu mandato na defesa intransigente da vida, da família e da liberdade religiosa, sendo a voz da direita na Bahia.')}}>
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
                   {[
@@ -322,7 +332,7 @@ const Home: React.FC = () => {
             </div>
             <div className="order-1 lg:order-2 relative">
               <img
-                src="/fotos-diego/diego-2.jpeg"
+                src={getSetting('about_image', '/fotos-diego/diego-2.jpeg')}
                 className="rounded-3xl shadow-2xl"
                 alt="Trajetória"
                 referrerPolicy="no-referrer"
@@ -356,10 +366,10 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div>
-              <span className="text-[#005a1a] font-bold uppercase tracking-[0.3em] text-xs mb-4 block">Ações Legislativas</span>
-              <ImpactText text="MANDATO PELA BAHIA" color="blue" className="text-4xl lg:text-6xl" />
+              <span className="text-[#005a1a] font-bold uppercase tracking-[0.3em] text-xs mb-4 block">{getSetting('mandato_badge', 'Ações Legislativas')}</span>
+              <ImpactText text={getSetting('mandato_title', 'MANDATO PELA BAHIA')} color="blue" className="text-4xl lg:text-6xl" />
               <p className="mt-4 text-slate-600 max-w-2xl">
-                Recordista de Projetos de Lei na Assembleia Legislativa da Bahia. Atuamos com transparência e coragem em defesa dos interesses do povo baiano.
+                {getSetting('mandato_subtitle', 'Recordista de Projetos de Lei na Assembleia Legislativa da Bahia. Atuamos com transparência e coragem em defesa dos interesses do povo baiano.')}
               </p>
             </div>
             <button
@@ -461,7 +471,7 @@ const Home: React.FC = () => {
       <section id="segurança" className="relative py-24 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-[#002776] z-0">
           <img
-            src="/fotos-diego/diego-3.jpeg"
+            src={getSetting('seguranca_image', '/fotos-diego/diego-3.jpeg')}
             className="w-full h-full object-cover opacity-20 mix-blend-overlay"
             alt="Segurança"
             referrerPolicy="no-referrer"
@@ -469,11 +479,10 @@ const Home: React.FC = () => {
         </div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="max-w-3xl">
-            <h2 className="text-4xl lg:text-6xl font-heading font-black text-white mb-8 leading-tight">
-              SEGURANÇA PÚBLICA É A NOSSA <span className="text-[#ffdf00]">PRIORIDADE</span>.
+            <h2 className="text-4xl lg:text-6xl font-heading font-black text-white mb-8 leading-tight" dangerouslySetInnerHTML={{__html: getSetting('seguranca_title', 'SEGURANÇA PÚBLICA É A NOSSA <span class="text-[#ffdf00]">PRIORIDADE</span>.')}}>
             </h2>
             <p className="text-xl text-white/80 mb-12 leading-relaxed">
-              Como Presidente da Comissão de Segurança, Diego destinou quase R$ 2,5 milhões para viaturas, armamentos e tecnologia. Luta pela blindagem da frota e pelo Sistema de Apoio à Vítima (SAV).
+              {getSetting('seguranca_subtitle', 'Como Presidente da Comissão de Segurança, Diego destinou quase R$ 2,5 milhões para viaturas, armamentos e tecnologia. Luta pela blindagem da frota e pelo Sistema de Apoio à Vítima (SAV).')}
             </p>
 
             <div className="mt-8">
@@ -589,7 +598,7 @@ const Home: React.FC = () => {
       <section id="bolsonaro" className="py-24 px-6 bg-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 w-full h-full opacity-10 pointer-events-none">
           <img
-            src="/fotos-diego/bolsonaro.jpg"
+            src={getSetting('bolsonaro_image', '/fotos-diego/bolsonaro.jpg')}
             className="w-full h-full object-cover object-top"
             alt="Bolsonaro"
             referrerPolicy="no-referrer"
@@ -599,22 +608,20 @@ const Home: React.FC = () => {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#ffdf00]/20 rounded-full mb-6">
               <Flag size={16} className="text-[#ffdf00]" />
-              <span className="text-xs font-bold text-[#ffdf00] uppercase tracking-widest">Alinhamento Total</span>
+              <span className="text-xs font-bold text-[#ffdf00] uppercase tracking-widest">{getSetting('bolsonaro_badge', 'Alinhamento Total')}</span>
             </div>
-            <h2 className="text-4xl lg:text-7xl font-heading font-black text-white mb-8 leading-tight">
-              DIEGO CASTRO E <span className="text-[#22c55e]">BOLSONARO</span>
+            <h2 className="text-4xl lg:text-7xl font-heading font-black text-white mb-8 leading-tight" dangerouslySetInnerHTML={{__html: getSetting('bolsonaro_title', 'DIEGO CASTRO E <span class="text-[#22c55e]">BOLSONARO</span>')}}>
             </h2>
-            <p className="text-xl text-white/70 mb-10 leading-relaxed">
-              O representante oficial das pautas conservadoras de <span className="text-[#22c55e] font-bold">Jair Bolsonaro</span> na Bahia. Defesa da liberdade, da pátria e dos valores cristãos em cada ação do mandato.
+            <p className="text-xl text-white/70 mb-10 leading-relaxed" dangerouslySetInnerHTML={{__html: getSetting('bolsonaro_subtitle', 'O representante oficial das pautas conservadoras de <span class="text-[#22c55e] font-bold">Jair Bolsonaro</span> na Bahia. Defesa da liberdade, da pátria e dos valores cristãos em cada ação do mandato.')}}>
             </p>
             <div className="grid grid-cols-2 gap-6 mb-12">
               <div className="p-6 bg-white/5 border border-white/10 rounded-2xl">
-                <div className="text-[#ffdf00] font-black text-2xl mb-2">100%</div>
-                <div className="text-white/60 text-xs font-bold uppercase tracking-widest">Lealdade às Pautas</div>
+                <div className="text-[#ffdf00] font-black text-2xl mb-2">{getSetting('bolsonaro_stats_1_value', '100%')}</div>
+                <div className="text-white/60 text-xs font-bold uppercase tracking-widest">{getSetting('bolsonaro_stats_1_label', 'Lealdade às Pautas')}</div>
               </div>
               <div className="p-6 bg-white/5 border border-white/10 rounded-2xl">
-                <div className="text-[#ffdf00] font-black text-2xl mb-2">BAHIA</div>
-                <div className="text-white/60 text-xs font-bold uppercase tracking-widest">Voz da Direita</div>
+                <div className="text-[#ffdf00] font-black text-2xl mb-2">{getSetting('bolsonaro_stats_2_value', 'BAHIA')}</div>
+                <div className="text-white/60 text-xs font-bold uppercase tracking-widest">{getSetting('bolsonaro_stats_2_label', 'Voz da Direita')}</div>
               </div>
             </div>
           </div>
@@ -626,43 +633,43 @@ const Home: React.FC = () => {
       <section id="bahia" className="py-24 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <ImpactText text="DIEGO PELA BAHIA" color="blue" className="text-4xl lg:text-6xl mb-4" />
-            <p className="text-slate-500 font-medium">Presença constante em todas as regiões do nosso estado</p>
+            <ImpactText text={getSetting('bahia_title', 'DIEGO PELA BAHIA')} color="blue" className="text-4xl lg:text-6xl mb-4" />
+            <p className="text-slate-500 font-medium">{getSetting('bahia_subtitle', 'Presença constante em todas as regiões do nosso estado')}</p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-12 items-center">
             <div className="space-y-8">
               <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100">
-                <h4 className="text-[#002776] font-black text-xl mb-4 uppercase">Agenda no Interior</h4>
+                <h4 className="text-[#002776] font-black text-xl mb-4 uppercase">{getSetting('bahia_item_1_title', 'Agenda no Interior')}</h4>
                 <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                  Mais de 200 cidades visitadas. Diego Castro não fica apenas no gabinete; ele percorre a Bahia para ouvir as demandas reais da população.
+                  {getSetting('bahia_item_1_text', 'Mais de 200 cidades visitadas. Diego Castro não fica apenas no gabinete; ele percorre a Bahia para ouvir as demandas reais da população.')}
                 </p>
                 <div className="flex items-center gap-3 text-[#005a1a] font-bold text-sm">
-                  <MapPin size={18} /> <span>Oeste, Norte, Sul e Recôncavo</span>
+                  <MapPin size={18} /> <span>{getSetting('bahia_item_1_footer', 'Oeste, Norte, Sul e Recôncavo')}</span>
                 </div>
               </div>
               <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100">
-                <h4 className="text-[#002776] font-black text-xl mb-4 uppercase">Encontro com Lideranças</h4>
+                <h4 className="text-[#002776] font-black text-xl mb-4 uppercase">{getSetting('bahia_item_2_title', 'Encontro com Lideranças')}</h4>
                 <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                  Fortalecimento da base conservadora em cada município, unindo forças para transformar a realidade da Bahia.
+                  {getSetting('bahia_item_2_text', 'Fortalecimento da base conservadora em cada município, unindo forças para transformar a realidade da Bahia.')}
                 </p>
                 <div className="flex items-center gap-3 text-[#005a1a] font-bold text-sm">
-                  <Users size={18} /> <span>União e Propósito</span>
+                  <Users size={18} /> <span>{getSetting('bahia_item_2_footer', 'União e Propósito')}</span>
                 </div>
               </div>
             </div>
 
             <div className="lg:col-span-2 relative aspect-[4/3] bg-slate-100 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl">
               <img
-                src="/fotos-diego/diego-6.jpeg"
+                src={getSetting('bahia_image', '/fotos-diego/diego-6.jpeg')}
                 className="w-full h-full object-cover opacity-80"
                 alt="Mapa Bahia"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#002776]/80 to-transparent flex items-end p-12">
                 <div className="text-white">
-                  <div className="text-5xl font-black mb-2">200+</div>
-                  <div className="text-sm font-bold uppercase tracking-[0.3em]">Cidades Atendidas</div>
+                  <div className="text-5xl font-black mb-2">{getSetting('bahia_image_stats_value', '200+')}</div>
+                  <div className="text-sm font-bold uppercase tracking-[0.3em]">{getSetting('bahia_image_stats_label', 'Cidades Atendidas')}</div>
                 </div>
               </div>
               {/* Interactive Map Placeholder */}

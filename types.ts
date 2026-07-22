@@ -53,3 +53,10 @@ export interface SecuritySegment {
   image: string;
   created_at?: string;
 }
+
+export interface SiteSetting {
+  key: string;
+  value: string;
+  description?: string;
+  group_name?: string;
+}

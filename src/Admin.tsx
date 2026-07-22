@@ -9,7 +9,7 @@ import {
 const Admin: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'news' | 'videos' | 'links' | 'segments' | 'projects'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'news' | 'videos' | 'links' | 'segments' | 'projects' | 'settings'>('dashboard');
   
   // Auth States
   const [authEmail, setAuthEmail] = useState('');
@@ -22,6 +22,7 @@ const Admin: React.FC = () => {
   const [links, setLinks] = useState<any[]>([]);
   const [segments, setSegments] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
+  const [settings, setSettings] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   
   // Form States
@@ -94,6 +95,9 @@ const Admin: React.FC = () => {
 
       const { data: projectsData } = await supabase.from('projects').select('*').order('year', { ascending: false });
       if (projectsData) setProjects(projectsData);
+
+      const { data: settingsData } = await supabase.from('site_settings').select('*').order('key', { ascending: true });
+      if (settingsData) setSettings(settingsData);
     };
 
     fetchData();
@@ -103,6 +107,7 @@ const Admin: React.FC = () => {
     const linksSub = supabase.channel('links-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'drive_links' }, fetchData).subscribe();
     const segmentsSub = supabase.channel('segments-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'security_segments' }, fetchData).subscribe();
     const projectsSub = supabase.channel('projects-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, fetchData).subscribe();
+    const settingsSub = supabase.channel('settings-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, fetchData).subscribe();
 
     return () => {
       supabase.removeChannel(newsSub);
@@ -110,6 +115,7 @@ const Admin: React.FC = () => {
       supabase.removeChannel(linksSub);
       supabase.removeChannel(segmentsSub);
       supabase.removeChannel(projectsSub);
+      supabase.removeChannel(settingsSub);
     };
   }, [user]);
 
@@ -172,7 +178,7 @@ const Admin: React.FC = () => {
     if (isSaving) return;
     setIsSaving(true);
 
-    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : 'drive_links';
+    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : activeTab === 'settings' ? 'site_settings' : 'drive_links';
     
     let finalData = { ...formData };
     
@@ -219,6 +225,11 @@ const Admin: React.FC = () => {
         key: finalData.key,
         url: finalData.url,
       };
+    } else if (activeTab === 'settings') {
+      finalData = {
+        key: finalData.key,
+        value: finalData.value,
+      };
     }
 
     try {
@@ -237,6 +248,8 @@ const Admin: React.FC = () => {
           setProjects(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
         } else if (tableName === 'security_segments') {
           setSegments(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
+        } else if (tableName === 'site_settings') {
+          setSettings(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
         } else if (tableName === 'drive_links') {
           setLinks(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
         }
@@ -255,6 +268,8 @@ const Admin: React.FC = () => {
             setProjects(prev => [newItem, ...prev]);
           } else if (tableName === 'security_segments') {
             setSegments(prev => [newItem, ...prev]);
+          } else if (tableName === 'site_settings') {
+            setSettings(prev => [newItem, ...prev]);
           } else if (tableName === 'drive_links') {
             setLinks(prev => [...prev, newItem]);
           }
@@ -272,7 +287,7 @@ const Admin: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : 'drive_links';
+    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : activeTab === 'settings' ? 'site_settings' : 'drive_links';
     if (window.confirm("Tem certeza que deseja excluir?")) {
       try {
         const { error } = await supabase.from(tableName).delete().eq('id', id);
@@ -287,6 +302,8 @@ const Admin: React.FC = () => {
           setProjects(prev => prev.filter(item => item.id !== id));
         } else if (tableName === 'security_segments') {
           setSegments(prev => prev.filter(item => item.id !== id));
+        } else if (tableName === 'site_settings') {
+          setSettings(prev => prev.filter(item => item.id !== id));
         } else if (tableName === 'drive_links') {
           setLinks(prev => prev.filter(item => item.id !== id));
         }
@@ -410,6 +427,7 @@ const Admin: React.FC = () => {
             { id: 'projects', label: 'Projetos', icon: <LayoutDashboard size={18} /> },
             { id: 'segments', label: 'Segmentações', icon: <Shield size={18} /> },
             { id: 'links', label: 'Drive Links', icon: <LinkIcon size={18} /> },
+            { id: 'settings', label: 'Config. do Site', icon: <Settings size={18} /> },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -438,7 +456,7 @@ const Admin: React.FC = () => {
         <header className="bg-white border-b border-slate-200 px-8 py-5 flex justify-between items-center sticky top-0 z-30">
           <div>
             <h1 className="text-xl font-black text-[#002776] uppercase tracking-tight">
-              {activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'news' ? 'Notícias' : activeTab === 'videos' ? 'Vídeos' : activeTab === 'projects' ? 'Projetos' : activeTab === 'segments' ? 'Segmentações' : 'Drive Links'}
+              {activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'news' ? 'Notícias' : activeTab === 'videos' ? 'Vídeos' : activeTab === 'projects' ? 'Projetos' : activeTab === 'segments' ? 'Segmentações' : activeTab === 'settings' ? 'Configurações' : 'Drive Links'}
             </h1>
             <p className="text-slate-400 text-xs font-medium mt-0.5">Gerenciar conteúdo do portal</p>
           </div>
@@ -592,6 +610,20 @@ const Admin: React.FC = () => {
                 <p className="text-3xl font-black text-[#002776]">{links.length}</p>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   {links.length === 1 ? 'link cadastrado' : 'links cadastrados'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
+                <Settings size={24} className="text-slate-500" />
+              </div>
+              <div>
+                <p className="text-3xl font-black text-[#002776]">{settings.length}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  {settings.length === 1 ? 'configuração cadastrada' : 'configurações cadastradas'}
                 </p>
               </div>
             </div>
@@ -914,6 +946,30 @@ const Admin: React.FC = () => {
                     </>
                   )}
 
+                  {activeTab === 'settings' && (
+                    <>
+                      <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 mb-4">
+                        <p className="text-xs text-blue-600"><strong>Cuidado:</strong> Não altere as chaves a menos que saiba o que está fazendo. Altere apenas os valores.</p>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Chave Identificadora</label>
+                        <input 
+                          type="text" placeholder="ex: hero_title" required
+                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all"
+                          value={formData.key || ''} onChange={e => setFormData({...formData, key: e.target.value})}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Valor</label>
+                        <textarea 
+                          placeholder="Texto ou URL da imagem" required rows={5}
+                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all resize-none"
+                          value={formData.value || ''} onChange={e => setFormData({...formData, value: e.target.value})}
+                        />
+                      </div>
+                    </>
+                  )}
+
                   <div className="pt-2">
                     <button 
                       type="submit" 
@@ -1004,6 +1060,20 @@ const Admin: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-bold text-[#002776]">{item.key}</h4>
                   <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{item.url}</p>
+                </div>
+                <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
+                  <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
+                </div>
+              </div>
+            ))}
+
+            {activeTab === 'settings' && settings.map(item => (
+              <div key={item.id} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
+                <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0"><Settings size={18} /></div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-[#002776]">{item.key}</h4>
+                  <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{item.value}</p>
                 </div>
                 <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={() => { setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
