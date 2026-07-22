@@ -590,7 +590,7 @@ const Home: React.FC = () => {
         <div className="absolute inset-0 w-full h-full opacity-10 pointer-events-none">
           <img
             src="/fotos-diego/bolsonaro.jpg"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
             alt="Bolsonaro"
             referrerPolicy="no-referrer"
           />
