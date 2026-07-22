@@ -1076,14 +1076,32 @@ const Admin: React.FC = () => {
                           <p className="text-xs text-slate-500 mt-1.5">{SETTING_LABELS[formData.key].desc}</p>
                         )}
                       </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 mt-4">Conteúdo / Valor</label>
-                        <textarea 
-                          placeholder="Texto ou URL da imagem" required rows={5}
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all resize-none"
-                          value={formData.value || ''} onChange={e => setFormData({...formData, value: e.target.value})}
-                        />
-                      </div>
+                      {formData.key?.includes('image') ? (
+                        <div className="space-y-2 mt-4">
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Conteúdo / Valor (Imagem)</label>
+                          <div className="flex gap-3 items-center">
+                            <input 
+                              type="url" placeholder="URL da Imagem ou faça o upload"
+                              className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all"
+                              value={formData.value || ''} onChange={e => setFormData({...formData, value: e.target.value})}
+                            />
+                            <label className="cursor-pointer bg-slate-100 p-3 rounded-xl hover:bg-slate-200 transition-all flex items-center justify-center">
+                              <Plus size={18} className="text-slate-500" />
+                              <input type="file" className="hidden" accept="image/*" onChange={e => handleFileChange(e, 'value')} />
+                            </label>
+                          </div>
+                          {formData.value && <img src={formData.value} className="h-24 rounded-xl border border-slate-200 object-cover mt-2" alt="Preview" />}
+                        </div>
+                      ) : (
+                        <div>
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 mt-4">Conteúdo / Valor</label>
+                          <textarea 
+                            placeholder="Texto ou URL da imagem" required rows={5}
+                            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all resize-none"
+                            value={formData.value || ''} onChange={e => setFormData({...formData, value: e.target.value})}
+                          />
+                        </div>
+                      )}
                     </>
                   )}
 
