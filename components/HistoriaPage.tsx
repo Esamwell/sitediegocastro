@@ -3,34 +3,180 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Shield, Users, Heart, Flag, BookOpen,
-  Briefcase, MapPin, Calendar, Scale, Star, CheckCircle2
+  Briefcase, MapPin, Calendar, Scale, Star, CheckCircle2,
+  ExternalLink
 } from 'lucide-react';
 import PatrioticBackground from './PatrioticBackground';
 import ImpactText from './ImpactText';
 
-const timeline = [
-  { year: '1992', event: 'Nascimento em Salvador, Bahia, no bairro do Cabula' },
-  { year: '2004', event: 'Fundou seu primeiro projeto social aos 12 anos, unindo futebol e evangelismo' },
-  { year: '2008', event: 'Projeto já beneficiava 88 jovens em situação de vulnerabilidade' },
-  { year: '2011', event: 'Tornou-se o primeiro presidente de um grêmio estudantil de direita no estado da Bahia' },
-  { year: '2013', event: 'Ingressou na Faculdade Unijorge para cursar Direito' },
-  { year: '2014', event: 'Liderou manifestações pró-impeachment na Bahia' },
-  { year: '2017', event: 'Fundou o movimento Bahia Direita, maior grupo conservador do estado' },
-  { year: '2018', event: 'Formou-se em Direito pela Unijorge' },
-  { year: '2019', event: 'Atuou como subdiretor do Trabalho no SIMM de Salvador' },
-  { year: '2020', event: 'Ganhou notoriedade nacional com ações jurídicas contra medidas abusivas na pandemia' },
-  { year: '2022', event: 'Eleito deputado estadual com votação expressiva pelo PL' },
-  { year: '2023', event: 'Tomou posse na Assembleia Legislativa da Bahia (Legislatura 2023-2027)' },
-  { year: '2024', event: 'Aprovação da Lei Antidrogas da Bahia para escolas públicas estaduais' },
-  { year: '2025', event: 'Presidiu a Comissão de Direitos Humanos e Segurança Pública da ALBA' },
-  { year: '2026', event: 'Assumiu a vice-liderança do Bloco da Minoria na Assembleia' },
-];
+const renderText = (text: string) => {
+  const parts = text.split(/(Jair Bolsonaro|Bolsonaro)/g);
+  return (
+    <>
+      {parts.map((part, index) => {
+        if (part === 'Jair Bolsonaro' || part === 'Bolsonaro') {
+          return <span key={index} className="text-[#005a1a] font-bold">{part}</span>;
+        }
+        return part;
+      })}
+    </>
+  );
+};
 
-const reconhecimentos = [
-  { icon: <Star size={20} />, text: 'Elogios do presidente chileno Sebastián Piñera em intercâmbio internacional' },
-  { icon: <Star size={20} />, text: 'Reconhecimento do vice-presidente de Honduras, Ricardo Álvarez' },
-  { icon: <Star size={20} />, text: 'Reconhecimento de Elisa Sliver, da equipe do presidente Donald Trump' },
-  { icon: <Star size={20} />, text: 'Apoio do deputado federal Eduardo Bolsonaro em 2022' },
+const timeline = [
+  {
+    year: '1992',
+    paragraphs: ['Nasceu em Salvador, no bairro do Cabula, em 14 de setembro.']
+  },
+  {
+    year: '2004–2008',
+    paragraphs: ['Aos 12 anos, fundou, no bairro do Cabula, o projeto social Unidos pelo Futebol e Evangelismo, com o objetivo de afastar crianças e adolescentes das drogas. Aos 16 anos, o projeto já beneficiava mais de 100 jovens e suas famílias.'],
+    links: [{ text: 'Perfil sobre o início da trajetória de Diego Castro', url: '#' }]
+  },
+  {
+    year: '2009',
+    paragraphs: ['Iniciou sua formação em Direito, aprofundando o interesse pela atuação jurídica e pela defesa de causas sociais.']
+  },
+  {
+    year: '2010',
+    paragraphs: ['Prosseguiu sua formação em Direito e aprofundou os conhecimentos adquiridos no curso.']
+  },
+  {
+    year: '2011',
+    paragraphs: ['Tornou-se o primeiro presidente do Grêmio Estudantil do Colégio Estadual Severino Vieira, fortalecendo sua atuação na liderança estudantil e se tornando uma das referências da juventude conservadora baiana.']
+  },
+  {
+    year: '2013',
+    paragraphs: [
+      'Já se posicionava publicamente a favor de Jair Bolsonaro, mencionando seu nome no Facebook.',
+      'Neste ano, conheceu o então deputado federal Jair Bolsonaro e tornou-se um fiel aliado.',
+      'Participou das mobilizações que mais tarde culminariam no impeachment de Dilma Rousseff na Bahia.',
+      'Fundou a organização latino-americana Unidad, da qual foi presidente, com o objetivo de combater o comunismo nas Américas.',
+      'Já naquela época, denunciava Nicolás Maduro, o Foro de São Paulo, Juan Manuel Santos, Daniel Ortega, na Nicarágua, e Evo Morales, na Bolívia.',
+      'Foi também um período de aproximação com lideranças internacionais das Américas.'
+    ]
+  },
+  {
+    year: '2016',
+    paragraphs: ['Teve presença forte nas manifestações contra Dilma Rousseff, tornando-se uma das principais vozes da juventude baiana no movimento pelo impeachment.']
+  },
+  {
+    year: '2017',
+    paragraphs: ['Fundou o Bahia à Direita, maior grupo conservador do estado. Seguindo os passos de Jair Bolsonaro, filiou-se ao então PSL e apoiou sua pré-candidatura à Presidência da República.']
+  },
+  {
+    year: '2018',
+    paragraphs: ['Formou-se em Direito pela UNO. Coordenou a campanha jovem de Jair Bolsonaro na Bahia junto com o Bahia à Direita. Atuou como subcoordenador de trabalho em Salvador, na Secretaria de Trabalho.']
+  },
+  {
+    year: '2019',
+    paragraphs: ['Atuou como subdiretor do Trabalho de Salvador no Serviço Municipal de Intermediação de Mão de Obra, o SIMM, vinculado à Secretaria Municipal de Trabalho, Esporte e Lazer.'],
+    links: [{ text: 'Perfil oficial de Diego Castro na ALBA', url: '#' }]
+  },
+  {
+    year: '2020',
+    paragraphs: [
+      'Ganhou notoriedade nacional pelas ações jurídicas contra medidas consideradas abusivas durante a pandemia.',
+      'Levantou-se contra o que classificou como a tirania do governo estadual e as medidas de restrição econômica, atuando em defesa de empresários, comerciantes e igrejas.',
+      'Consolidou-se como o advogado que mais ajuizou ações contra o fechamento de igrejas e do comércio na Bahia.',
+      'Defendeu o protocolo de tratamento precoce e foi o primeiro a apoiar publicamente a Dra. Raíssa Soares.'
+    ]
+  },
+  {
+    year: '2021',
+    paragraphs: [
+      'Impulsionou a candidatura da Dra. Raíssa Soares ao governo do estado, que depois se converteu em candidatura ao Senado Federal.',
+      'Atuou como advogado dela, com papel decisivo em vitórias judiciais contra ações movidas pelo governo do estado e pelo deputado Hilton Coelho, do PSOL.',
+      'Acompanhando Jair Bolsonaro, filiou-se ao Partido Liberal.'
+    ]
+  },
+  {
+    year: '2022',
+    paragraphs: [
+      'Percorreu a Bahia com a caravana Bahia Direita em defesa de Jair Bolsonaro, contribuindo para contrapor a narrativa da imprensa considerada de esquerda no estado.',
+      'Candidatou-se a deputado estadual e foi eleito, em sua primeira eleição, com 33.827 votos.'
+    ],
+    links: [{ text: 'Resultado e perfil eleitoral de Diego Castro', url: '#' }]
+  },
+  {
+    year: '2023',
+    paragraphs: [
+      'Foi, segundo o registro do mandato, o primeiro parlamentar eleito do país a visitar os presos do 8 de janeiro na Papuda e na Colmeia, sete dias após os fatos, ao lado do deputado federal Capitão Alden, tornando-se alvo do STF.',
+      'Tomou posse na Assembleia Legislativa da Bahia e se firmou como principal figura de oposição ao PT no estado.',
+      'Denunciou pela primeira vez o chamado “kit Lula” no Carnaval de Salvador, lanche distribuído pela Polícia Militar.',
+      'Com apenas quatro meses de mandato, teve papel decisivo na criação da Polícia Penal na Bahia, destravando uma pauta que estava parada havia 20 anos na Casa.',
+      'Foi o único deputado estadual do Brasil a participar das diligências da CPI do MST no Sul da Bahia, iniciando ali o ciclo de fiscalizações que passou a ser a marca do mandato.',
+      'Em decorrência das diligências, foi processado pelo MST e por mais 16 deputados federais de esquerda, sob acusações relacionadas a uma suposta invasão de propriedade e a cinco crimes que Diego afirma não terem ocorrido.',
+      'Foi convidado pela comitiva de Jair Bolsonaro para a posse do presidente Javier Milei, na Argentina.'
+    ],
+    links: [
+      { text: 'Lista de parlamentares que visitaram presos do 8 de janeiro', url: '#' },
+      { text: 'Debate sobre a regulamentação da Polícia Penal — ALBA', url: '#' },
+      { text: 'Diligências da CPI do MST na Bahia — Câmara dos Deputados', url: '#' },
+      { text: 'Posse de Javier Milei — A Tarde', url: '#' }
+    ]
+  },
+  {
+    year: '2024',
+    paragraphs: [
+      'Tornou-se o “deputado revelação” da Assembleia Legislativa e se consolidou como recordista de projetos de lei da Casa.',
+      'Protocolou títulos de cidadão baiano para Jair e Eduardo Bolsonaro.',
+      'Aprovou a lei do pacote antidrogas nas escolas.',
+      'Consolidou-se como o deputado que mais destinou recursos para a segurança pública, realizando audiências públicas sobre direitos humanos e condições de trabalho da Polícia Militar, da Polícia Penal e da Polícia Civil.',
+      'Articulou o maior crescimento da direita baiana, lançando 184 candidatos a vereador e percorrendo mais de 75 cidades em 45 dias de campanha.'
+    ],
+    links: [
+      { text: 'Pacote antidrogas nas escolas estaduais', url: '#' },
+      { text: 'Proposições legislativas de Diego Castro — ALBA', url: '#' }
+    ]
+  },
+  {
+    year: '2025',
+    paragraphs: [
+      'Convidado pelo Partido Republicano dos Estados Unidos para a posse de Donald Trump, integrou a comitiva brasileira em Washington.',
+      'Assumiu a presidência da Comissão de Direitos Humanos e Segurança Pública da ALBA, com papel decisivo na defesa dos direitos humanos e das condições de trabalho dos profissionais da segurança pública baiana, denunciando problemas de remuneração e alimentação durante o Carnaval.',
+      'Aprovou a Comenda Dois de Julho em homenagem a Clériston Pereira da Cunha, o Clezão.',
+      'Foi o único deputado presente nas enchentes do Sul da Bahia, visitando os desabrigados e levando donativos a Aurelino Leal e Ubaitaba.',
+      'Apresentou o projeto que cria o Estatuto da Liberdade Cristã e atuou para barrar projeto de lei que, em sua avaliação, poderia fechar e multar igrejas na Bahia.',
+      'Após denunciar suspeitas de fraude em suas fiscalizações, teve a residência invadida e sofreu ameaças e processos.',
+      'Denunciou publicamente o projeto de lei da deputada Olívia Santana, do PCdoB, que apelidou de “Bolsa Família do Crime”.',
+      'Foi processado pela parlamentar e venceu a disputa judicial, tornando-se um dos principais opositores do PCdoB na Bahia.',
+      'Barrou o financiamento público estadual a uma apresentação da banda Bozokill, que fazia apologia à morte de Jair Bolsonaro e de seus apoiadores.',
+      'Processou o governador Jerônimo Rodrigues após a declaração sobre mandar apoiadores de Bolsonaro “para a vala”.',
+      'Convocou as primeiras manifestações do Brasil contra a prisão de Bolsonaro e participou do ato na Avenida Paulista ao lado dele, pouco antes de sua prisão.',
+      'Encerrou o ano como o deputado com mais proposições e maior engajamento nas redes sociais da Casa.'
+    ],
+    links: [
+      { text: 'Residência de Diego Castro foi invadida em Salvador', url: '#' },
+      { text: 'Diego Castro acionou o STF após fala de Jerônimo Rodrigues', url: '#' },
+      { text: 'Presidência da Comissão de Direitos Humanos e Segurança Pública', url: '#' },
+      { text: 'PL 25.704/2025 — Estatuto da Liberdade Cristã', url: '#' },
+      { text: 'Denúncia de Diego ao projeto de Olívia Santana', url: '#' },
+      { text: 'Publicação original sobre o “Bolsa Família do Crime”', url: '#' },
+      { text: 'Decisão judicial sobre a queixa-crime', url: '#' },
+      { text: 'Cancelamento do show da Bozokill após ação popular', url: '#' }
+    ]
+  },
+  {
+    year: '2026',
+    paragraphs: [
+      'Consolidou-se como o deputado mais produtivo da Assembleia Legislativa da Bahia e o que mais destinou recursos à educação militar no estado.',
+      'Aprovou a lei que declarou João Dourado a Capital Estadual da Cebola, trazendo investimentos e visibilidade para a região.',
+      'Foi reconhecido pelo Instituto LabCaos como o deputado mais engajado nas redes sociais da Assembleia.',
+      'Assumiu a vice-liderança da oposição na ALBA.',
+      'Como legado à frente da Comissão de Direitos Humanos e Segurança Pública, aprovou o requerimento que deu ensejo a investigações sobre crimes praticados contra produtores rurais no Extremo Sul da Bahia.',
+      'Tornou-se o deputado com o maior número de fiscalizações da Bahia.',
+      'Denunciou o que classificou como uma “máfia” e uma articulação entre o Partido Comunista Chinês e o governo petista do Estado da Bahia, apontando a possível existência de uma base secreta ou estrutura chinesa de monitoramento em funcionamento em Salvador.',
+      'O assunto ganhou repercussão nacional e internacional.',
+      'Foi impedido de entrar em hospitais para realizar fiscalizações após denunciar a situação da rede pública de saúde da Bahia, em decorrência de processo movido pelo governo estadual.',
+      'Entregou, em cerimônia póstuma, a Comenda Dois de Julho à família de Clezão.'
+    ],
+    links: [
+      { text: 'Vice-liderança da oposição — A Tarde', url: '#' },
+      { text: 'Pedido de apuração sobre possível estrutura chinesa — BNews', url: '#' },
+      { text: 'Homenagem póstuma a Clezão — ALBA', url: '#' }
+    ]
+  }
 ];
 
 const comissoes = [
@@ -100,9 +246,9 @@ const HistoriaPage: React.FC = () => {
             className="relative rounded-[2.5rem] overflow-hidden shadow-2xl"
           >
             <img
-              src="/fotos-diego/diego-2.jpeg"
-              alt="Diego Castro"
-              className="w-full h-[30rem] lg:h-[40rem] object-cover"
+              src="/diego e bs/diego jovem com bolsonaro.png"
+              alt="Trajetória de Diego Castro"
+              className="w-full h-[30rem] lg:h-[40rem] object-cover object-top"
               referrerPolicy="no-referrer"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#002776]/60 to-transparent" />
@@ -116,172 +262,12 @@ const HistoriaPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ORIGENS */}
-      <section className="py-16 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
-            <div>
-              <ImpactText text="ORIGENS" color="blue" className="text-3xl lg:text-5xl mb-8" />
-              <div className="space-y-6 text-slate-600 text-lg leading-relaxed">
-                <p>
-                  Diego Castro Barbosa nasceu em Salvador, Bahia, em 14 de setembro de 1992. Filho de Idalice Monteiro de Castro e Telmo José Barbosa, construiu desde cedo uma trajetória marcada pela liderança, pelo serviço ao próximo e pela defesa dos valores conservadores.
-                </p>
-                <p>
-                  Advogado e técnico em edificações, é atualmente uma das principais vozes da oposição na Assembleia Legislativa da Bahia, onde cumpre o primeiro mandato como deputado estadual pelo Partido Liberal (PL).
-                </p>
-              </div>
-            </div>
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200">
-              <h4 className="text-[#002776] font-black text-xl mb-6 uppercase tracking-tight">Dados Pessoais</h4>
-              <div className="space-y-4">
-                {[
-                  { label: 'Nome Completo', value: 'Diego Castro Barbosa' },
-                  { label: 'Nascimento', value: '14/09/1992 — Salvador, BA' },
-                  { label: 'Pais', value: 'Idalice Monteiro de Castro e Telmo José Barbosa' },
-                  { label: 'Formação', value: 'Direito — Unijorge (2013-2018)' },
-                  { label: 'Partido', value: 'Partido Liberal (PL)' },
-                  { label: 'Cargo', value: 'Deputado Estadual (2023-2027)' },
-                ].map((item, i) => (
-                  <div key={i} className="flex justify-between items-center border-b border-slate-200 pb-3">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">{item.label}</span>
-                    <span className="text-[#002776] font-bold text-sm text-right">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PROJETO SOCIAL E ATIVISMO INICIAL */}
-      <section className="py-16 px-6 bg-slate-50">
-        <div className="max-w-5xl mx-auto">
-          <ImpactText text="O INÍCIO DA TRAJETÓRIA" color="blue" className="text-3xl lg:text-5xl mb-12" />
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex gap-6">
-              <div className="w-14 h-14 bg-[#005a1a]/10 rounded-2xl flex items-center justify-center text-[#005a1a] shrink-0">
-                <Heart size={28} />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-[#002776] mb-3">Primeiro Projeto Social</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Aos 12 anos, no bairro do Cabula, em Salvador, fundou seu primeiro projeto social, que unia futebol e evangelismo para atender crianças e adolescentes em situação de vulnerabilidade. Aos 16 anos, a iniciativa já beneficiava cerca de 88 jovens.
-                </p>
-              </div>
-            </div>
-            <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex gap-6">
-              <div className="w-14 h-14 bg-[#002776]/10 rounded-2xl flex items-center justify-center text-[#002776] shrink-0">
-                <Users size={28} />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-[#002776] mb-3">Liderança Estudantil</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Na adolescência, tornou-se o primeiro presidente de um grêmio estudantil de direita no estado da Bahia, em 2011. Participou de intercâmbios e eventos internacionais no Chile, recebendo elogios do então presidente Sebastián Piñera.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* RECONHECIMENTOS INTERNACIONAIS */}
-      <section className="py-16 px-6 bg-[#002776]">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-5xl font-heading font-black text-white mb-4">RECONHECIMENTOS</h2>
-            <p className="text-white/60 font-medium">Trajetória reconhecida nacional e internacionalmente</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {reconhecimentos.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white/5 border border-white/10 p-6 rounded-2xl flex items-center gap-4"
-              >
-                <div className="text-[#ffdf00] shrink-0">{item.icon}</div>
-                <span className="text-white/90 font-medium text-sm">{item.text}</span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ATIVISMO POLÍTICO E BAHIA DIREITA */}
-      <section className="py-16 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <ImpactText text="ATIVISMO E COMPROMISSO" color="blue" className="text-3xl lg:text-5xl mb-12" />
-          <div className="space-y-8">
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200">
-              <h3 className="text-xl font-bold text-[#002776] mb-4 flex items-center gap-3">
-                <Flag size={24} className="text-[#005a1a]" />
-                Manifestações Pró-Impeachment (2014-2016)
-              </h3>
-              <p className="text-slate-600 leading-relaxed">
-                Entre 2014 e 2016, foi um dos líderes baianos das manifestações pró-impeachment que mobilizaram milhões de brasileiros. Sua atuação nas ruas consolidou sua imagem como líder do conservadorismo no estado.
-              </p>
-            </div>
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200">
-              <h3 className="text-xl font-bold text-[#002776] mb-4 flex items-center gap-3">
-                <Shield size={24} className="text-[#005a1a]" />
-                Bahia Direita (2017)
-              </h3>
-              <p className="text-slate-600 leading-relaxed">
-                Em 2017, junto com amigos e aliados, fundou o movimento Bahia Direita, que se tornou o maior grupo conservador do estado, presente em mais de 200 municípios e atuante em mobilizações de rua, ações jurídicas e iniciativas sociais em defesa das liberdades individuais e dos valores cristãos.
-              </p>
-            </div>
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200">
-              <h3 className="text-xl font-bold text-[#002776] mb-4 flex items-center gap-3">
-                <Scale size={24} className="text-[#005a1a]" />
-                Atuação Jurídica na Pandemia (2020)
-              </h3>
-              <p className="text-slate-600 leading-relaxed">
-                Durante a pandemia de Covid-19, ganhou notoriedade nacional por sua atuação jurídica contra medidas que considerou abusivas, como o passaporte sanitário imposto pelo governo estadual. Movimentou mais de 50 ações judiciais e representações administrativas em defesa das liberdades civis, processando o então governador Rui Costa e outros gestores. Essa postura lhe rendeu reconhecimento entre defensores da liberdade e também resultou em perseguições políticas, incluindo tentativas de suspender sua inscrição na Ordem dos Advogados do Brasil (OAB).
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FORMAÇÃO E CARRIERA */}
-      <section className="py-16 px-6 bg-slate-50">
-        <div className="max-w-5xl mx-auto">
-          <ImpactText text="FORMAÇÃO E CARREIRA" color="blue" className="text-3xl lg:text-5xl mb-12" />
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex gap-6">
-              <div className="w-14 h-14 bg-[#005a1a]/10 rounded-2xl flex items-center justify-center text-[#005a1a] shrink-0">
-                <BookOpen size={28} />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-[#002776] mb-3">Formação Acadêmica</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Formado em Direito pela Unijorge (2013-2018). Autor do artigo "Os deveres jurídicos das agências reguladoras e a garantia da livre concorrência", publicado na Revista de Direito Administrativo e Constitucional (REDAP) em 2019.
-                </p>
-              </div>
-            </div>
-            <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex gap-6">
-              <div className="w-14 h-14 bg-[#002776]/10 rounded-2xl flex items-center justify-center text-[#002776] shrink-0">
-                <Briefcase size={28} />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-[#002776] mb-3">Experiência Profissional</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Exerceu a advocacia no escritório Biset, Castro e Matos Advogados Associados. Atuou como subdiretor do Trabalho de Salvador no Serviço Municipal de Intermediação de Mão de Obra (SIMM) em 2019.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* TRAJETÓRIA CRONOLÓGICA */}
       <section className="py-16 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <ImpactText text="CRONOLOGIA" color="blue" className="text-3xl lg:text-5xl mb-4" />
-            <p className="text-slate-500 font-medium">Marcos importantes da minha vida pública</p>
+            <ImpactText text="TRAJETÓRIA" color="blue" className="text-3xl lg:text-5xl mb-4" />
+            <p className="text-slate-500 font-medium">Linha do tempo interativa e fatos organizados</p>
           </div>
           <div className="relative">
             <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-slate-200 hidden lg:block" />
@@ -301,9 +287,30 @@ const HistoriaPage: React.FC = () => {
                   <div className="relative">
                     <div className="w-4 h-4 bg-[#005a1a] rounded-full mt-1.5 hidden lg:block" />
                   </div>
-                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex-1">
-                    <span className="text-[#005a1a] font-black text-sm lg:hidden block mb-1">{item.year}</span>
-                    <p className="text-slate-700 font-medium">{item.event}</p>
+                  <div className="bg-slate-50 p-6 lg:p-8 rounded-2xl border border-slate-100 flex-1">
+                    <span className="text-[#005a1a] font-black text-xl lg:hidden block mb-4">{item.year}</span>
+                    
+                    <div className="space-y-4">
+                      {item.paragraphs.map((p, idx) => (
+                        <p key={idx} className="text-slate-700 font-medium leading-relaxed">
+                          {renderText(p)}
+                        </p>
+                      ))}
+                    </div>
+
+                    {item.links && item.links.length > 0 && (
+                      <div className="mt-6 pt-6 border-t border-slate-200 flex flex-col gap-3">
+                        {item.links.map((link, idx) => (
+                          <a 
+                            key={idx} 
+                            href={link.url} 
+                            className="inline-flex items-center gap-2 text-sm font-bold text-[#002776] hover:text-[#005a1a] transition-colors"
+                          >
+                            <ExternalLink size={14} /> Saiba mais: {renderText(link.text)}
+                          </a>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -312,16 +319,29 @@ const HistoriaPage: React.FC = () => {
         </div>
       </section>
 
-      {/* MANDATO NA ASSEMBLEIA */}
+      {/* LEALDADE A BOLSONARO */}
       <section className="py-16 px-6 bg-slate-50">
-        <div className="max-w-5xl mx-auto">
+         <div className="max-w-4xl mx-auto bg-gradient-to-br from-[#002776] to-[#005a1a] rounded-3xl p-10 lg:p-16 text-white shadow-xl relative overflow-hidden">
+            <div className="relative z-10">
+              <h3 className="text-3xl font-heading font-black mb-6 uppercase text-[#ffdf00]">Lealdade a Jair Bolsonaro</h3>
+              <p className="text-lg text-white/90 leading-relaxed">
+                A relação política de Diego Castro com {renderText('Jair Bolsonaro')} atravessa diferentes fases de sua trajetória. Desde a juventude, Diego defende publicamente as mesmas pautas conservadoras, participou das mobilizações que fortaleceram {renderText('Bolsonaro')} na Bahia e permaneceu ao seu lado nos momentos de maior pressão política.
+              </p>
+            </div>
+            <Heart className="absolute -bottom-10 -right-10 w-64 h-64 text-white/5" />
+         </div>
+      </section>
+
+      {/* MANDATO NA ASSEMBLEIA */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-5xl mx-auto text-center">
           <ImpactText text="NA ASSEMBLEIA LEGISLATIVA" color="blue" className="text-3xl lg:text-5xl mb-12" />
-          <div className="grid lg:grid-cols-2 gap-8 mb-12">
-            <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 shadow-sm text-left">
               <h3 className="text-xl font-bold text-[#002776] mb-6">Atuação nas Comissões</h3>
               <div className="space-y-4">
                 {comissoes.map((item, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl">
+                  <div key={i} className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-xl">
                     <CheckCircle2 size={18} className="text-[#005a1a] shrink-0" />
                     <div className="flex-1">
                       <span className="text-[#002776] font-bold text-sm">{item.cargo}</span>
@@ -333,27 +353,6 @@ const HistoriaPage: React.FC = () => {
                 ))}
               </div>
             </div>
-            <div className="bg-[#002776] p-8 rounded-3xl text-white">
-              <h3 className="text-xl font-bold mb-6">Principais Conquistas</h3>
-              <div className="space-y-4">
-                {[
-                  'Lei Antidrogas da Bahia (2024) — ações de conscientização nas escolas públicas estaduais',
-                  'Dezenas de proposições para valorização dos policiais',
-                  'Emendas parlamentares destinadas à segurança pública',
-                  'Fiscalização rigorosa do Executivo estadual',
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle2 size={18} className="text-[#ffdf00] shrink-0 mt-0.5" />
-                    <span className="text-white/90 text-sm leading-relaxed">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-            <p className="text-slate-600 text-lg leading-relaxed italic">
-              "Sua principal bandeira é a segurança pública. Apresentou dezenas de proposições voltadas à valorização dos policiais militares, civis, penais e guardas municipais, à melhoria das condições de trabalho e ao enfrentamento da criminalidade."
-            </p>
           </div>
         </div>
       </section>

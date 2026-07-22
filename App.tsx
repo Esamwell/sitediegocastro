@@ -223,8 +223,8 @@ const Home: React.FC = () => {
               <TrendingUp size={16} className="text-[#002776]" />
               <span className="text-xs font-bold text-[#002776] uppercase tracking-widest">Compromisso com a Bahia</span>
             </div>
-            <h1 className="text-5xl lg:text-8xl font-heading font-black text-[#002776] leading-[0.9] mb-8">
-              DEFESA DA <span className="text-[#005a1a]">BAHIA</span>, VALORES DA <span className="text-[#002776]">FAMÍLIA</span>.
+            <h1 className="text-5xl lg:text-8xl font-heading font-black text-[#002776] leading-[0.9] mb-8 uppercase">
+              A voz que o sistema quer calar
             </h1>
             <p className="text-lg lg:text-xl text-slate-600 mb-10 max-w-xl leading-relaxed">
               Recordista de Projetos de Lei e o deputado que mais investe na Segurança Pública da Bahia. Diego Castro é o guardião dos valores conservadores na ALBA.
@@ -248,7 +248,7 @@ const Home: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-[#005a1a] to-[#002776] rounded-3xl rotate-6 opacity-10" />
               <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl overflow-hidden -rotate-3 border-4 border-white">
                 <img
-                  src="/fotos-diego/diego-1.jpeg"
+                  src="/diego e bs/principal.png"
                   alt="Diego Castro"
                   className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                   referrerPolicy="no-referrer"
@@ -258,7 +258,7 @@ const Home: React.FC = () => {
               <div className="absolute -bottom-6 -right-6 bg-[#ffdf00] p-6 rounded-2xl shadow-xl border-4 border-white rotate-6">
                 <div className="text-center">
                   <div className="text-3xl font-black text-[#002776]">100%</div>
-                  <div className="text-[10px] font-bold text-[#002776] uppercase tracking-tighter">Pelo Povo Baiano</div>
+                  <div className="text-sm font-black text-[#005a1a] uppercase tracking-tighter">Bolsonaro</div>
                 </div>
               </div>
             </div>
@@ -270,14 +270,15 @@ const Home: React.FC = () => {
       <section className="bg-[#002776] py-12 px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
-            { label: 'Projetos de Lei', value: 'Recordista' },
-            { label: 'Cidades Visitadas', value: '200+' },
+            { label: '170+ Proposições e 95 PLs', value: 'Recordista', hint: 'Fonte: site oficial do mandato' },
+            { label: 'Cidades Visitadas', value: 'Mais de 100' },
             { label: 'Emendas Segurança', value: 'R$ 2,5M' },
             { label: 'Fiscalizações', value: '80+' },
           ].map((stat, i) => (
-            <div key={i} className="text-center">
+            <div key={i} className="text-center flex flex-col items-center justify-center">
               <div className="text-3xl lg:text-5xl font-heading font-black text-[#ffdf00] mb-1">{stat.value}</div>
               <div className="text-xs lg:text-sm font-bold text-white/60 uppercase tracking-widest">{stat.label}</div>
+              {stat.hint && <div className="text-[10px] text-white/40 mt-2 italic">{stat.hint}</div>}
             </div>
           ))}
         </div>
@@ -288,13 +289,15 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1">
-              <ImpactText text="QUEM É DIEGO CASTRO" color="blue" className="text-4xl lg:text-6xl mb-8" />
+              <h2 className="text-4xl lg:text-5xl font-heading font-black text-[#002776] mb-8 uppercase leading-tight">
+                Fiel defensor do presidente <span className="text-[#005a1a]">Bolsonaro</span>
+              </h2>
               <div className="space-y-6 text-slate-600 text-lg leading-relaxed">
                 <p>
                   Conservador baiano, advogado e cristão, Diego Castro é o atual Presidente da Comissão de Direitos Humanos e Segurança Pública da Assembleia Legislativa da Bahia.
                 </p>
                 <p>
-                  Fiel defensor das bandeiras do ex-presidente Jair Bolsonaro, Diego pauta seu mandato na defesa intransigente da vida, da família e da liberdade religiosa, sendo a voz da direita na Bahia.
+                  Fiel defensor das bandeiras do ex-presidente <span className="text-[#005a1a] font-bold">Jair Bolsonaro</span>, Diego pauta seu mandato na defesa intransigente da vida, da família e da liberdade religiosa, sendo a voz da direita na Bahia.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
                   {[
@@ -599,10 +602,10 @@ const Home: React.FC = () => {
               <span className="text-xs font-bold text-[#ffdf00] uppercase tracking-widest">Alinhamento Total</span>
             </div>
             <h2 className="text-4xl lg:text-7xl font-heading font-black text-white mb-8 leading-tight">
-              DIEGO CASTRO E <span className="text-[#ffdf00]">BOLSONARO</span>
+              DIEGO CASTRO E <span className="text-[#22c55e]">BOLSONARO</span>
             </h2>
             <p className="text-xl text-white/70 mb-10 leading-relaxed">
-              O representante oficial das pautas conservadoras de Jair Bolsonaro na Bahia. Defesa da liberdade, da pátria e dos valores cristãos em cada ação do mandato.
+              O representante oficial das pautas conservadoras de <span className="text-[#22c55e] font-bold">Jair Bolsonaro</span> na Bahia. Defesa da liberdade, da pátria e dos valores cristãos em cada ação do mandato.
             </p>
             <div className="grid grid-cols-2 gap-6 mb-12">
               <div className="p-6 bg-white/5 border border-white/10 rounded-2xl">
