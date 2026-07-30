@@ -264,7 +264,7 @@ const HistoriaPage: React.FC = () => {
             <p className="text-slate-500 font-medium">{getSetting('historia_timeline_subtitle', 'Linha do tempo interativa e fatos organizados')}</p>
           </div>
           <div className="relative">
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-slate-200 hidden lg:block" />
+            <div className="absolute left-[7.5rem] top-0 bottom-0 w-0.5 bg-slate-200 hidden lg:block" />
             <div className="space-y-8">
               {parsedTimeline.map((item: any, i: number) => (
                 <motion.div
