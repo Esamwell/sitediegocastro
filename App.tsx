@@ -19,6 +19,9 @@ import ImpactText from './components/ImpactText';
 import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
 import Admin from './src/Admin';
+import PautasPage from './components/PautasPage';
+import SegurancaPage from './components/SegurancaPage';
+import ProtectedRoute from './components/ProtectedRoute';
 import HistoriaPage from './components/HistoriaPage';
 import { Project, News, Video, SecuritySegment, SiteSetting } from './types';
 
@@ -31,6 +34,7 @@ const App: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/historia" element={<HistoriaPage />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/seguranca-publica" element={<SegurancaPage />} />
         <Route path="/seguranca/:id" element={<SecuritySegmentPage />} />
       </Routes>
     </BrowserRouter>
@@ -492,14 +496,12 @@ const Home: React.FC = () => {
               >
                 Saiba Mais <ChevronRight size={20} />
               </button>
-              <a
-                href="/segmentacoes_seguranca.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/seguranca-publica"
                 className="bg-transparent border-2 border-[#ffdf00] text-[#ffdf00] px-8 py-4 rounded-2xl font-black text-lg uppercase tracking-wider hover:bg-[#ffdf00] hover:text-[#002776] hover:scale-105 transition-all shadow-xl flex items-center gap-3"
               >
-                Todas as Ações <ExternalLink size={20} />
-              </a>
+                Segmentações <ExternalLink size={20} />
+              </Link>
             </div>
           </div>
         </div>
