@@ -35,12 +35,8 @@ const defaultTimeline = [
     links: [{ text: 'Perfil sobre o início da trajetória de Diego Castro', url: '#' }]
   },
   {
-    year: '2009',
-    paragraphs: ['Iniciou sua formação em Direito, aprofundando o interesse pela atuação jurídica e pela defesa de causas sociais.']
-  },
-  {
     year: '2010',
-    paragraphs: ['Prosseguiu sua formação em Direito e aprofundou os conhecimentos adquiridos no curso.']
+    paragraphs: ['Participou do curso de filosofia do professor Olavo de Carvalho e o conheceu naquele mesmo ano.']
   },
   {
     year: '2011',
@@ -49,17 +45,17 @@ const defaultTimeline = [
   {
     year: '2013',
     paragraphs: [
+      'Iniciou sua graduação em Direito.',
       'Já se posicionava publicamente a favor de Jair Bolsonaro, mencionando seu nome no Facebook.',
       'Neste ano, conheceu o então deputado federal Jair Bolsonaro e tornou-se um fiel aliado.',
-      'Participou das mobilizações que mais tarde culminariam no impeachment de Dilma Rousseff na Bahia.',
       'Fundou a organização latino-americana Unidad, da qual foi presidente, com o objetivo de combater o comunismo nas Américas.',
       'Já naquela época, denunciava Nicolás Maduro, o Foro de São Paulo, Juan Manuel Santos, Daniel Ortega, na Nicarágua, e Evo Morales, na Bolívia.',
       'Foi também um período de aproximação com lideranças internacionais das Américas.'
     ]
   },
   {
-    year: '2016',
-    paragraphs: ['Teve presença forte nas manifestações contra Dilma Rousseff, tornando-se uma das principais vozes da juventude baiana no movimento pelo impeachment.']
+    year: '2015',
+    paragraphs: ['Desde o início do ano, teve forte presença nas manifestações pelo impeachment de Dilma Rousseff, tornando-se uma das principais vozes da juventude baiana no movimento.']
   },
   {
     year: '2017',
@@ -67,7 +63,7 @@ const defaultTimeline = [
   },
   {
     year: '2018',
-    paragraphs: ['Formou-se em Direito pela UNO. Coordenou a campanha jovem de Jair Bolsonaro na Bahia junto com o Bahia à Direita. Atuou como subcoordenador de trabalho em Salvador, na Secretaria de Trabalho.']
+    paragraphs: ['Formou-se em Direito pela Unijorge. Coordenou a campanha jovem de Jair Bolsonaro na Bahia junto com o Bahia à Direita. Atuou como subcoordenador de trabalho em Salvador, na Secretaria de Trabalho.']
   },
   {
     year: '2019',
@@ -221,7 +217,7 @@ const HistoriaPage: React.FC = () => {
           <div className="flex items-center">
             <Link to="/" className="hover:opacity-80 transition-opacity">
               <img
-                src="/logo diego castro verde.png"
+                src="/LOGO DIEGO VERDE EXTENSA.png"
                 alt="Diego Castro"
                 className="h-20 w-auto"
                 referrerPolicy="no-referrer"
@@ -322,7 +318,7 @@ const HistoriaPage: React.FC = () => {
          <div className="max-w-4xl mx-auto bg-gradient-to-br from-[#002776] to-[#005a1a] rounded-3xl p-10 lg:p-16 text-white shadow-xl relative overflow-hidden">
             <div className="relative z-10">
               <h3 className="text-3xl font-heading font-black mb-6 uppercase text-[#ffdf00]">{getSetting('historia_loyalty_title', 'Lealdade a Jair Bolsonaro')}</h3>
-              <p className="text-lg text-white/90 leading-relaxed" dangerouslySetInnerHTML={{ __html: getSetting('historia_loyalty_text', 'A relação política de Diego Castro com <span class="text-[#005a1a] font-bold">Jair Bolsonaro</span> atravessa diferentes fases de sua trajetória. Desde a juventude, Diego defende publicamente as mesmas pautas conservadoras, participou das mobilizações que fortaleceram <span class="text-[#005a1a] font-bold">Bolsonaro</span> na Bahia e permaneceu ao seu lado nos momentos de maior pressão política.') }} />
+              <p className="text-lg text-white/90 leading-relaxed" dangerouslySetInnerHTML={{ __html: getSetting('historia_loyalty_text', 'A relação política de Diego Castro com <span class="text-[#ffdf00] font-bold">Jair Bolsonaro</span> atravessa diferentes fases de sua trajetória. Desde a juventude, Diego defende publicamente as mesmas pautas conservadoras, participou das mobilizações que fortaleceram <span class="text-[#ffdf00] font-bold">Bolsonaro</span> na Bahia e permaneceu ao seu lado nos momentos de maior pressão política.') }} />
             </div>
             <Heart className="absolute -bottom-10 -right-10 w-64 h-64 text-white/5" />
          </div>
@@ -334,7 +330,7 @@ const HistoriaPage: React.FC = () => {
       <footer className="bg-slate-900 text-white py-12 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <img
-            src="/logo diego castro.png"
+            src="/LOGO DIEGO VERDE EXTENSA.png"
             alt="Diego Castro"
             className="h-20 w-auto mx-auto mb-6"
             referrerPolicy="no-referrer"

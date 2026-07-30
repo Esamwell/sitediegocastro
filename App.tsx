@@ -10,7 +10,7 @@ import {
   MapPin, Calendar, Play, ChevronRight, Menu, X,
   Instagram, Twitter, Facebook, MessageCircle,
   FileText, Download, Newspaper, Info, Phone, Mail,
-  ArrowRight, CheckCircle2, Search, TrendingUp, ArrowLeft
+  ArrowRight, CheckCircle2, Search, TrendingUp, ArrowLeft, ExternalLink
 } from 'lucide-react';
 import { BrowserRouter, Routes, Route, Link, useParams } from 'react-router-dom';
 import { supabase } from './src/supabaseClient';
@@ -149,7 +149,7 @@ const Home: React.FC = () => {
           <div className="flex items-center">
             <button onClick={() => scrollToSection('início')} className="hover:opacity-80 transition-opacity">
               <img
-                src="/logo diego castro verde.png"
+                src="/LOGO DIEGO VERDE EXTENSA.png"
                 alt="Diego Castro"
                 className="h-20 w-auto"
                 referrerPolicy="no-referrer"
@@ -158,7 +158,7 @@ const Home: React.FC = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-8">
-            {['Início', 'Quem é', 'Mandato', 'Bahia', 'Segurança', 'Notícias', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
+            {['Início', 'Quem é', 'Projetos', 'Bahia', 'Segurança', 'Notícias', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
@@ -193,7 +193,7 @@ const Home: React.FC = () => {
             <div className="flex justify-between items-center mb-12">
               <div className="flex items-center">
                 <img
-                  src="/logo diego castro verde.png"
+                  src="/LOGO DIEGO VERDE EXTENSA.png"
                   alt="Diego Castro"
                   className="h-16 w-auto"
                   referrerPolicy="no-referrer"
@@ -204,7 +204,7 @@ const Home: React.FC = () => {
               </button>
             </div>
             <div className="flex flex-col gap-6">
-              {['Início', 'Quem é', 'Mandato', 'Bahia', 'Segurança', 'Notícias', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
+              {['Início', 'Quem é', 'Projetos', 'Bahia', 'Segurança', 'Notícias', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
@@ -242,7 +242,7 @@ const Home: React.FC = () => {
               {getSetting('hero_subtitle', 'Recordista de Projetos de Lei e o deputado que mais investe na Segurança Pública da Bahia. Diego Castro é o guardião dos valores conservadores na ALBA.')}
             </p>
             <div className="flex flex-wrap gap-4">
-              <button onClick={() => scrollToSection('mandato')} className="bg-[#002776] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#001a4d] transition-all shadow-xl shadow-blue-200 flex items-center gap-2">
+              <button onClick={() => scrollToSection('projetos')} className="bg-[#002776] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#001a4d] transition-all shadow-xl shadow-blue-200 flex items-center gap-2">
                 Conheça o Mandato <ArrowRight size={20} />
               </button>
               <button onClick={() => setIsProjectsModalOpen(true)} className="bg-white text-[#002776] border-2 border-[#002776] px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all">
@@ -262,7 +262,7 @@ const Home: React.FC = () => {
                 <img
                   src={getSetting('hero_image', '/diego e bs/principal.png')}
                   alt="Diego Castro"
-                  className="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover object-top"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -361,8 +361,8 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* MANDATO - PROJETOS */}
-      <section id="mandato" className="py-24 px-6 bg-slate-50">
+      {/* PROJETOS */}
+      <section id="projetos" className="py-24 px-6 bg-slate-50">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div>
@@ -485,13 +485,21 @@ const Home: React.FC = () => {
               {getSetting('seguranca_subtitle', 'Como Presidente da Comissão de Segurança, Diego destinou quase R$ 2,5 milhões para viaturas, armamentos e tecnologia. Luta pela blindagem da frota e pelo Sistema de Apoio à Vítima (SAV).')}
             </p>
 
-            <div className="mt-8">
+            <div className="mt-8 flex flex-wrap gap-4">
               <button
                 onClick={() => setIsSecurityModalOpen(true)}
                 className="bg-[#ffdf00] text-[#002776] px-8 py-4 rounded-2xl font-black text-lg uppercase tracking-wider hover:bg-white hover:scale-105 transition-all shadow-xl flex items-center gap-3"
               >
                 Saiba Mais <ChevronRight size={20} />
               </button>
+              <a
+                href="/segmentacoes_seguranca.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-transparent border-2 border-[#ffdf00] text-[#ffdf00] px-8 py-4 rounded-2xl font-black text-lg uppercase tracking-wider hover:bg-[#ffdf00] hover:text-[#002776] hover:scale-105 transition-all shadow-xl flex items-center gap-3"
+              >
+                Todas as Ações <ExternalLink size={20} />
+              </a>
             </div>
           </div>
         </div>
@@ -858,7 +866,7 @@ const Home: React.FC = () => {
                   <div className="text-sm text-slate-400 font-bold uppercase">Telefones</div>
                   <a href={`tel:+55${getSetting('contato_phone_1', '71 3115-7253').replace(/\D/g, '')}`} className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">{getSetting('contato_phone_1', '71 3115-7253')}</a>
                   <span className="text-slate-400 mx-2">/</span>
-                  <a href={`tel:+55${getSetting('contato_phone_2', '71 9 9983-2548').replace(/\D/g, '')}`} className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">{getSetting('contato_phone_2', '71 9 9983-2548')}</a>
+                  <a href={`tel:+55${getSetting('contato_phone_2', '71 99983-2548').replace(/\D/g, '')}`} className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">{getSetting('contato_phone_2', '71 99983-2548')}</a>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -867,7 +875,7 @@ const Home: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-sm text-slate-400 font-bold uppercase">WhatsApp</div>
-                  <a href={`https://wa.me/55${getSetting('contato_phone_2', '71 9 9983-2548').replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-slate-900 hover:text-[#005a1a] transition-colors">+55 {getSetting('contato_phone_2', '71 9 9983-2548')}</a>
+                  <a href={`https://wa.me/55${getSetting('contato_phone_2', '71 99983-2548').replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-slate-900 hover:text-[#005a1a] transition-colors">+55 {getSetting('contato_phone_2', '71 99983-2548')}</a>
                 </div>
               </div>
             </div>
@@ -913,7 +921,7 @@ const Home: React.FC = () => {
             <div className="space-y-6">
               <div className="flex items-center">
                 <img
-                  src="/logo diego castro.png"
+                  src="/LOGO DIEGO VERDE EXTENSA.png"
                   alt="Diego Castro"
                   className="h-24 w-auto"
                   referrerPolicy="no-referrer"
@@ -934,7 +942,7 @@ const Home: React.FC = () => {
               <ul className="space-y-4 text-sm text-white/60">
                 <li><button onClick={() => scrollToSection('início')} className="hover:text-white transition-colors">Início</button></li>
                 <li><button onClick={() => scrollToSection('quem-é')} className="hover:text-white transition-colors">Quem é Diego</button></li>
-                <li><button onClick={() => scrollToSection('mandato')} className="hover:text-white transition-colors">O Mandato</button></li>
+                <li><button onClick={() => scrollToSection('projetos')} className="hover:text-white transition-colors">O Mandato</button></li>
                 <li><button onClick={() => scrollToSection('notícias')} className="hover:text-white transition-colors">Notícias</button></li>
               </ul>
             </div>

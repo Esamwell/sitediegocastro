@@ -49,9 +49,9 @@ const Admin: React.FC = () => {
     'about_image': { label: 'Imagem Principal', desc: 'A foto principal da seção sobre.', section: 'Página Inicial - Sobre o Diego' },
     'about_image_secondary': { label: 'Imagem Secundária', desc: 'A foto menor da seção sobre.', section: 'Página Inicial - Sobre o Diego' },
     
-    'mandato_badge': { label: 'Tagline', desc: 'Ex: Ações Legislativas', section: 'Página Inicial - Mandato' },
-    'mandato_title': { label: 'Título Principal', desc: 'Título da seção de mandato.', section: 'Página Inicial - Mandato' },
-    'mandato_subtitle': { label: 'Subtítulo', desc: 'Texto descritivo abaixo do título.', section: 'Página Inicial - Mandato' },
+    'mandato_badge': { label: 'Tagline', desc: 'Ex: Ações Legislativas', section: 'Página Inicial - Projetos' },
+    'mandato_title': { label: 'Título Principal', desc: 'Título da seção de mandato.', section: 'Página Inicial - Projetos' },
+    'mandato_subtitle': { label: 'Subtítulo', desc: 'Texto descritivo abaixo do título.', section: 'Página Inicial - Projetos' },
 
     'bahia_title': { label: 'Título', desc: 'Ex: DIEGO PELA BAHIA', section: 'Página Inicial - Bahia' },
     'bahia_subtitle': { label: 'Subtítulo', desc: '', section: 'Página Inicial - Bahia' },
@@ -190,7 +190,21 @@ const Admin: React.FC = () => {
       if (videosData) setVideos(videosData);
 
       const { data: linksData } = await supabase.from('drive_links').select('*');
-      if (linksData) setLinks(linksData);
+      if (linksData) {
+        setLinks(linksData);
+        // Garantir que todas as chaves de links existam
+        const requiredKeys = ['releases', 'fotos_alta', 'biografia', 'biblioteca', 'panfletos', 'artes', 'videos_curtos', 'informativos'];
+        const existingKeys = linksData.map(l => l.key);
+        const missingKeys = requiredKeys.filter(k => !existingKeys.includes(k));
+        if (missingKeys.length > 0) {
+          const insertData = missingKeys.map(k => ({ key: k, url: '#' }));
+          const { error } = await supabase.from('drive_links').insert(insertData);
+          if (!error) {
+            const { data: newLinksData } = await supabase.from('drive_links').select('*');
+            if (newLinksData) setLinks(newLinksData);
+          }
+        }
+      }
 
       const { data: segmentsData } = await supabase.from('security_segments').select('*');
       if (segmentsData) setSegments(segmentsData);
@@ -479,7 +493,7 @@ const Admin: React.FC = () => {
 
         <div className="max-w-md w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-10 text-center shadow-2xl relative z-10">
           <div className="mb-8">
-            <img src="/logo diego castro verde.png" className="h-20 mx-auto mb-6 drop-shadow-lg" alt="Logo" />
+            <img src="/LOGO DIEGO VERDE EXTENSA.png" className="h-20 mx-auto mb-6 drop-shadow-lg" alt="Logo" />
             <h1 className="text-2xl font-black text-white uppercase tracking-tight">Painel Admin</h1>
             <p className="text-white/50 text-sm mt-2 font-medium">Acesso restrito para gestão do portal do mandato.</p>
           </div>
@@ -527,7 +541,7 @@ const Admin: React.FC = () => {
         <div className="absolute bottom-20 left-0 w-24 h-24 bg-[#005a1a]/20 rounded-full blur-2xl" />
 
         <div className="p-6 pb-4 relative z-10">
-          <img src="/logo diego castro.png" className="h-10 mb-3" alt="Logo" />
+          <img src="/LOGO DIEGO VERDE EXTENSA.png" className="h-10 mb-3" alt="Logo" />
           <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Mandato</div>
           <div className="text-xs font-bold text-white/50 uppercase tracking-wider">Diego Castro</div>
         </div>
