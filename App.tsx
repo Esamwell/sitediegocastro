@@ -10,7 +10,7 @@ import {
   MapPin, Calendar, Play, ChevronRight, Menu, X,
   Instagram, Twitter, Facebook, MessageCircle,
   FileText, Download, Newspaper, Info, Phone, Mail,
-  ArrowRight, CheckCircle2, Search, TrendingUp, ArrowLeft, ExternalLink
+  ArrowRight, CheckCircle2, Search, TrendingUp, ArrowLeft, ExternalLink, Share2
 } from 'lucide-react';
 import { BrowserRouter, Routes, Route, Link, useParams } from 'react-router-dom';
 import { supabase } from './src/supabaseClient';
@@ -1102,12 +1102,27 @@ const Home: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap gap-4">
+              <div className="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center flex-wrap gap-4">
                 <button
                   onClick={() => setSelectedNews(null)}
                   className="flex items-center gap-2 text-[#002776] font-bold hover:gap-3 transition-all"
                 >
                   <ArrowLeft size={18} /> Voltar
+                </button>
+                <button
+                  onClick={() => {
+                    const url = window.location.href;
+                    const text = `${selectedNews.title} - Diego Castro`;
+                    if (navigator.share) {
+                      navigator.share({ title: selectedNews.title, text: text, url: url }).catch(() => {});
+                    } else {
+                      navigator.clipboard.writeText(`${text}\n${url}`);
+                      alert('Link copiado para a área de transferência!');
+                    }
+                  }}
+                  className="flex items-center gap-2 text-[#005a1a] font-bold hover:bg-emerald-50 px-4 py-2 rounded-xl transition-all"
+                >
+                  <Share2 size={18} /> Compartilhar
                 </button>
               </div>
             </div>

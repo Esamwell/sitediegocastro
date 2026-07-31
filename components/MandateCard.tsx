@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Project, News } from '../types';
-import { ArrowRight, Calendar } from 'lucide-react';
+import { ArrowRight, Calendar, Share2 } from 'lucide-react';
 
 interface CardProps {
   item: Project | News;
@@ -82,12 +82,29 @@ const MandateCard: React.FC<CardProps> = ({ item, type, onNewsClick, onProjectCl
           {news.excerpt}
         </p>
       </div>
-      <div className="p-4 border-t border-slate-50">
+      <div className="p-4 border-t border-slate-50 flex justify-between items-center">
         <button 
           onClick={() => onNewsClick?.(news)}
           className="text-[#005a1a] font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all"
         >
           Ler mais <ArrowRight size={14} />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            const url = window.location.href;
+            const text = `${news.title} - Diego Castro`;
+            if (navigator.share) {
+              navigator.share({ title: news.title, text: text, url: url }).catch(() => {});
+            } else {
+              navigator.clipboard.writeText(`${text}\n${url}`);
+              alert('Link copiado para a área de transferência!');
+            }
+          }}
+          className="text-slate-400 hover:text-[#005a1a] transition-colors p-1"
+          title="Compartilhar"
+        >
+          <Share2 size={16} />
         </button>
       </div>
     </motion.div>
