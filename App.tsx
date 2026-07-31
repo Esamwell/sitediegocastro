@@ -12,7 +12,7 @@ import {
   FileText, Download, Newspaper, Info, Phone, Mail,
   ArrowRight, CheckCircle2, Search, TrendingUp, ArrowLeft, ExternalLink, Share2
 } from 'lucide-react';
-import { BrowserRouter, Routes, Route, Link, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
 import { supabase } from './src/supabaseClient';
 import PatrioticBackground from './components/PatrioticBackground';
 import ImpactText from './components/ImpactText';
@@ -32,6 +32,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/noticia/:noticiaId" element={<Home />} />
         <Route path="/historia" element={<HistoriaPage />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/seguranca-publica" element={<SegurancaPage />} />
@@ -42,6 +43,8 @@ const App: React.FC = () => {
 };
 
 const Home: React.FC = () => {
+  const { noticiaId } = useParams();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [news, setNews] = useState<News[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
@@ -66,7 +69,9 @@ const Home: React.FC = () => {
     const fetchData = async () => {
       // News
       const { data: newsData } = await supabase.from('news').select('*').order('created_at', { ascending: false });
-      if (newsData) setNews(newsData);
+      if (newsData) {
+        setNews(newsData);
+      }
 
       // Videos
       const { data: videosData } = await supabase.from('videos').select('*').order('created_at', { ascending: false });
@@ -116,6 +121,22 @@ const Home: React.FC = () => {
       supabase.removeChannel(settingsSub);
     };
   }, []);
+
+  useEffect(() => {
+    if (noticiaId && news.length > 0) {
+      const foundNews = news.find((n) => n.id === noticiaId);
+      if (foundNews) setSelectedNews(foundNews);
+    } else if (!noticiaId) {
+      setSelectedNews(null);
+    }
+  }, [noticiaId, news]);
+
+  const handleCloseNews = () => {
+    setSelectedNews(null);
+    if (noticiaId) {
+      navigate('/', { replace: true });
+    }
+  };
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -719,7 +740,7 @@ const Home: React.FC = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {news.length > 0 ? news.slice(0, 6).map((item) => (
-              <MandateCard key={item.id} item={item} type="news" onNewsClick={setSelectedNews} />
+              <MandateCard key={item.id} item={item} type="news" onNewsClick={(n) => navigate(`/noticia/${n.id}`)} />
             )) : (
               <div className="col-span-3 text-center py-12 text-slate-400 font-medium">Nenhuma notícia cadastrada.</div>
             )}
@@ -1063,7 +1084,7 @@ const Home: React.FC = () => {
             className="bg-white rounded-[2.5rem] max-w-3xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
           >
             <button
-              onClick={() => setSelectedNews(null)}
+              onClick={handleCloseNews}
               className="absolute top-6 right-6 z-10 bg-white/80 backdrop-blur-sm p-3 rounded-full text-slate-400 hover:text-[#002776] transition-colors shadow-lg"
             >
               <X size={24} />
@@ -1104,15 +1125,15 @@ const Home: React.FC = () => {
 
               <div className="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center flex-wrap gap-4">
                 <button
-                  onClick={() => setSelectedNews(null)}
+                  onClick={handleCloseNews}
                   className="flex items-center gap-2 text-[#002776] font-bold hover:gap-3 transition-all"
                 >
                   <ArrowLeft size={18} /> Voltar
                 </button>
                 <button
                   onClick={() => {
-                    const url = window.location.href;
-                    const text = `${selectedNews.title} - Diego Castro`;
+                    const url = `${window.location.origin}/noticia/${selectedNews.id}`;
+                    const text = `${selectedNews.title}`;
                     if (navigator.share) {
                       navigator.share({ title: selectedNews.title, text: text, url: url }).catch(() => {});
                     } else {

@@ -92,8 +92,8 @@ const MandateCard: React.FC<CardProps> = ({ item, type, onNewsClick, onProjectCl
         <button
           onClick={(e) => {
             e.stopPropagation();
-            const url = window.location.href;
-            const text = `${news.title} - Diego Castro`;
+            const url = `${window.location.origin}/noticia/${news.id}`;
+            const text = `${news.title}`;
             if (navigator.share) {
               navigator.share({ title: news.title, text: text, url: url }).catch(() => {});
             } else {
