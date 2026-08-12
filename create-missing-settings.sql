@@ -62,7 +62,7 @@ INSERT INTO public.site_settings (key, value, description) VALUES
 ('contato_address_2', 'Gabinete 208, Anexo Nelson Mandela', 'Endereço Contato 2'),
 ('contato_email', 'deputado@diegocastro.com.br', 'Email Contato'),
 ('contato_phone_1', '(71) 3115-7140', 'Telefone 1 Contato'),
-('contato_phone_2', '(71) 99999-9999', 'Telefone 2 Contato'),
+('contato_phone_2', '(71) 99983-2548', 'Telefone 2 Contato'),
 
 ('videos_title', 'ACOMPANHE NOSSOS VÍDEOS', 'Título Vídeos'),
 
