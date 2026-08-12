@@ -8,9 +8,25 @@ import {
 import PatrioticBackground from './PatrioticBackground';
 import ImpactText from './ImpactText';
 import { segurancaData } from '../src/data/segurancaData';
+import { supabase } from '../src/supabaseClient';
 
 export default function SegurancaPage() {
   const [activeSegment, setActiveSegment] = useState(segurancaData[0].id);
+  const [settings, setSettings] = useState<Record<string, string>>({});
+
+  React.useEffect(() => {
+    const fetchSettings = async () => {
+      const { data } = await supabase.from('site_settings').select('*');
+      if (data) {
+        const map: Record<string, string> = {};
+        data.forEach((s: any) => { map[s.key] = s.value; });
+        setSettings(map);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const getSetting = (key: string, def: string) => settings[key] || def;
 
   const activeData = segurancaData.find(s => s.id === activeSegment);
 
@@ -64,6 +80,26 @@ export default function SegurancaPage() {
               ))}
             </nav>
           </div>
+
+          {/* Banner lateral - abaixo do menu */}
+          {getSetting('banner_4_image', '/banners/2.jpeg') && (
+            <div className="mt-4 flex flex-col gap-2">
+              <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-[0.2em]">Publicidade</span>
+              <a
+                href={getSetting('banner_4_link', '#')}
+                target={getSetting('banner_4_link', '#').startsWith('http') ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                className="block overflow-hidden rounded-lg border border-gray-700 hover:border-gray-500 shadow-sm hover:shadow-md transition-all duration-200"
+              >
+                <img
+                  src={getSetting('banner_4_image', '/banners/2.jpeg')}
+                  alt="Publicidade"
+                  className="w-full h-auto object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              </a>
+            </div>
+          )}
         </aside>
 
         {/* Content Area */}

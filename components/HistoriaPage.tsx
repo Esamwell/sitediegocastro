@@ -313,6 +313,26 @@ const HistoriaPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Banner Publicidade - Página História */}
+      {getSetting('banner_1_image', '/banners/1.jpeg') && (
+        <div className="max-w-5xl mx-auto px-6 my-6 flex flex-col items-center">
+          <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-[0.2em] mb-1.5">Publicidade</span>
+          <a
+            href={getSetting('banner_1_link', '#')}
+            target={getSetting('banner_1_link', '#').startsWith('http') ? '_blank' : '_self'}
+            rel="noopener noreferrer"
+            className="block overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full"
+          >
+            <img
+              src={getSetting('banner_1_image', '/banners/1.jpeg')}
+              alt="Publicidade"
+              className="w-full object-cover" style={{ maxHeight: '90px' }}
+              referrerPolicy="no-referrer"
+            />
+          </a>
+        </div>
+      )}
+
       {/* LEALDADE A BOLSONARO */}
       <section className="py-16 px-6 bg-slate-50">
          <div className="max-w-4xl mx-auto bg-gradient-to-br from-[#002776] to-[#005a1a] rounded-3xl p-10 lg:p-16 text-white shadow-xl relative overflow-hidden">

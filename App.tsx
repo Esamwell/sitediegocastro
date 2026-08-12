@@ -391,19 +391,20 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Banner 1 */}
+      {/* Banner 1 - entre Hero e Projetos */}
       {getSetting('banner_1_image', '/banners/1.jpeg') && (
-        <div className="max-w-7xl mx-auto px-6 mb-16">
-          <a 
-            href={getSetting('banner_1_link', '#')} 
+        <div className="max-w-5xl mx-auto px-6 my-8 flex flex-col items-center">
+          <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-[0.2em] mb-1.5">Publicidade</span>
+          <a
+            href={getSetting('banner_1_link', '#')}
             target={getSetting('banner_1_link', '#').startsWith('http') ? '_blank' : '_self'}
             rel="noopener noreferrer"
-            className="block overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+            className="block overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full"
           >
-            <img 
-              src={getSetting('banner_1_image', '/banners/1.jpeg')} 
-              alt="Banner Publicitário 1" 
-              className="w-full h-auto object-cover"
+            <img
+              src={getSetting('banner_1_image', '/banners/1.jpeg')}
+              alt="Publicidade"
+              className="w-full object-cover" style={{ maxHeight: '90px' }}
               referrerPolicy="no-referrer"
             />
           </a>
@@ -552,19 +553,20 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Banner 2 */}
+      {/* Banner 2 - entre Segurança e Família */}
       {getSetting('banner_2_image', '/banners/2.jpeg') && (
-        <div className="max-w-7xl mx-auto px-6 mb-16">
-          <a 
-            href={getSetting('banner_2_link', '#')} 
+        <div className="max-w-5xl mx-auto px-6 my-8 flex flex-col items-center">
+          <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-[0.2em] mb-1.5">Publicidade</span>
+          <a
+            href={getSetting('banner_2_link', '#')}
             target={getSetting('banner_2_link', '#').startsWith('http') ? '_blank' : '_self'}
             rel="noopener noreferrer"
-            className="block overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+            className="block overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full"
           >
-            <img 
-              src={getSetting('banner_2_image', '/banners/2.jpeg')} 
-              alt="Banner Publicitário 2" 
-              className="w-full h-auto object-cover"
+            <img
+              src={getSetting('banner_2_image', '/banners/2.jpeg')}
+              alt="Publicidade"
+              className="w-full object-cover" style={{ maxHeight: '90px' }}
               referrerPolicy="no-referrer"
             />
           </a>
@@ -668,19 +670,20 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Banner 3 */}
+      {/* Banner 3 - entre Agro e Bolsonaro */}
       {getSetting('banner_3_image', '/banners/4.jpeg') && (
-        <div className="max-w-7xl mx-auto px-6 mb-16">
-          <a 
-            href={getSetting('banner_3_link', '#')} 
+        <div className="max-w-5xl mx-auto px-6 my-8 flex flex-col items-center">
+          <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-[0.2em] mb-1.5">Publicidade</span>
+          <a
+            href={getSetting('banner_3_link', '#')}
             target={getSetting('banner_3_link', '#').startsWith('http') ? '_blank' : '_self'}
             rel="noopener noreferrer"
-            className="block overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+            className="block overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full"
           >
-            <img 
-              src={getSetting('banner_3_image', '/banners/4.jpeg')} 
-              alt="Banner Publicitário 3" 
-              className="w-full h-auto object-cover"
+            <img
+              src={getSetting('banner_3_image', '/banners/4.jpeg')}
+              alt="Publicidade"
+              className="w-full object-cover" style={{ maxHeight: '90px' }}
               referrerPolicy="no-referrer"
             />
           </a>
@@ -800,11 +803,36 @@ const Home: React.FC = () => {
             )}
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {news.length > 0 ? news.slice(0, 6).map((item) => (
-              <MandateCard key={item.id} item={item} type="news" onNewsClick={(n) => navigate(`/noticia/${n.id}`)} />
-            )) : (
-              <div className="col-span-3 text-center py-12 text-slate-400 font-medium">Nenhuma notícia cadastrada.</div>
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* News Grid */}
+            <div className="flex-1">
+              <div className="grid md:grid-cols-2 gap-6">
+                {news.length > 0 ? news.slice(0, 4).map((item) => (
+                  <MandateCard key={item.id} item={item} type="news" onNewsClick={(n) => navigate(`/noticia/${n.id}`)} />
+                )) : (
+                  <div className="col-span-2 text-center py-12 text-slate-400 font-medium">Nenhuma notícia cadastrada.</div>
+                )}
+              </div>
+            </div>
+
+            {/* Sidebar com Banner lateral */}
+            {getSetting('banner_4_image', '/banners/2.jpeg') && (
+              <aside className="lg:w-64 xl:w-72 flex-shrink-0 hidden lg:flex flex-col gap-4">
+                <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-[0.2em]">Publicidade</span>
+                <a
+                  href={getSetting('banner_4_link', '#')}
+                  target={getSetting('banner_4_link', '#').startsWith('http') ? '_blank' : '_self'}
+                  rel="noopener noreferrer"
+                  className="block overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200"
+                >
+                  <img
+                    src={getSetting('banner_4_image', '/banners/2.jpeg')}
+                    alt="Publicidade"
+                    className="w-full h-auto object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </a>
+              </aside>
             )}
           </div>
         </div>
