@@ -125,6 +125,13 @@ const Admin: React.FC = () => {
     'historia_main_text': { label: 'Texto de Introdução', desc: 'O primeiro texto grande que conta a história.', section: 'Página História - Conteúdo' },
     'historia_timeline_title': { label: 'Título da Linha do Tempo', desc: 'O título antes das datas importantes.', section: 'Página História - Conteúdo' },
     'historia_mission_title': { label: 'Título da Missão', desc: 'O título da seção de Missão e Valores.', section: 'Página História - Conteúdo' },
+
+    'banner_1_image': { label: 'Banner 1 - Imagem', desc: 'Imagem do Banner 1 (Recomendado: formato horizontal largo).', section: 'Banners Publicitários' },
+    'banner_1_link': { label: 'Banner 1 - Link', desc: 'URL de destino para o clique no Banner 1.', section: 'Banners Publicitários' },
+    'banner_2_image': { label: 'Banner 2 - Imagem', desc: 'Imagem do Banner 2 (Recomendado: formato horizontal largo).', section: 'Banners Publicitários' },
+    'banner_2_link': { label: 'Banner 2 - Link', desc: 'URL de destino para o clique no Banner 2.', section: 'Banners Publicitários' },
+    'banner_3_image': { label: 'Banner 3 - Imagem', desc: 'Imagem do Banner 3 (Recomendado: formato horizontal largo).', section: 'Banners Publicitários' },
+    'banner_3_link': { label: 'Banner 3 - Link', desc: 'URL de destino para o clique no Banner 3.', section: 'Banners Publicitários' },
   };
   
   // Form States
@@ -358,7 +365,12 @@ const Admin: React.FC = () => {
       
       if (isEditing && isEditing !== 'new') {
         if (tableName === 'site_settings') {
-          result = await supabase.from(tableName).update(finalData).eq('key', isEditing);
+          const exists = settings.some(item => item.key === isEditing);
+          if (exists) {
+            result = await supabase.from(tableName).update(finalData).eq('key', isEditing);
+          } else {
+            result = await supabase.from(tableName).insert([{ ...finalData, description: SETTING_LABELS[finalData.key]?.desc || '' }]).select();
+          }
         } else {
           result = await supabase.from(tableName).update(finalData).eq('id', isEditing);
         }
@@ -374,7 +386,13 @@ const Admin: React.FC = () => {
         } else if (tableName === 'security_segments') {
           setSegments(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
         } else if (tableName === 'site_settings') {
-          setSettings(prev => prev.map(item => item.key === isEditing ? { ...item, ...finalData } : item));
+          const exists = settings.some(item => item.key === isEditing);
+          if (exists) {
+            setSettings(prev => prev.map(item => item.key === isEditing ? { ...item, ...finalData } : item));
+          } else {
+            const newItem = result.data?.[0] || { ...finalData, description: SETTING_LABELS[finalData.key]?.desc || '' };
+            setSettings(prev => [newItem, ...prev]);
+          }
         } else if (tableName === 'drive_links') {
           setLinks(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
         }
@@ -1235,7 +1253,20 @@ const Admin: React.FC = () => {
 
             {activeTab === 'settings' && (
               <div className="space-y-6">
-                {Object.entries(settings.reduce((acc, item) => {
+                {Object.entries((() => {
+                  const mergedSettings = [...settings];
+                  const existingKeys = new Set(settings.map(s => s.key));
+                  Object.keys(SETTING_LABELS).forEach(key => {
+                    if (!existingKeys.has(key)) {
+                      mergedSettings.push({
+                        key,
+                        value: '',
+                        description: SETTING_LABELS[key].desc
+                      });
+                    }
+                  });
+                  return mergedSettings;
+                })().reduce((acc, item) => {
                   const section = SETTING_LABELS[item.key]?.section || 'Outras Configurações';
                   if (!acc[section]) acc[section] = [];
                   acc[section].push(item);

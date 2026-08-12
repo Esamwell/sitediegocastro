@@ -391,6 +391,25 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      {/* Banner 1 */}
+      {getSetting('banner_1_image', '/banners/1.jpeg') && (
+        <div className="max-w-7xl mx-auto px-6 mb-16">
+          <a 
+            href={getSetting('banner_1_link', '#')} 
+            target={getSetting('banner_1_link', '#').startsWith('http') ? '_blank' : '_self'}
+            rel="noopener noreferrer"
+            className="block overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+          >
+            <img 
+              src={getSetting('banner_1_image', '/banners/1.jpeg')} 
+              alt="Banner Publicitário 1" 
+              className="w-full h-auto object-cover"
+              referrerPolicy="no-referrer"
+            />
+          </a>
+        </div>
+      )}
+
       {/* PROJETOS */}
       <section id="projetos" className="py-24 px-6 bg-slate-50">
         <div className="max-w-7xl mx-auto">
@@ -533,6 +552,25 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      {/* Banner 2 */}
+      {getSetting('banner_2_image', '/banners/2.jpeg') && (
+        <div className="max-w-7xl mx-auto px-6 mb-16">
+          <a 
+            href={getSetting('banner_2_link', '#')} 
+            target={getSetting('banner_2_link', '#').startsWith('http') ? '_blank' : '_self'}
+            rel="noopener noreferrer"
+            className="block overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+          >
+            <img 
+              src={getSetting('banner_2_image', '/banners/2.jpeg')} 
+              alt="Banner Publicitário 2" 
+              className="w-full h-auto object-cover"
+              referrerPolicy="no-referrer"
+            />
+          </a>
+        </div>
+      )}
+
       {/* DEFESA DA FAMÍLIA E DA FÉ */}
       <section id="familia" className="py-24 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -629,6 +667,25 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Banner 3 */}
+      {getSetting('banner_3_image', '/banners/4.jpeg') && (
+        <div className="max-w-7xl mx-auto px-6 mb-16">
+          <a 
+            href={getSetting('banner_3_link', '#')} 
+            target={getSetting('banner_3_link', '#').startsWith('http') ? '_blank' : '_self'}
+            rel="noopener noreferrer"
+            className="block overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+          >
+            <img 
+              src={getSetting('banner_3_image', '/banners/4.jpeg')} 
+              alt="Banner Publicitário 3" 
+              className="w-full h-auto object-cover"
+              referrerPolicy="no-referrer"
+            />
+          </a>
+        </div>
+      )}
 
       {/* DIEGO E BOLSONARO */}
       <section id="bolsonaro" className="py-24 px-6 bg-slate-900 relative overflow-hidden">
