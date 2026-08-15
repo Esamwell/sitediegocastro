@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import PatrioticBackground from './PatrioticBackground';
 import ImpactText from './ImpactText';
+import AdBanner from './AdBanner';
 import { segurancaData } from '../src/data/segurancaData';
 import { supabase } from '../src/supabaseClient';
 
@@ -82,24 +83,13 @@ export default function SegurancaPage() {
           </div>
 
           {/* Banner lateral - abaixo do menu */}
-          {getSetting('banner_4_image', '/banners/2.jpeg') && (
-            <div className="mt-4 flex flex-col gap-2">
-              <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-[0.2em]">Publicidade</span>
-              <a
-                href={getSetting('banner_4_link', '#')}
-                target={getSetting('banner_4_link', '#').startsWith('http') ? '_blank' : '_self'}
-                rel="noopener noreferrer"
-                className="block overflow-hidden rounded-lg border border-gray-700 hover:border-gray-500 shadow-sm hover:shadow-md transition-all duration-200"
-              >
-                <img
-                  src={getSetting('banner_4_image', '/banners/2.jpeg')}
-                  alt="Publicidade"
-                  className="w-full h-auto object-contain"
-                  referrerPolicy="no-referrer"
-                />
-              </a>
-            </div>
-          )}
+          <AdBanner
+            image={getSetting('banner_4_image', '/banners/4.jpeg')}
+            link={getSetting('banner_4_link', '#')}
+            variant="sidebar"
+            theme="dark"
+            className="mt-4"
+          />
         </aside>
 
         {/* Content Area */}

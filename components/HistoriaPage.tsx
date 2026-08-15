@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import PatrioticBackground from './PatrioticBackground';
 import ImpactText from './ImpactText';
+import AdBanner from './AdBanner';
 import { supabase } from '../src/supabaseClient';
 
 const renderText = (text: string) => {
@@ -314,24 +315,11 @@ const HistoriaPage: React.FC = () => {
       </section>
 
       {/* Banner Publicidade - Página História */}
-      {getSetting('banner_1_image', '/banners/1.jpeg') && (
-        <div className="max-w-5xl mx-auto px-6 my-6 flex flex-col items-center">
-          <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-[0.2em] mb-1.5">Publicidade</span>
-          <a
-            href={getSetting('banner_1_link', '#')}
-            target={getSetting('banner_1_link', '#').startsWith('http') ? '_blank' : '_self'}
-            rel="noopener noreferrer"
-            className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full bg-slate-50"
-          >
-            <img
-              src={getSetting('banner_1_image', '/banners/1.jpeg')}
-              alt="Publicidade"
-              className="w-full h-auto max-h-[150px] md:max-h-[250px] object-contain"
-              referrerPolicy="no-referrer"
-            />
-          </a>
-        </div>
-      )}
+      <AdBanner
+        image={getSetting('banner_1_image', '/banners/1.jpeg')}
+        link={getSetting('banner_1_link', '#')}
+        variant="leaderboard"
+      />
 
       {/* LEALDADE A BOLSONARO */}
       <section className="py-16 px-6 bg-slate-50">

@@ -18,6 +18,7 @@ import PatrioticBackground from './components/PatrioticBackground';
 import ImpactText from './components/ImpactText';
 import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
+import AdBanner from './components/AdBanner';
 import Admin from './src/Admin';
 import PautasPage from './components/PautasPage';
 import SegurancaPage from './components/SegurancaPage';
@@ -392,24 +393,11 @@ const Home: React.FC = () => {
       </section>
 
       {/* Banner 1 - entre Hero e Projetos */}
-      {getSetting('banner_1_image', '/banners/1.jpeg') && (
-        <div className="max-w-5xl mx-auto px-6 my-8 flex flex-col items-center">
-          <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-[0.2em] mb-1.5">Publicidade</span>
-          <a
-            href={getSetting('banner_1_link', '#')}
-            target={getSetting('banner_1_link', '#').startsWith('http') ? '_blank' : '_self'}
-            rel="noopener noreferrer"
-            className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full bg-slate-50"
-          >
-            <img
-              src={getSetting('banner_1_image', '/banners/1.jpeg')}
-              alt="Publicidade"
-              className="w-full h-auto max-h-[150px] md:max-h-[250px] object-contain"
-              referrerPolicy="no-referrer"
-            />
-          </a>
-        </div>
-      )}
+      <AdBanner
+        image={getSetting('banner_1_image', '/banners/1.jpeg')}
+        link={getSetting('banner_1_link', '#')}
+        variant="leaderboard"
+      />
 
       {/* PROJETOS */}
       <section id="projetos" className="py-24 px-6 bg-slate-50">
@@ -554,24 +542,11 @@ const Home: React.FC = () => {
       </section>
 
       {/* Banner 2 - entre Segurança e Família */}
-      {getSetting('banner_2_image', '/banners/2.jpeg') && (
-        <div className="max-w-5xl mx-auto px-6 my-8 flex flex-col items-center">
-          <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-[0.2em] mb-1.5">Publicidade</span>
-          <a
-            href={getSetting('banner_2_link', '#')}
-            target={getSetting('banner_2_link', '#').startsWith('http') ? '_blank' : '_self'}
-            rel="noopener noreferrer"
-            className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full bg-slate-50"
-          >
-            <img
-              src={getSetting('banner_2_image', '/banners/2.jpeg')}
-              alt="Publicidade"
-              className="w-full h-auto max-h-[150px] md:max-h-[250px] object-contain"
-              referrerPolicy="no-referrer"
-            />
-          </a>
-        </div>
-      )}
+      <AdBanner
+        image={getSetting('banner_2_image', '/banners/2.jpeg')}
+        link={getSetting('banner_2_link', '#')}
+        variant="leaderboard"
+      />
 
       {/* DEFESA DA FAMÍLIA E DA FÉ */}
       <section id="familia" className="py-24 px-6 bg-white">
@@ -671,24 +646,11 @@ const Home: React.FC = () => {
       </section>
 
       {/* Banner 3 - entre Agro e Bolsonaro */}
-      {getSetting('banner_3_image', '/banners/4.jpeg') && (
-        <div className="max-w-5xl mx-auto px-6 my-8 flex flex-col items-center">
-          <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-[0.2em] mb-1.5">Publicidade</span>
-          <a
-            href={getSetting('banner_3_link', '#')}
-            target={getSetting('banner_3_link', '#').startsWith('http') ? '_blank' : '_self'}
-            rel="noopener noreferrer"
-            className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full bg-slate-50"
-          >
-            <img
-              src={getSetting('banner_3_image', '/banners/4.jpeg')}
-              alt="Publicidade"
-              className="w-full h-auto max-h-[150px] md:max-h-[250px] object-contain"
-              referrerPolicy="no-referrer"
-            />
-          </a>
-        </div>
-      )}
+      <AdBanner
+        image={getSetting('banner_3_image', '/banners/2.jpeg')}
+        link={getSetting('banner_3_link', '#')}
+        variant="leaderboard"
+      />
 
       {/* DIEGO E BOLSONARO */}
       <section id="bolsonaro" className="py-24 px-6 bg-slate-900 relative overflow-hidden">
@@ -816,24 +778,14 @@ const Home: React.FC = () => {
             </div>
 
             {/* Sidebar com Banner lateral */}
-            {getSetting('banner_4_image', '/banners/2.jpeg') && (
-              <aside className="lg:w-64 xl:w-72 flex-shrink-0 hidden lg:flex flex-col gap-4">
-                <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-[0.2em]">Publicidade</span>
-                <a
-                  href={getSetting('banner_4_link', '#')}
-                  target={getSetting('banner_4_link', '#').startsWith('http') ? '_blank' : '_self'}
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full bg-slate-50"
-                >
-                  <img
-                    src={getSetting('banner_4_image', '/banners/2.jpeg')}
-                    alt="Publicidade"
-                    className="w-full h-auto max-h-[250px] md:max-h-[350px] object-contain"
-                    referrerPolicy="no-referrer"
-                  />
-                </a>
-              </aside>
-            )}
+            <aside className="w-full flex-shrink-0 lg:w-[300px]">
+              <AdBanner
+                image={getSetting('banner_4_image', '/banners/4.jpeg')}
+                link={getSetting('banner_4_link', '#')}
+                variant="sidebar"
+                className="lg:sticky lg:top-28"
+              />
+            </aside>
           </div>
         </div>
       </section>
