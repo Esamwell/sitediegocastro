@@ -399,12 +399,12 @@ const Home: React.FC = () => {
             href={getSetting('banner_1_link', '#')}
             target={getSetting('banner_1_link', '#').startsWith('http') ? '_blank' : '_self'}
             rel="noopener noreferrer"
-            className="block overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full"
+            className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full bg-slate-50"
           >
             <img
               src={getSetting('banner_1_image', '/banners/1.jpeg')}
               alt="Publicidade"
-              className="w-full h-auto object-contain"
+              className="w-full h-auto max-h-[150px] md:max-h-[250px] object-contain"
               referrerPolicy="no-referrer"
             />
           </a>
@@ -561,12 +561,12 @@ const Home: React.FC = () => {
             href={getSetting('banner_2_link', '#')}
             target={getSetting('banner_2_link', '#').startsWith('http') ? '_blank' : '_self'}
             rel="noopener noreferrer"
-            className="block overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full"
+            className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full bg-slate-50"
           >
             <img
               src={getSetting('banner_2_image', '/banners/2.jpeg')}
               alt="Publicidade"
-              className="w-full h-auto object-contain"
+              className="w-full h-auto max-h-[150px] md:max-h-[250px] object-contain"
               referrerPolicy="no-referrer"
             />
           </a>
@@ -678,12 +678,12 @@ const Home: React.FC = () => {
             href={getSetting('banner_3_link', '#')}
             target={getSetting('banner_3_link', '#').startsWith('http') ? '_blank' : '_self'}
             rel="noopener noreferrer"
-            className="block overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full"
+            className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full bg-slate-50"
           >
             <img
               src={getSetting('banner_3_image', '/banners/4.jpeg')}
               alt="Publicidade"
-              className="w-full h-auto object-contain"
+              className="w-full h-auto max-h-[150px] md:max-h-[250px] object-contain"
               referrerPolicy="no-referrer"
             />
           </a>
@@ -823,12 +823,12 @@ const Home: React.FC = () => {
                   href={getSetting('banner_4_link', '#')}
                   target={getSetting('banner_4_link', '#').startsWith('http') ? '_blank' : '_self'}
                   rel="noopener noreferrer"
-                  className="block overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200"
+                  className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 w-full bg-slate-50"
                 >
                   <img
                     src={getSetting('banner_4_image', '/banners/2.jpeg')}
                     alt="Publicidade"
-                    className="w-full h-auto object-contain"
+                    className="w-full h-auto max-h-[250px] md:max-h-[350px] object-contain"
                     referrerPolicy="no-referrer"
                   />
                 </a>
