@@ -157,6 +157,10 @@ const Home: React.FC = () => {
   const getDriveLink = (key: string, defaultUrl: string = '#') => driveLinks[key] || defaultDriveLinks[key] || defaultUrl;
   const getSetting = (key: string, defaultVal: string) => settings[key] || defaultVal;
 
+  // O Banner 1 ocupa uma célula da grade de Projetos. Quando há arte, mostramos
+  // 3 projetos + banner (4 colunas fechadas); sem arte, os 4 projetos de sempre.
+  const banner1Image = getSetting('banner_1_image', BANNER_DEFAULTS.banner_1_image);
+
   const extractYoutubeId = (url: string) => {
     if (!url) return null;
     const shortsMatch = url.match(/\/shorts\/([^#&?]+)/);
@@ -391,13 +395,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Banner 1 - entre Hero e Projetos */}
-      <AdBanner
-        image={getSetting('banner_1_image', BANNER_DEFAULTS.banner_1_image)}
-        link={getSetting('banner_1_link', '#')}
-        variant="leaderboard"
-      />
-
       {/* PROJETOS */}
       <section id="projetos" className="py-24 px-6 bg-slate-50">
         <div className="max-w-7xl mx-auto">
@@ -418,9 +415,16 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {projects.slice(0, 4).map((project) => (
+            {projects.slice(0, banner1Image ? 3 : 4).map((project) => (
               <MandateCard key={project.id} item={project} type="project" onProjectClick={setSelectedProject} />
             ))}
+            {/* Banner 1 - ao lado dos projetos, fechando a linha de 4 colunas */}
+            <AdBanner
+              image={banner1Image}
+              link={getSetting('banner_1_link', '#')}
+              variant="sidebar"
+              className="self-start"
+            />
             {projects.length === 0 && (
               <div className="col-span-full text-center py-12 text-slate-400 font-medium">Nenhum projeto cadastrado.</div>
             )}
