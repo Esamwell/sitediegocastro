@@ -19,6 +19,7 @@ import ImpactText from './components/ImpactText';
 import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
 import AdBanner from './components/AdBanner';
+import { BANNER_DEFAULTS } from './src/siteDefaults';
 import Admin from './src/Admin';
 import SegurancaPage from './components/SegurancaPage';
 import HistoriaPage from './components/HistoriaPage';
@@ -392,7 +393,7 @@ const Home: React.FC = () => {
 
       {/* Banner 1 - entre Hero e Projetos */}
       <AdBanner
-        image={getSetting('banner_1_image', '/banners/1.jpeg')}
+        image={getSetting('banner_1_image', BANNER_DEFAULTS.banner_1_image)}
         link={getSetting('banner_1_link', '#')}
         variant="leaderboard"
       />
@@ -541,7 +542,7 @@ const Home: React.FC = () => {
 
       {/* Banner 2 - entre Segurança e Família */}
       <AdBanner
-        image={getSetting('banner_2_image', '/banners/2.jpeg')}
+        image={getSetting('banner_2_image', BANNER_DEFAULTS.banner_2_image)}
         link={getSetting('banner_2_link', '#')}
         variant="leaderboard"
       />
@@ -646,7 +647,7 @@ const Home: React.FC = () => {
       {/* Banner 3 - entre Agro e Bolsonaro. Sem arte própria ainda: fica
           oculto até subirem uma no painel, em vez de repetir o Banner 2. */}
       <AdBanner
-        image={getSetting('banner_3_image', '')}
+        image={getSetting('banner_3_image', BANNER_DEFAULTS.banner_3_image)}
         link={getSetting('banner_3_link', '#')}
         variant="leaderboard"
       />
@@ -779,7 +780,7 @@ const Home: React.FC = () => {
             {/* Sidebar com Banner lateral */}
             <aside className="w-full flex-shrink-0 lg:w-[300px]">
               <AdBanner
-                image={getSetting('banner_4_image', '/banners/4.jpeg')}
+                image={getSetting('banner_4_image', BANNER_DEFAULTS.banner_4_image)}
                 link={getSetting('banner_4_link', '#')}
                 variant="sidebar"
                 className="lg:sticky lg:top-28"

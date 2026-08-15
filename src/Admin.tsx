@@ -6,59 +6,78 @@ import {
   ChevronRight, LayoutDashboard, Settings, Shield, Upload,
   ImageOff
 } from 'lucide-react';
+import { resolveBannerImage } from './siteDefaults';
 
-/** Uma configuração é visual quando a chave é de imagem e o valor é um caminho/URL. */
-const isImageSetting = (key: string, value: string) =>
-  /image|banner/i.test(key || '') && /^(https?:\/\/|\/)/.test((value || '').trim());
+const BOX = 'w-24 h-16 flex-shrink-0 rounded-lg flex items-center justify-center';
 
 /**
  * Miniatura da imagem que está no ar naquela configuração, exibida na lista.
  * Serve para identificar a peça sem precisar abrir a edição — principalmente
  * nos banners, que são vários e só se distinguem pela arte.
+ *
+ * Importante: o valor pode estar vazio no banco e mesmo assim haver imagem no
+ * site, porque o componente cai na arte padrão de BANNER_DEFAULTS. Por isso a
+ * miniatura mostra o valor EFETIVO e marca quando ele vem do padrão — dizer
+ * "vazio" ali seria mentira, o banner está visível.
  */
 const SettingThumb: React.FC<{ settingKey: string; value: string }> = ({ settingKey, value }) => {
   const [failed, setFailed] = useState(false);
-  const isImage = isImageSetting(settingKey, value);
-  const isEmptyBanner = /banner/i.test(settingKey) && /image/i.test(settingKey) && !(value || '').trim();
 
-  useEffect(() => setFailed(false), [value]);
+  const stored = (value || '').trim();
+  const effective = resolveBannerImage(settingKey, stored);
+  const usesDefault = !stored && !!effective;
+  const isImageKey = /image|banner/i.test(settingKey || '');
+  const showsImage = isImageKey && /^(https?:\/\/|\/)/.test(effective);
 
-  if (isImage && !failed) {
+  useEffect(() => setFailed(false), [effective]);
+
+  if (showsImage && !failed) {
     return (
       <a
-        href={value}
+        href={effective}
         target="_blank"
         rel="noopener noreferrer"
-        title="Abrir imagem em tamanho real"
-        className="w-24 h-16 flex-shrink-0 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center hover:border-[#002776] transition-colors"
+        title={
+          usesDefault
+            ? 'Arte padrão do site (nada salvo no painel). Está visível no site.'
+            : 'Abrir imagem em tamanho real'
+        }
+        className={`${BOX} relative overflow-hidden border bg-slate-50 transition-colors ${
+          usesDefault ? 'border-amber-300' : 'border-slate-200'
+        } hover:border-[#002776]`}
       >
         <img
-          src={value}
+          src={effective}
           alt=""
           loading="lazy"
           className="max-w-full max-h-full object-contain"
           onError={() => setFailed(true)}
         />
+        {usesDefault && (
+          <span className="absolute bottom-0 inset-x-0 bg-amber-400/90 text-[8px] font-bold uppercase tracking-wider text-amber-950 text-center leading-tight py-0.5">
+            Padrão
+          </span>
+        )}
       </a>
     );
   }
 
-  if (isImage && failed) {
+  if (showsImage && failed) {
     return (
       <div
         title="A imagem não carregou — verifique o link"
-        className="w-24 h-16 flex-shrink-0 rounded-lg border border-red-200 bg-red-50 text-red-400 flex items-center justify-center"
+        className={`${BOX} border border-red-200 bg-red-50 text-red-400`}
       >
         <ImageOff size={18} />
       </div>
     );
   }
 
-  if (isEmptyBanner) {
+  if (isImageKey && !effective) {
     return (
       <div
         title="Sem arte — este banner está oculto no site"
-        className="w-24 h-16 flex-shrink-0 rounded-lg border border-dashed border-slate-300 bg-slate-50 text-slate-400 flex items-center justify-center text-[9px] font-bold uppercase tracking-wider text-center px-1"
+        className={`${BOX} border border-dashed border-slate-300 bg-slate-50 text-slate-400 text-[9px] font-bold uppercase tracking-wider px-1 text-center`}
       >
         Oculto
       </div>

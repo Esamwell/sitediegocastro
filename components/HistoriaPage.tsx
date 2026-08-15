@@ -9,6 +9,7 @@ import {
 import PatrioticBackground from './PatrioticBackground';
 import ImpactText from './ImpactText';
 import AdBanner from './AdBanner';
+import { BANNER_DEFAULTS } from '../src/siteDefaults';
 import { supabase } from '../src/supabaseClient';
 
 const renderText = (text: string) => {
@@ -316,7 +317,7 @@ const HistoriaPage: React.FC = () => {
 
       {/* Banner Publicidade - Página História */}
       <AdBanner
-        image={getSetting('banner_1_image', '/banners/1.jpeg')}
+        image={getSetting('banner_1_image', BANNER_DEFAULTS.banner_1_image)}
         link={getSetting('banner_1_link', '#')}
         variant="leaderboard"
       />

@@ -8,6 +8,7 @@ import {
 import PatrioticBackground from './PatrioticBackground';
 import ImpactText from './ImpactText';
 import AdBanner from './AdBanner';
+import { BANNER_DEFAULTS } from '../src/siteDefaults';
 import { segurancaData } from '../src/data/segurancaData';
 import { supabase } from '../src/supabaseClient';
 
@@ -84,7 +85,7 @@ export default function SegurancaPage() {
 
           {/* Banner lateral - abaixo do menu */}
           <AdBanner
-            image={getSetting('banner_4_image', '/banners/4.jpeg')}
+            image={getSetting('banner_4_image', BANNER_DEFAULTS.banner_4_image)}
             link={getSetting('banner_4_link', '#')}
             variant="sidebar"
             theme="dark"
