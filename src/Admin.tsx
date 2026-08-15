@@ -3,8 +3,74 @@ import { supabase } from './supabaseClient';
 import { 
   Plus, Trash2, Edit2, Save, X, LogOut, 
   Newspaper, Video, Link as LinkIcon, ExternalLink,
-  ChevronRight, LayoutDashboard, Settings, Shield, Upload
+  ChevronRight, LayoutDashboard, Settings, Shield, Upload,
+  ImageOff
 } from 'lucide-react';
+
+/** Uma configuração é visual quando a chave é de imagem e o valor é um caminho/URL. */
+const isImageSetting = (key: string, value: string) =>
+  /image|banner/i.test(key || '') && /^(https?:\/\/|\/)/.test((value || '').trim());
+
+/**
+ * Miniatura da imagem que está no ar naquela configuração, exibida na lista.
+ * Serve para identificar a peça sem precisar abrir a edição — principalmente
+ * nos banners, que são vários e só se distinguem pela arte.
+ */
+const SettingThumb: React.FC<{ settingKey: string; value: string }> = ({ settingKey, value }) => {
+  const [failed, setFailed] = useState(false);
+  const isImage = isImageSetting(settingKey, value);
+  const isEmptyBanner = /banner/i.test(settingKey) && /image/i.test(settingKey) && !(value || '').trim();
+
+  useEffect(() => setFailed(false), [value]);
+
+  if (isImage && !failed) {
+    return (
+      <a
+        href={value}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Abrir imagem em tamanho real"
+        className="w-24 h-16 flex-shrink-0 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center hover:border-[#002776] transition-colors"
+      >
+        <img
+          src={value}
+          alt=""
+          loading="lazy"
+          className="max-w-full max-h-full object-contain"
+          onError={() => setFailed(true)}
+        />
+      </a>
+    );
+  }
+
+  if (isImage && failed) {
+    return (
+      <div
+        title="A imagem não carregou — verifique o link"
+        className="w-24 h-16 flex-shrink-0 rounded-lg border border-red-200 bg-red-50 text-red-400 flex items-center justify-center"
+      >
+        <ImageOff size={18} />
+      </div>
+    );
+  }
+
+  if (isEmptyBanner) {
+    return (
+      <div
+        title="Sem arte — este banner está oculto no site"
+        className="w-24 h-16 flex-shrink-0 rounded-lg border border-dashed border-slate-300 bg-slate-50 text-slate-400 flex items-center justify-center text-[9px] font-bold uppercase tracking-wider text-center px-1"
+      >
+        Oculto
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0">
+      <Settings size={18} />
+    </div>
+  );
+};
 
 const Admin: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -1284,7 +1350,7 @@ const Admin: React.FC = () => {
                     <div>
                       {sectionItems.map(item => (
                         <div key={item.key} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
-                          <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0"><Settings size={18} /></div>
+                          <SettingThumb settingKey={item.key} value={item.value} />
                           <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-bold text-[#002776]">
                               {SETTING_LABELS[item.key]?.label || item.key}
