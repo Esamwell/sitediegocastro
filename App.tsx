@@ -19,6 +19,8 @@ import ImpactText from './components/ImpactText';
 import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
 import AdBanner from './components/AdBanner';
+import GaleriaSection, { GalleryPhoto } from './components/GaleriaSection';
+import InstagramSection, { InstagramPost } from './components/InstagramSection';
 import { BANNER_DEFAULTS } from './src/siteDefaults';
 import Admin from './src/Admin';
 import SegurancaPage from './components/SegurancaPage';
@@ -57,6 +59,8 @@ const Home: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [driveLinks, setDriveLinks] = useState<Record<string, string>>({});
   const [settings, setSettings] = useState<Record<string, string>>({});
+  const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([]);
+  const [instagramPosts, setInstagramPosts] = useState<InstagramPost[]>([]);
 
   const { scrollYProgress } = useScroll();
   const opacity = useScroll(); // Placeholder for scroll logic if needed
@@ -93,6 +97,22 @@ const Home: React.FC = () => {
       const { data: projectsData } = await supabase.from('projects').select('*').order('year', { ascending: false });
       if (projectsData) setProjects(projectsData);
       
+      // Galeria
+      const { data: galleryData } = await supabase
+        .from('gallery')
+        .select('*')
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: false });
+      if (galleryData) setGalleryPhotos(galleryData);
+
+      // Posts do Instagram
+      const { data: instagramData } = await supabase
+        .from('instagram_posts')
+        .select('*')
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: false });
+      if (instagramData) setInstagramPosts(instagramData);
+
       // Site Settings
       const { data: settingsData } = await supabase.from('site_settings').select('*');
       if (settingsData) {
@@ -111,6 +131,8 @@ const Home: React.FC = () => {
     const segmentsSub = supabase.channel('segments-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'security_segments' }, fetchData).subscribe();
     const projectsSub = supabase.channel('projects-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, fetchData).subscribe();
     const settingsSub = supabase.channel('settings-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, fetchData).subscribe();
+    const gallerySub = supabase.channel('gallery-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'gallery' }, fetchData).subscribe();
+    const instagramSub = supabase.channel('instagram-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'instagram_posts' }, fetchData).subscribe();
 
     return () => {
       supabase.removeChannel(newsSub);
@@ -119,6 +141,8 @@ const Home: React.FC = () => {
       supabase.removeChannel(segmentsSub);
       supabase.removeChannel(projectsSub);
       supabase.removeChannel(settingsSub);
+      supabase.removeChannel(gallerySub);
+      supabase.removeChannel(instagramSub);
     };
   }, []);
 
@@ -192,7 +216,7 @@ const Home: React.FC = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-8">
-            {['Início', 'Quem é', 'Projetos', 'Bahia', 'Segurança', 'Notícias', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
+            {['Início', 'Quem é', 'Projetos', 'Bahia', 'Segurança', 'Notícias', 'Galeria', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
@@ -238,7 +262,7 @@ const Home: React.FC = () => {
               </button>
             </div>
             <div className="flex flex-col gap-6">
-              {['Início', 'Quem é', 'Projetos', 'Bahia', 'Segurança', 'Notícias', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
+              {['Início', 'Quem é', 'Projetos', 'Bahia', 'Segurança', 'Notícias', 'Galeria', 'Bolsonaro', 'Imprensa', 'Contato'].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
@@ -722,9 +746,11 @@ const Home: React.FC = () => {
             </div>
 
             <div className="lg:col-span-2 relative aspect-[4/3] bg-slate-100 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl">
+              {/* object-top: o corte 4:3 é ancorado no topo para não cortar a
+                  cabeça em fotos mais altas que o contêiner. */}
               <img
                 src={getSetting('bahia_image', '/fotos-diego/diego-6.jpeg')}
-                className="w-full h-full object-cover opacity-80"
+                className="w-full h-full object-cover object-top opacity-80"
                 alt="Mapa Bahia"
                 referrerPolicy="no-referrer"
               />
@@ -828,6 +854,21 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+
+      {/* GALERIA (some sozinha quando não há foto cadastrada) */}
+      <GaleriaSection
+        photos={galleryPhotos}
+        title={getSetting('galeria_title', 'GALERIA')}
+        subtitle={getSetting('galeria_subtitle', 'Registros do mandato pelas cidades da Bahia')}
+      />
+
+      {/* INSTAGRAM */}
+      <InstagramSection
+        posts={instagramPosts}
+        title={getSetting('instagram_title', 'NO INSTAGRAM')}
+        subtitle={getSetting('instagram_subtitle', 'Acompanhe o dia a dia em @diegocastroba')}
+        profileUrl={getSetting('instagram_url', 'https://www.instagram.com/diegocastroba/')}
+      />
 
       {/* IMPRENSA E ARQUIVOS */}
       <section id="imprensa" className="py-24 px-6 bg-slate-50">

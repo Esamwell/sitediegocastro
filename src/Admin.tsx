@@ -4,9 +4,10 @@ import {
   Plus, Trash2, Edit2, Save, X, LogOut, 
   Newspaper, Video, Link as LinkIcon, ExternalLink,
   ChevronRight, LayoutDashboard, Settings, Shield, Upload,
-  ImageOff
+  ImageOff, Images, Instagram
 } from 'lucide-react';
 import { resolveBannerImage } from './siteDefaults';
+import { extractInstagramShortcode } from './instagram';
 
 const BOX = 'w-24 h-16 flex-shrink-0 rounded-lg flex items-center justify-center';
 
@@ -94,7 +95,7 @@ const SettingThumb: React.FC<{ settingKey: string; value: string }> = ({ setting
 const Admin: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'news' | 'videos' | 'links' | 'segments' | 'projects' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'news' | 'videos' | 'links' | 'segments' | 'projects' | 'settings' | 'gallery' | 'instagram'>('dashboard');
   
   // Auth States
   const [authEmail, setAuthEmail] = useState('');
@@ -107,6 +108,9 @@ const Admin: React.FC = () => {
   const [links, setLinks] = useState<any[]>([]);
   const [segments, setSegments] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
+  const [gallery, setGallery] = useState<any[]>([]);
+  const [instagramPosts, setInstagramPosts] = useState<any[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [settings, setSettings] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -306,6 +310,12 @@ const Admin: React.FC = () => {
       const { data: projectsData } = await supabase.from('projects').select('*').order('year', { ascending: false });
       if (projectsData) setProjects(projectsData);
 
+      const { data: galleryData } = await supabase.from('gallery').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false });
+      if (galleryData) setGallery(galleryData);
+
+      const { data: instagramData } = await supabase.from('instagram_posts').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false });
+      if (instagramData) setInstagramPosts(instagramData);
+
       const { data: settingsData } = await supabase.from('site_settings').select('*').order('key', { ascending: true });
       if (settingsData) setSettings(settingsData);
     };
@@ -388,12 +398,95 @@ const Admin: React.FC = () => {
     }
   };
 
+  /**
+   * Envia fotos para o bucket 'galeria' do Storage e cria as linhas da tabela.
+   *
+   * Diferente do handleFileChange, que embute a imagem em base64 na própria
+   * coluna, aqui o arquivo vai para o Storage e o banco guarda só a URL. É o
+   * que permite dezenas de fotos sem estourar o tamanho das consultas — e por
+   * isso o limite pode ser bem mais generoso (5MB em vez de 800KB).
+   *
+   * Aceita seleção múltipla: numa galeria o normal é subir um lote de uma vez.
+   */
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Iteração manual em vez de Array.from: o tsconfig do projeto não inclui
+    // DOM.Iterable, então Array.from(FileList) perderia a tipagem de File.
+    const fileList = e.target.files;
+    const files: File[] = [];
+    for (let i = 0; i < (fileList?.length || 0); i++) {
+      const file = fileList?.item(i);
+      if (file) files.push(file);
+    }
+    if (files.length === 0) return;
+
+    const tooBig = files.find(f => f.size > 5 * 1024 * 1024);
+    if (tooBig) {
+      alert(`"${tooBig.name}" passa de 5MB. Reduza a foto e tente de novo.`);
+      e.target.value = '';
+      return;
+    }
+
+    const uploaded: any[] = [];
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        setUploadProgress(`Enviando ${i + 1} de ${files.length}...`);
+
+        const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${extension}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('galeria')
+          .upload(path, file, { cacheControl: '31536000', upsert: false });
+        if (uploadError) throw uploadError;
+
+        const { data: publicUrl } = supabase.storage.from('galeria').getPublicUrl(path);
+
+        const { data: inserted, error: insertError } = await supabase
+          .from('gallery')
+          .insert([{
+            image_url: publicUrl.publicUrl,
+            storage_path: path,
+            // nome do arquivo sem extensão vira legenda inicial, editável depois
+            title: file.name.replace(/\.[^.]+$/, ''),
+            sort_order: gallery.length + i,
+          }])
+          .select();
+        if (insertError) throw insertError;
+        if (inserted?.[0]) uploaded.push(inserted[0]);
+      }
+
+      setGallery(prev => [...uploaded, ...prev]);
+      alert(`${uploaded.length} foto(s) enviada(s) com sucesso.`);
+    } catch (error: any) {
+      alert(`Erro no envio: ${error.message || error}`);
+    } finally {
+      setUploadProgress(null);
+      e.target.value = '';
+    }
+  };
+
+  /** Remove a foto do banco e também o arquivo do Storage, para não deixar lixo. */
+  const handleGalleryDelete = async (item: any) => {
+    if (!confirm('Excluir esta foto da galeria?')) return;
+    try {
+      const { error } = await supabase.from('gallery').delete().eq('id', item.id);
+      if (error) throw error;
+      if (item.storage_path) {
+        await supabase.storage.from('galeria').remove([item.storage_path]);
+      }
+      setGallery(prev => prev.filter(g => g.id !== item.id));
+    } catch (error: any) {
+      alert(`Erro ao excluir: ${error.message || error}`);
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSaving) return;
     setIsSaving(true);
 
-    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : activeTab === 'settings' ? 'site_settings' : 'drive_links';
+    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : activeTab === 'settings' ? 'site_settings' : activeTab === 'gallery' ? 'gallery' : activeTab === 'instagram' ? 'instagram_posts' : 'drive_links';
     
     let finalData = { ...formData };
     
@@ -445,6 +538,26 @@ const Admin: React.FC = () => {
         key: finalData.key,
         value: finalData.value,
       };
+    } else if (activeTab === 'gallery') {
+      finalData = {
+        image_url: finalData.image_url,
+        title: finalData.title,
+        storage_path: finalData.storage_path,
+        sort_order: Number(finalData.sort_order) || 0,
+      };
+    } else if (activeTab === 'instagram') {
+      const shortcode = extractInstagramShortcode(finalData.post_url || '');
+      if (!shortcode) {
+        alert('URL inválida. Cole o link de um post, reel ou vídeo do Instagram — algo como https://www.instagram.com/p/ABC123/');
+        setIsSaving(false);
+        return;
+      }
+      finalData = {
+        post_url: finalData.post_url,
+        shortcode,
+        caption: finalData.caption,
+        sort_order: Number(finalData.sort_order) || 0,
+      };
     }
 
     try {
@@ -482,6 +595,10 @@ const Admin: React.FC = () => {
           }
         } else if (tableName === 'drive_links') {
           setLinks(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
+        } else if (tableName === 'gallery') {
+          setGallery(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
+        } else if (tableName === 'instagram_posts') {
+          setInstagramPosts(prev => prev.map(item => item.id === isEditing ? { ...item, ...finalData } : item));
         }
       } else {
         result = await supabase.from(tableName).insert([finalData]).select();
@@ -502,6 +619,10 @@ const Admin: React.FC = () => {
             setSettings(prev => [newItem, ...prev]);
           } else if (tableName === 'drive_links') {
             setLinks(prev => [...prev, newItem]);
+          } else if (tableName === 'gallery') {
+            setGallery(prev => [newItem, ...prev]);
+          } else if (tableName === 'instagram_posts') {
+            setInstagramPosts(prev => [newItem, ...prev]);
           }
         }
       }
@@ -517,7 +638,7 @@ const Admin: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : activeTab === 'settings' ? 'site_settings' : 'drive_links';
+    const tableName = activeTab === 'news' ? 'news' : activeTab === 'videos' ? 'videos' : activeTab === 'segments' ? 'security_segments' : activeTab === 'projects' ? 'projects' : activeTab === 'settings' ? 'site_settings' : activeTab === 'gallery' ? 'gallery' : activeTab === 'instagram' ? 'instagram_posts' : 'drive_links';
     if (window.confirm("Tem certeza que deseja excluir?")) {
       try {
         let error;
@@ -543,6 +664,8 @@ const Admin: React.FC = () => {
           setSettings(prev => prev.filter(item => item.key !== id));
         } else if (tableName === 'drive_links') {
           setLinks(prev => prev.filter(item => item.id !== id));
+        } else if (tableName === 'instagram_posts') {
+          setInstagramPosts(prev => prev.filter(item => item.id !== id));
         }
       } catch (error) {
         console.error("Error deleting document", error);
@@ -662,6 +785,8 @@ const Admin: React.FC = () => {
             { id: 'news', label: 'Notícias', icon: <Newspaper size={18} /> },
             { id: 'videos', label: 'Vídeos', icon: <Video size={18} /> },
             { id: 'projects', label: 'Projetos', icon: <LayoutDashboard size={18} /> },
+            { id: 'gallery', label: 'Galeria', icon: <Images size={18} /> },
+            { id: 'instagram', label: 'Instagram', icon: <Instagram size={18} /> },
             { id: 'segments', label: 'Segmentações', icon: <Shield size={18} /> },
             { id: 'links', label: 'Drive Links', icon: <LinkIcon size={18} /> },
             { id: 'settings', label: 'Config. do Site', icon: <Settings size={18} /> },
@@ -693,16 +818,20 @@ const Admin: React.FC = () => {
         <header className="bg-white border-b border-slate-200 px-8 py-5 flex justify-between items-center sticky top-0 z-30">
           <div>
             <h1 className="text-xl font-black text-[#002776] uppercase tracking-tight">
-              {activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'news' ? 'Notícias' : activeTab === 'videos' ? 'Vídeos' : activeTab === 'projects' ? 'Projetos' : activeTab === 'segments' ? 'Segmentações' : activeTab === 'settings' ? 'Configurações' : 'Drive Links'}
+              {activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'news' ? 'Notícias' : activeTab === 'videos' ? 'Vídeos' : activeTab === 'projects' ? 'Projetos' : activeTab === 'segments' ? 'Segmentações' : activeTab === 'settings' ? 'Configurações' : activeTab === 'gallery' ? 'Galeria' : activeTab === 'instagram' ? 'Instagram' : 'Drive Links'}
             </h1>
             <p className="text-slate-400 text-xs font-medium mt-0.5">Gerenciar conteúdo do portal</p>
           </div>
-          <button 
-            onClick={() => { setIsEditing('new'); setFormData({}); }}
-            className="bg-[#005a1a] text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#004a15] transition-all shadow-lg shadow-emerald-100"
-          >
-            <Plus size={18} /> Adicionar
-          </button>
+          {/* Na Galeria as fotos entram pelo botão "Enviar fotos": um item criado
+              por aqui ficaria sem imagem e a inserção falharia. */}
+          {activeTab !== 'gallery' && (
+            <button
+              onClick={() => { setIsEditing('new'); setFormData({}); }}
+              className="bg-[#005a1a] text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#004a15] transition-all shadow-lg shadow-emerald-100"
+            >
+              <Plus size={18} /> Adicionar
+            </button>
+          )}
         </header>
 
         <div className="p-8">
@@ -774,6 +903,57 @@ const Admin: React.FC = () => {
           )}
 
           {/* Individual Page Counters */}
+          {activeTab === 'gallery' && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                    <Images size={24} className="text-purple-500" />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-black text-[#002776]">{gallery.length}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      {gallery.length === 1 ? 'foto na galeria' : 'fotos na galeria'}
+                    </p>
+                  </div>
+                </div>
+                <label className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all ${uploadProgress ? 'bg-slate-200 text-slate-400 cursor-wait' : 'bg-[#002776] text-white hover:bg-[#001a4d] cursor-pointer'}`}>
+                  <Upload size={16} />
+                  {uploadProgress || 'Enviar fotos'}
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    multiple
+                    disabled={!!uploadProgress}
+                    onChange={handleGalleryUpload}
+                  />
+                </label>
+              </div>
+              <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
+                <p className="text-xs text-blue-600">
+                  <strong>Dica:</strong> dá para selecionar várias fotos de uma vez. Limite de 5MB por foto.
+                  As imagens vão para o Storage do Supabase, não para dentro do banco — por isso aqui o limite é
+                  bem maior que nos outros campos de imagem do painel.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'instagram' && (
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center">
+                <Instagram size={24} className="text-pink-500" />
+              </div>
+              <div>
+                <p className="text-3xl font-black text-[#002776]">{instagramPosts.length}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  {instagramPosts.length === 1 ? 'post publicado' : 'posts publicados'}
+                </p>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'news' && (
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
@@ -1183,6 +1363,82 @@ const Admin: React.FC = () => {
                     </>
                   )}
 
+                  {activeTab === 'gallery' && (
+                    <>
+                      <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 mb-4">
+                        <p className="text-xs text-blue-600">
+                          <strong>Dica:</strong> para adicionar fotos novas use o botão <strong>Enviar fotos</strong> lá em cima.
+                          Este formulário serve para ajustar a legenda e a ordem de uma foto já enviada.
+                        </p>
+                      </div>
+                      {formData.image_url && (
+                        <img
+                          src={formData.image_url}
+                          className="h-40 w-auto max-w-full rounded-xl border border-slate-200 object-contain mb-4"
+                          alt="Foto da galeria"
+                        />
+                      )}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Legenda</label>
+                        <input
+                          type="text" placeholder="Ex: Visita ao Hospital Regional de Feira de Santana"
+                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all"
+                          value={formData.title || ''} onChange={e => setFormData({ ...formData, title: e.target.value })}
+                        />
+                      </div>
+                      <div className="mt-4">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Ordem de exibição</label>
+                        <input
+                          type="number" placeholder="0"
+                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all"
+                          value={formData.sort_order ?? 0} onChange={e => setFormData({ ...formData, sort_order: e.target.value })}
+                        />
+                        <p className="text-xs text-slate-500 mt-1.5">Menor número aparece primeiro.</p>
+                      </div>
+                    </>
+                  )}
+
+                  {activeTab === 'instagram' && (
+                    <>
+                      <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 mb-4">
+                        <p className="text-xs text-blue-600">
+                          <strong>Como pegar o link:</strong> abra o post no Instagram, toque nos três pontinhos
+                          e escolha <strong>Copiar link</strong>. Cole aqui embaixo. Funciona com post, reel e vídeo.
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">URL do post</label>
+                        <input
+                          type="url" required placeholder="https://www.instagram.com/p/ABC123/"
+                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all"
+                          value={formData.post_url || ''} onChange={e => setFormData({ ...formData, post_url: e.target.value })}
+                        />
+                        {formData.post_url && (
+                          extractInstagramShortcode(formData.post_url)
+                            ? <p className="text-xs text-emerald-600 font-bold mt-1.5">Link válido — post {extractInstagramShortcode(formData.post_url)}</p>
+                            : <p className="text-xs text-red-500 font-bold mt-1.5">Não parece um link de post do Instagram.</p>
+                        )}
+                      </div>
+                      <div className="mt-4">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Descrição interna (opcional)</label>
+                        <input
+                          type="text" placeholder="Só para você identificar na lista"
+                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all"
+                          value={formData.caption || ''} onChange={e => setFormData({ ...formData, caption: e.target.value })}
+                        />
+                        <p className="text-xs text-slate-500 mt-1.5">A legenda que aparece no site vem do próprio Instagram, sempre atualizada.</p>
+                      </div>
+                      <div className="mt-4">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Ordem de exibição</label>
+                        <input
+                          type="number" placeholder="0"
+                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all"
+                          value={formData.sort_order ?? 0} onChange={e => setFormData({ ...formData, sort_order: e.target.value })}
+                        />
+                      </div>
+                    </>
+                  )}
+
                   {activeTab === 'settings' && (
                     <>
                       <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 mb-4">
@@ -1292,6 +1548,48 @@ const Admin: React.FC = () => {
                 </div>
               </div>
             ))}
+
+            {activeTab === 'gallery' && gallery.map(item => (
+              <div key={item.id} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
+                <img src={item.image_url} className="w-16 h-16 object-cover rounded-lg flex-shrink-0 bg-slate-100" alt="" loading="lazy" />
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-[#002776] truncate">{item.title || 'Sem legenda'}</h4>
+                  <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">Ordem: {item.sort_order ?? 0}</p>
+                </div>
+                <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
+                  <button onClick={() => handleGalleryDelete(item)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
+                </div>
+              </div>
+            ))}
+
+            {activeTab === 'gallery' && gallery.length === 0 && (
+              <div className="px-6 py-16 text-center text-slate-400 font-medium text-sm">
+                Nenhuma foto ainda. Use o botão <strong>Enviar fotos</strong> acima para começar.
+              </div>
+            )}
+
+            {activeTab === 'instagram' && instagramPosts.map(item => (
+              <div key={item.id} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
+                <div className="w-12 h-12 bg-pink-50 text-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Instagram size={20} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-[#002776] truncate">{item.caption || `Post ${item.shortcode}`}</h4>
+                  <a href={item.post_url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-400 hover:text-[#002776] font-medium truncate mt-0.5 block">{item.post_url}</a>
+                </div>
+                <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
+                  <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
+                </div>
+              </div>
+            ))}
+
+            {activeTab === 'instagram' && instagramPosts.length === 0 && (
+              <div className="px-6 py-16 text-center text-slate-400 font-medium text-sm">
+                Nenhum post ainda. Clique em <strong>Adicionar</strong> e cole o link de um post do Instagram.
+              </div>
+            )}
 
             {activeTab === 'segments' && segments.map(item => (
               <div key={item.id} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
