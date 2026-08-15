@@ -92,7 +92,7 @@ const Admin: React.FC = () => {
     'contato_address_1': { label: 'Endereço (Linha 1)', desc: '', section: 'Página Inicial - Contato' },
     'contato_address_2': { label: 'Endereço (Linha 2)', desc: '', section: 'Página Inicial - Contato' },
     'contato_email': { label: 'E-mail', desc: '', section: 'Página Inicial - Contato' },
-    'contato_phone_1': { label: 'Telefone 1', desc: '', section: 'Página Inicial - Contato' },
+
     'contato_phone_2': { label: 'Telefone 2 (WhatsApp)', desc: '', section: 'Página Inicial - Contato' },
 
     'videos_title': { label: 'Título', desc: '', section: 'Página Inicial - Vídeos' },

@@ -404,7 +404,7 @@ const Home: React.FC = () => {
             <img
               src={getSetting('banner_1_image', '/banners/1.jpeg')}
               alt="Publicidade"
-              className="w-full object-cover" style={{ maxHeight: '90px' }}
+              className="w-full h-auto object-contain"
               referrerPolicy="no-referrer"
             />
           </a>
@@ -566,7 +566,7 @@ const Home: React.FC = () => {
             <img
               src={getSetting('banner_2_image', '/banners/2.jpeg')}
               alt="Publicidade"
-              className="w-full object-cover" style={{ maxHeight: '90px' }}
+              className="w-full h-auto object-contain"
               referrerPolicy="no-referrer"
             />
           </a>
@@ -683,7 +683,7 @@ const Home: React.FC = () => {
             <img
               src={getSetting('banner_3_image', '/banners/4.jpeg')}
               alt="Publicidade"
-              className="w-full object-cover" style={{ maxHeight: '90px' }}
+              className="w-full h-auto object-contain"
               referrerPolicy="no-referrer"
             />
           </a>
@@ -828,7 +828,7 @@ const Home: React.FC = () => {
                   <img
                     src={getSetting('banner_4_image', '/banners/2.jpeg')}
                     alt="Publicidade"
-                    className="w-full h-auto object-cover"
+                    className="w-full h-auto object-contain"
                     referrerPolicy="no-referrer"
                   />
                 </a>
@@ -971,17 +971,7 @@ const Home: React.FC = () => {
                   <a href={`mailto:${getSetting('contato_email', 'dep.drdiegocastro@alba.ba.gov.br')}`} className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">{getSetting('contato_email', 'dep.drdiegocastro@alba.ba.gov.br')}</a>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-[#002776]">
-                  <Phone size={24} />
-                </div>
-                <div>
-                  <div className="text-sm text-slate-400 font-bold uppercase">Telefones</div>
-                  <a href={`tel:+55${getSetting('contato_phone_1', '71 3115-7253').replace(/\D/g, '')}`} className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">{getSetting('contato_phone_1', '71 3115-7253')}</a>
-                  <span className="text-slate-400 mx-2">/</span>
-                  <a href={`tel:+55${getSetting('contato_phone_2', '71 99983-2548').replace(/\D/g, '')}`} className="text-lg font-bold text-slate-900 hover:text-[#002776] transition-colors">{getSetting('contato_phone_2', '71 99983-2548')}</a>
-                </div>
-              </div>
+
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-[#002776]">
                   <MessageCircle size={24} />

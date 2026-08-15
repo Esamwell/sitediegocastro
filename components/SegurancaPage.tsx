@@ -94,7 +94,7 @@ export default function SegurancaPage() {
                 <img
                   src={getSetting('banner_4_image', '/banners/2.jpeg')}
                   alt="Publicidade"
-                  className="w-full h-auto object-cover"
+                  className="w-full h-auto object-contain"
                   referrerPolicy="no-referrer"
                 />
               </a>

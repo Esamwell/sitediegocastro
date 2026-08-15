@@ -61,7 +61,7 @@ INSERT INTO public.site_settings (key, value, description) VALUES
 ('contato_address_1', 'Assembleia Legislativa da Bahia - ALBA', 'Endereço Contato 1'),
 ('contato_address_2', 'Gabinete 208, Anexo Nelson Mandela', 'Endereço Contato 2'),
 ('contato_email', 'deputado@diegocastro.com.br', 'Email Contato'),
-('contato_phone_1', '(71) 3115-7140', 'Telefone 1 Contato'),
+
 ('contato_phone_2', '(71) 99983-2548', 'Telefone 2 Contato'),
 
 ('videos_title', 'ACOMPANHE NOSSOS VÍDEOS', 'Título Vídeos'),
@@ -93,5 +93,14 @@ INSERT INTO public.site_settings (key, value, description) VALUES
 ('historia_hero_image', '/fotos-diego/diego-5.jpg', 'História Imagem'),
 ('historia_main_text', 'Desde cedo percebi que não podíamos mais ficar de braços cruzados enquanto destruíam nossos valores...', 'História Texto'),
 ('historia_timeline_title', 'A LINHA DO TEMPO DA NOSSA LUTA', 'História Título Linha do Tempo'),
-('historia_mission_title', 'O QUE DEFENDE NOSSO MANDATO', 'História Missão Título')
+('historia_mission_title', 'O QUE DEFENDE NOSSO MANDATO', 'História Missão Título'),
+
+('banner_1_image', '/banners/1.jpeg', 'Banner 1 Imagem'),
+('banner_1_link', '#', 'Banner 1 Link'),
+('banner_2_image', '/banners/2.jpeg', 'Banner 2 Imagem'),
+('banner_2_link', '#', 'Banner 2 Link'),
+('banner_3_image', '/banners/4.jpeg', 'Banner 3 Imagem'),
+('banner_3_link', '#', 'Banner 3 Link'),
+('banner_4_image', '/banners/2.jpeg', 'Banner 4 Imagem'),
+('banner_4_link', '#', 'Banner 4 Link')
 ON CONFLICT (key) DO NOTHING;

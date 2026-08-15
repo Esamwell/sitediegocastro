@@ -326,7 +326,7 @@ const HistoriaPage: React.FC = () => {
             <img
               src={getSetting('banner_1_image', '/banners/1.jpeg')}
               alt="Publicidade"
-              className="w-full object-cover" style={{ maxHeight: '90px' }}
+              className="w-full h-auto object-contain"
               referrerPolicy="no-referrer"
             />
           </a>
