@@ -126,13 +126,13 @@ const Admin: React.FC = () => {
     'historia_timeline_title': { label: 'Título da Linha do Tempo', desc: 'O título antes das datas importantes.', section: 'Página História - Conteúdo' },
     'historia_mission_title': { label: 'Título da Missão', desc: 'O título da seção de Missão e Valores.', section: 'Página História - Conteúdo' },
 
-    'banner_1_image': { label: 'Banner 1 - Imagem', desc: 'Faixa horizontal entre o Hero e os Projetos (e na página História). Envie na proporção 970x250 — arte fora dessa proporção aparece menor, centralizada.', section: 'Banners Publicitários' },
+    'banner_1_image': { label: 'Banner 1 - Imagem', desc: 'Peça horizontal entre o Hero e os Projetos (e na página História). A arte nunca é cortada: faixa larga (ex: 1200x310) preenche a coluna toda; quadrada aparece inteira, centralizada e menor. Deixe em branco para ocultar.', section: 'Banners Publicitários' },
     'banner_1_link': { label: 'Banner 1 - Link', desc: 'URL de destino para o clique no Banner 1.', section: 'Banners Publicitários' },
-    'banner_2_image': { label: 'Banner 2 - Imagem', desc: 'Faixa horizontal entre Segurança e Família. Envie na proporção 970x250.', section: 'Banners Publicitários' },
+    'banner_2_image': { label: 'Banner 2 - Imagem', desc: 'Peça horizontal entre Segurança e Família. Formato ideal: faixa larga (ex: 1200x310). Deixe em branco para ocultar.', section: 'Banners Publicitários' },
     'banner_2_link': { label: 'Banner 2 - Link', desc: 'URL de destino para o clique no Banner 2.', section: 'Banners Publicitários' },
-    'banner_3_image': { label: 'Banner 3 - Imagem', desc: 'Faixa horizontal entre Agro e Bolsonaro. Envie na proporção 970x250.', section: 'Banners Publicitários' },
+    'banner_3_image': { label: 'Banner 3 - Imagem', desc: 'Peça horizontal entre Agro e Bolsonaro. Está vazio (oculto) — suba uma arte em faixa larga para ativar. Evite repetir a mesma arte do Banner 2.', section: 'Banners Publicitários' },
     'banner_3_link': { label: 'Banner 3 - Link', desc: 'URL de destino para o clique no Banner 3.', section: 'Banners Publicitários' },
-    'banner_4_image': { label: 'Banner 4 - Lateral (Notícias)', desc: 'Banner vertical ao lado da grade de notícias e na página Segurança. Envie na proporção 300x600 (nunca uma arte horizontal — ela fica achatada).', section: 'Banners Publicitários' },
+    'banner_4_image': { label: 'Banner 4 - Lateral (Notícias)', desc: 'Peça vertical ao lado da grade de notícias e na página Segurança. Ocupa 300px de largura, então formato story (9:16) ou 300x600 cai perfeito. Arte horizontal aqui fica achatada.', section: 'Banners Publicitários' },
     'banner_4_link': { label: 'Banner 4 - Link (Lateral)', desc: 'URL de destino para o clique no Banner lateral de Notícias.', section: 'Banners Publicitários' },
   };
   

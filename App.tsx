@@ -20,9 +20,7 @@ import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
 import AdBanner from './components/AdBanner';
 import Admin from './src/Admin';
-import PautasPage from './components/PautasPage';
 import SegurancaPage from './components/SegurancaPage';
-import ProtectedRoute from './components/ProtectedRoute';
 import HistoriaPage from './components/HistoriaPage';
 import { Project, News, Video, SecuritySegment, SiteSetting } from './types';
 
@@ -645,9 +643,10 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Banner 3 - entre Agro e Bolsonaro */}
+      {/* Banner 3 - entre Agro e Bolsonaro. Sem arte própria ainda: fica
+          oculto até subirem uma no painel, em vez de repetir o Banner 2. */}
       <AdBanner
-        image={getSetting('banner_3_image', '/banners/2.jpeg')}
+        image={getSetting('banner_3_image', '')}
         link={getSetting('banner_3_link', '#')}
         variant="leaderboard"
       />

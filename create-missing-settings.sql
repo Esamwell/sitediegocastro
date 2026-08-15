@@ -99,7 +99,7 @@ INSERT INTO public.site_settings (key, value, description) VALUES
 ('banner_1_link', '#', 'Banner 1 Link'),
 ('banner_2_image', '/banners/2.jpeg', 'Banner 2 Imagem'),
 ('banner_2_link', '#', 'Banner 2 Link'),
-('banner_3_image', '/banners/2.jpeg', 'Banner 3 Imagem'),
+('banner_3_image', '', 'Banner 3 Imagem'),
 ('banner_3_link', '#', 'Banner 3 Link'),
 ('banner_4_image', '/banners/4.jpeg', 'Banner 4 Imagem'),
 ('banner_4_link', '#', 'Banner 4 Link')
