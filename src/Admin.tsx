@@ -502,7 +502,9 @@ const Admin: React.FC = () => {
             storage_path: path,
             // nome do arquivo sem extensão vira legenda inicial, editável depois
             title: file.name.replace(/\.[^.]+$/, ''),
-            sort_order: gallery.length + i,
+            // 0 = ordem natural. Com o desempate por data decrescente, foto nova
+            // entra no topo sozinha. Número diferente de 0 é fixação manual.
+            sort_order: 0,
           }])
           .select();
         if (insertError) throw insertError;
@@ -521,6 +523,40 @@ const Admin: React.FC = () => {
     if (adjusted.length) report.push(`\nAjustes automáticos:\n${adjusted.join('\n')}`);
     if (failed.length) report.push(`\n${failed.length} foto(s) não puderam ser enviadas:\n\n${failed.join('\n\n')}`);
     alert(report.join('\n') || 'Nenhuma foto foi enviada.');
+  };
+
+  /**
+   * Zera a ordem manual de todas as fotos.
+   *
+   * Com sort_order igual em todas, quem decide é o desempate por data
+   * decrescente — ou seja, as mais recentes no topo. Serve para desfazer
+   * fixações antigas de uma vez, sem editar foto por foto.
+   */
+  const handleGallerySortByDate = async () => {
+    const pinned = gallery.filter(g => (g.sort_order ?? 0) !== 0);
+    if (pinned.length === 0) {
+      alert('A galeria já está na ordem por data, com as mais recentes no topo.');
+      return;
+    }
+    if (!confirm(
+      `Isto vai soltar ${pinned.length} foto(s) que estão com posição fixada, ` +
+      `deixando a galeria em ordem de data (mais recentes primeiro). Continuar?`
+    )) return;
+
+    try {
+      setUploadProgress('Reorganizando...');
+      const { error } = await supabase
+        .from('gallery')
+        .update({ sort_order: 0 })
+        .neq('sort_order', 0);
+      if (error) throw error;
+      setGallery(prev => prev.map(g => ({ ...g, sort_order: 0 })));
+      alert('Pronto. As fotos mais recentes agora aparecem primeiro.');
+    } catch (error: any) {
+      alert(`Erro ao reorganizar: ${error.message || error}`);
+    } finally {
+      setUploadProgress(null);
+    }
   };
 
   /** Remove a foto do banco e também o arquivo do Storage, para não deixar lixo. */
@@ -974,6 +1010,16 @@ const Admin: React.FC = () => {
                     </p>
                   </div>
                 </div>
+                <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleGallerySortByDate}
+                  disabled={!!uploadProgress}
+                  className="px-4 py-3 rounded-xl font-bold text-sm border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-50 transition-all"
+                  title="Solta as fotos fixadas e deixa tudo em ordem de data"
+                >
+                  Ordenar por data
+                </button>
                 <label className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all ${uploadProgress ? 'bg-slate-200 text-slate-400 cursor-wait' : 'bg-[#002776] text-white hover:bg-[#001a4d] cursor-pointer'}`}>
                   <Upload size={16} />
                   {uploadProgress || 'Enviar fotos'}
@@ -988,6 +1034,7 @@ const Admin: React.FC = () => {
                     onChange={handleGalleryUpload}
                   />
                 </label>
+                </div>
               </div>
               <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
                 <p className="text-xs text-blue-600">
@@ -1453,7 +1500,11 @@ const Admin: React.FC = () => {
                           className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#002776]/20 focus:border-[#002776] transition-all"
                           value={formData.sort_order ?? 0} onChange={e => setFormData({ ...formData, sort_order: e.target.value })}
                         />
-                        <p className="text-xs text-slate-500 mt-1.5">Menor número aparece primeiro.</p>
+                        <p className="text-xs text-slate-500 mt-1.5">
+                          Deixe <strong>0</strong> para a ordem normal, em que as fotos mais recentes
+                          aparecem primeiro. Use <strong>-1</strong> para fixar esta foto no topo, ou
+                          <strong> 1</strong> para empurrar para o fim.
+                        </p>
                       </div>
                     </>
                   )}
