@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { resolveBannerImage } from './siteDefaults';
 import { extractInstagramShortcode } from './instagram';
-import { prepareImageForUpload, formatSize, isHeic } from './imageUpload';
+import { prepareImageForUpload, formatSize, looksLikeHeic } from './imageUpload';
 
 const BOX = 'w-24 h-16 flex-shrink-0 rounded-lg flex items-center justify-center';
 
@@ -477,7 +477,7 @@ const Admin: React.FC = () => {
       try {
         // A conversão de HEIC é a parte lenta; avisa antes para o botão não
         // parecer travado.
-        setUploadProgress(isHeic(file) ? `Convertendo ${position}...` : `Preparando ${position}...`);
+        setUploadProgress(looksLikeHeic(file) ? `Convertendo ${position}...` : `Preparando ${position}...`);
         const prepared = await prepareImageForUpload(file);
         if (prepared.note) adjusted.push(`${file.name}: ${prepared.note}`);
 

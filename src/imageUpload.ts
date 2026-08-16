@@ -4,16 +4,18 @@
  * Resolve dois problemas de foto vinda de celular:
  *
  * 1. HEIC/HEIF (padrão do iPhone) não é exibido por nenhum navegador. O arquivo
- *    sobe, mas aparece quebrado no painel e no site. Aqui ele é convertido para
- *    JPEG antes do envio.
+ *    sobe, mas aparece quebrado no painel e no site. Aqui ele é decodificado e
+ *    reescrito como JPEG antes do envio.
  * 2. Foto de celular costuma ter 4000px e vários MB. Numa galeria com dezenas
  *    de imagens isso deixa a página lenta. Acima de MAX_SIDE ela é reduzida.
  *
- * REGRA CENTRAL: nada é enviado sem que o navegador prove que consegue decodificar
- * o resultado. Conversão de HEIC falha silenciosamente em alguns arquivos (HDR de
- * 10 bits, Live Photo, HEIC de iPhone recente), e sem essa verificação o arquivo
- * quebrado subia mesmo assim. Agora falha na hora, com mensagem dizendo qual foto
- * e o que fazer.
+ * REGRA CENTRAL: nada é enviado sem que o navegador tenha decodificado a imagem
+ * antes. O caminho de saída sempre passa por um ImageBitmap real, então é
+ * impossível subir arquivo que a galeria não conseguiria exibir.
+ *
+ * A decodificação usa heic-to (libheif atual). A biblioteca anterior, heic2any,
+ * embutia um libheif de 2020 que devolvia ERR_LIBHEIF em HEIC de iPhone recente
+ * — especialmente foto HDR de 10 bits.
  */
 
 const HEIC_EXTENSION = /\.(heic|heif)$/i;
@@ -30,113 +32,116 @@ export interface PreparedImage {
 /** Erro com texto pronto para o usuário final. */
 export class ImagePrepError extends Error {}
 
-export const isHeic = (file: File) =>
-  HEIC_EXTENSION.test(file.name) || /heic|heif/i.test(file.type);
-
 /**
- * Tenta decodificar o blob. É a prova de que o navegador consegue exibir a
- * imagem — se falha aqui, falharia na tag <img> da galeria.
+ * Checagem rápida e síncrona, só para rotular o progresso na tela.
+ * A decisão real usa isHeicFile, que lê os bytes do arquivo.
  */
-const decode = async (blob: Blob): Promise<ImageBitmap | null> => {
-  try {
-    return await createImageBitmap(blob);
-  } catch {
-    return null;
-  }
-};
+export const looksLikeHeic = (file: File) =>
+  HEIC_EXTENSION.test(file.name) || /heic|heif/i.test(file.type);
 
 const canvasToBlob = (canvas: HTMLCanvasElement, type: string, quality: number) =>
   new Promise<Blob | null>(resolve => canvas.toBlob(resolve, type, quality));
 
-/** Redesenha o bitmap num canvas, opcionalmente reduzindo. Sempre sai JPEG. */
-const reencode = async (bitmap: ImageBitmap, scale: number) => {
-  const targetW = Math.max(1, Math.round(bitmap.width * scale));
-  const targetH = Math.max(1, Math.round(bitmap.height * scale));
+/** Redesenha o bitmap num canvas aplicando escala. Sempre sai JPEG. */
+const toJpeg = async (bitmap: ImageBitmap, scale: number) => {
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
 
   const canvas = document.createElement('canvas');
-  canvas.width = targetW;
-  canvas.height = targetH;
+  canvas.width = width;
+  canvas.height = height;
 
   const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
+  if (!ctx) throw new ImagePrepError('Não foi possível processar a imagem neste navegador.');
 
   // Fundo branco: imagem com transparência viraria preto ao virar JPEG.
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, targetW, targetH);
-  ctx.drawImage(bitmap, 0, 0, targetW, targetH);
+  ctx.fillRect(0, 0, width, height);
+  ctx.drawImage(bitmap, 0, 0, width, height);
 
   const blob = await canvasToBlob(canvas, 'image/jpeg', JPEG_QUALITY);
-  return blob ? { blob, width: targetW, height: targetH } : null;
+  if (!blob) throw new ImagePrepError('Não foi possível gerar a imagem final.');
+  return { blob, width, height };
 };
+
+/**
+ * Decodifica HEIC. O import é dinâmico de propósito: o libheif em WASM pesa
+ * alguns megabytes e não pode entrar no pacote principal do site, que é
+ * carregado por todo visitante. Só desce quando alguém envia um HEIC no painel.
+ */
+const decodeHeic = async (file: File): Promise<ImageBitmap> => {
+  const { heicTo } = await import('heic-to');
+  return heicTo({ blob: file, type: 'bitmap' });
+};
+
+const heicHelp = (file: File, err: any) =>
+  new ImagePrepError(
+    `"${file.name}" é um HEIC que não pôde ser aberto (${err?.message || err}). ` +
+    `No iPhone, abra a foto, toque em Compartilhar e escolha Salvar como JPEG — ` +
+    `ou mude em Ajustes > Câmera > Formatos para "Mais compatível" para as ` +
+    `próximas fotos já saírem em JPEG.`
+  );
 
 export const prepareImageForUpload = async (file: File): Promise<PreparedImage> => {
   const steps: string[] = [];
-  let working: Blob = file;
-  let extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
 
-  // --- 1. HEIC/HEIF -> JPEG -------------------------------------------------
-  if (isHeic(file)) {
-    let raw: unknown;
+  // --- 1. Decodificar -------------------------------------------------------
+  // Ordem escolhida para evitar baixar o decodificador à toa: tenta primeiro o
+  // caminho nativo do navegador, que resolve JPG/PNG/WEBP sem custo nenhum.
+  let bitmap: ImageBitmap | null = null;
+  let heic = looksLikeHeic(file);
+
+  if (heic) {
     try {
-      // Import dinâmico: o decodificador é pesado e só deve carregar quando há
-      // de fato um arquivo HEIC.
-      const mod: any = await import('heic2any');
-      const convert = (mod?.default ?? mod) as (opts: any) => Promise<Blob | Blob[]>;
-      if (typeof convert !== 'function') {
-        throw new Error('conversor não carregou');
-      }
-      raw = await convert({ blob: file, toType: 'image/jpeg', quality: JPEG_QUALITY });
+      bitmap = await decodeHeic(file);
     } catch (err: any) {
-      throw new ImagePrepError(
-        `"${file.name}" é um HEIC que não pôde ser convertido (${err?.message || err}). ` +
-        `Costuma acontecer com foto HDR de iPhone recente. ` +
-        `Abra a foto no celular, use Compartilhar > Salvar como JPEG, ou mude em ` +
-        `Ajustes > Câmera > Formatos para "Mais compatível", e envie de novo.`
-      );
+      throw heicHelp(file, err);
     }
-
-    const candidate = Array.isArray(raw) ? raw[0] : (raw as Blob);
-    if (!candidate || !(candidate instanceof Blob) || candidate.size === 0) {
-      throw new ImagePrepError(
-        `"${file.name}" foi convertido mas o resultado veio vazio. Salve a foto ` +
-        `como JPEG no celular e envie de novo.`
-      );
-    }
-
-    working = candidate;
-    extension = 'jpg';
-    steps.push('convertida de HEIC');
-  }
-
-  // --- 2. Verificação + redução --------------------------------------------
-  const bitmap = await decode(working);
-
-  if (!bitmap) {
-    // Chegou aqui significa que nem o arquivo original nem o convertido são
-    // exibíveis. Barrar agora evita a foto quebrada na galeria.
-    throw new ImagePrepError(
-      isHeic(file)
-        ? `"${file.name}" continuou ilegível depois da conversão. Salve a foto como ` +
-          `JPEG no celular e envie de novo.`
-        : `"${file.name}" não é uma imagem que o navegador consiga abrir. ` +
+  } else {
+    try {
+      bitmap = await createImageBitmap(file);
+    } catch {
+      // Pode ser um HEIC com extensão trocada — acontece quando a foto passa
+      // por transferência ou é renomeada à mão. Vale tentar o decodificador.
+      try {
+        bitmap = await decodeHeic(file);
+        heic = true;
+      } catch {
+        throw new ImagePrepError(
+          `"${file.name}" não é uma imagem que o navegador consiga abrir. ` +
           `Formatos aceitos: JPG, PNG, WEBP, GIF e HEIC de iPhone.`
-    );
-  }
-
-  const largestSide = Math.max(bitmap.width, bitmap.height);
-  if (largestSide > MAX_SIDE) {
-    const result = await reencode(bitmap, MAX_SIDE / largestSide);
-    if (result) {
-      working = result.blob;
-      extension = 'jpg';
-      steps.push(`reduzida para ${result.width}x${result.height}`);
+        );
+      }
     }
   }
+
+  if (heic) steps.push('convertida de HEIC');
+
+  // --- 2. Redimensionar quando necessário -----------------------------------
+  const largestSide = Math.max(bitmap.width, bitmap.height);
+  const needsResize = largestSide > MAX_SIDE;
+
+  // HEIC sempre precisa ser reescrito (o original não é exibível). Os demais só
+  // passam pelo canvas se forem grandes demais — reencode à toa perderia
+  // qualidade sem motivo.
+  if (!heic && !needsResize) {
+    bitmap.close();
+    return {
+      blob: file,
+      extension: file.name.split('.').pop()?.toLowerCase() || 'jpg',
+      note: null,
+    };
+  }
+
+  const scale = needsResize ? MAX_SIDE / largestSide : 1;
+  const result = await toJpeg(bitmap, scale);
   bitmap.close();
 
+  if (needsResize) steps.push(`reduzida para ${result.width}x${result.height}`);
+
   return {
-    blob: working,
-    extension,
+    blob: result.blob,
+    extension: 'jpg',
     note: steps.length ? steps.join(' e ') : null,
   };
 };
