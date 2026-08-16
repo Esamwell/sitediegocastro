@@ -22,9 +22,15 @@ interface GaleriaSectionProps {
  * célula tem proporção fixa e object-cover: assim foto em pé e foto deitada
  * convivem sem furo no layout.
  */
-const GaleriaSection: React.FC<GaleriaSectionProps> = ({ photos, title, subtitle }) => {
+const GaleriaSection: React.FC<GaleriaSectionProps> = ({ photos: allPhotos, title, subtitle }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [showAll, setShowAll] = useState(false);
+  // Rede de segurança: foto que o navegador não conseguir abrir some da grade em
+  // vez de virar ícone quebrado. Vale para o que já subiu em formato inválido
+  // antes da conversão existir, e para arquivo removido do Storage.
+  const [brokenIds, setBrokenIds] = useState<string[]>([]);
+
+  const photos = allPhotos.filter(p => brokenIds.indexOf(p.id) === -1);
 
   const close = useCallback(() => setOpenIndex(null), []);
   const go = useCallback(
@@ -83,6 +89,7 @@ const GaleriaSection: React.FC<GaleriaSectionProps> = ({ photos, title, subtitle
                 loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 referrerPolicy="no-referrer"
+                onError={() => setBrokenIds(prev => prev.indexOf(photo.id) === -1 ? [...prev, photo.id] : prev)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               {photo.title && (

@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { resolveBannerImage } from './siteDefaults';
 import { extractInstagramShortcode } from './instagram';
-import { prepareImageForUpload, formatSize } from './imageUpload';
+import { prepareImageForUpload, formatSize, isHeic } from './imageUpload';
 
 const BOX = 'w-24 h-16 flex-shrink-0 rounded-lg flex items-center justify-center';
 
@@ -90,6 +90,41 @@ const SettingThumb: React.FC<{ settingKey: string; value: string }> = ({ setting
     <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center flex-shrink-0">
       <Settings size={18} />
     </div>
+  );
+};
+
+/**
+ * Miniatura da galeria que assume o estado de falha.
+ *
+ * Foto em formato que o navegador não abre (HEIC enviado antes da conversão
+ * existir) apareceria como ícone quebrado, sem explicar nada. Aqui vira um aviso
+ * explícito, para saber quais apagar e reenviar.
+ */
+const GalleryThumb: React.FC<{ url: string }> = ({ url }) => {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => setFailed(false), [url]);
+
+  if (failed) {
+    return (
+      <div
+        title="Formato não exibível pelo navegador. Apague e envie de novo — agora a conversão é automática."
+        className="w-16 h-16 flex-shrink-0 rounded-lg border border-red-200 bg-red-50 text-red-400 flex flex-col items-center justify-center gap-0.5 text-center"
+      >
+        <ImageOff size={16} />
+        <span className="text-[7px] font-bold uppercase tracking-wide leading-none">Quebrada</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={url}
+      className="w-16 h-16 object-cover rounded-lg flex-shrink-0 bg-slate-100"
+      alt=""
+      loading="lazy"
+      onError={() => setFailed(true)}
+    />
   );
 };
 
@@ -430,19 +465,21 @@ const Admin: React.FC = () => {
     }
 
     const uploaded: any[] = [];
-    const converted: string[] = [];
-    try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const position = `${i + 1} de ${files.length}`;
+    const adjusted: string[] = [];
+    const failed: string[] = [];
 
+    // Cada foto é tratada isoladamente: uma que falhe não pode descartar o
+    // restante de um lote de vinte.
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const position = `${i + 1} de ${files.length}`;
+
+      try {
         // A conversão de HEIC é a parte lenta; avisa antes para o botão não
         // parecer travado.
-        setUploadProgress(
-          /\.(heic|heif)$/i.test(file.name) ? `Convertendo ${position}...` : `Preparando ${position}...`
-        );
+        setUploadProgress(isHeic(file) ? `Convertendo ${position}...` : `Preparando ${position}...`);
         const prepared = await prepareImageForUpload(file);
-        if (prepared.note) converted.push(`${file.name}: ${prepared.note}`);
+        if (prepared.note) adjusted.push(`${file.name}: ${prepared.note}`);
 
         setUploadProgress(`Enviando ${position}...`);
         const path = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${prepared.extension}`;
@@ -470,19 +507,20 @@ const Admin: React.FC = () => {
           .select();
         if (insertError) throw insertError;
         if (inserted?.[0]) uploaded.push(inserted[0]);
+      } catch (error: any) {
+        failed.push(error?.message || `${file.name}: ${error}`);
       }
-
-      setGallery(prev => [...uploaded, ...prev]);
-      alert(
-        `${uploaded.length} foto(s) enviada(s) com sucesso.` +
-        (converted.length ? `\n\nAjustes automáticos:\n${converted.join('\n')}` : '')
-      );
-    } catch (error: any) {
-      alert(`Erro no envio: ${error.message || error}`);
-    } finally {
-      setUploadProgress(null);
-      e.target.value = '';
     }
+
+    setUploadProgress(null);
+    e.target.value = '';
+    if (uploaded.length) setGallery(prev => [...uploaded, ...prev]);
+
+    const report: string[] = [];
+    if (uploaded.length) report.push(`${uploaded.length} foto(s) enviada(s) com sucesso.`);
+    if (adjusted.length) report.push(`\nAjustes automáticos:\n${adjusted.join('\n')}`);
+    if (failed.length) report.push(`\n${failed.length} foto(s) não puderam ser enviadas:\n\n${failed.join('\n\n')}`);
+    alert(report.join('\n') || 'Nenhuma foto foi enviada.');
   };
 
   /** Remove a foto do banco e também o arquivo do Storage, para não deixar lixo. */
@@ -1573,7 +1611,7 @@ const Admin: React.FC = () => {
 
             {activeTab === 'gallery' && gallery.map(item => (
               <div key={item.id} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
-                <img src={item.image_url} className="w-16 h-16 object-cover rounded-lg flex-shrink-0 bg-slate-100" alt="" loading="lazy" />
+                <GalleryThumb url={item.image_url} />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-bold text-[#002776] truncate">{item.title || 'Sem legenda'}</h4>
                   <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">Ordem: {item.sort_order ?? 0}</p>
