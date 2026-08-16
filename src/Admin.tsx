@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { resolveBannerImage } from './siteDefaults';
 import { extractInstagramShortcode } from './instagram';
+import { prepareImageForUpload, formatSize } from './imageUpload';
 
 const BOX = 'w-24 h-16 flex-shrink-0 rounded-lg flex items-center justify-center';
 
@@ -419,25 +420,40 @@ const Admin: React.FC = () => {
     }
     if (files.length === 0) return;
 
-    const tooBig = files.find(f => f.size > 5 * 1024 * 1024);
+    // Teto generoso: a foto é reduzida antes de subir, então o limite serve
+    // apenas para barrar arquivo fora do comum (vídeo renomeado, RAW etc).
+    const tooBig = files.find(f => f.size > 25 * 1024 * 1024);
     if (tooBig) {
-      alert(`"${tooBig.name}" passa de 5MB. Reduza a foto e tente de novo.`);
+      alert(`"${tooBig.name}" tem ${formatSize(tooBig.size)} e passa do limite de 25MB.`);
       e.target.value = '';
       return;
     }
 
     const uploaded: any[] = [];
+    const converted: string[] = [];
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        setUploadProgress(`Enviando ${i + 1} de ${files.length}...`);
+        const position = `${i + 1} de ${files.length}`;
 
-        const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${extension}`;
+        // A conversão de HEIC é a parte lenta; avisa antes para o botão não
+        // parecer travado.
+        setUploadProgress(
+          /\.(heic|heif)$/i.test(file.name) ? `Convertendo ${position}...` : `Preparando ${position}...`
+        );
+        const prepared = await prepareImageForUpload(file);
+        if (prepared.note) converted.push(`${file.name}: ${prepared.note}`);
+
+        setUploadProgress(`Enviando ${position}...`);
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${prepared.extension}`;
 
         const { error: uploadError } = await supabase.storage
           .from('galeria')
-          .upload(path, file, { cacheControl: '31536000', upsert: false });
+          .upload(path, prepared.blob, {
+            cacheControl: '31536000',
+            upsert: false,
+            contentType: prepared.blob.type || 'image/jpeg',
+          });
         if (uploadError) throw uploadError;
 
         const { data: publicUrl } = supabase.storage.from('galeria').getPublicUrl(path);
@@ -457,7 +473,10 @@ const Admin: React.FC = () => {
       }
 
       setGallery(prev => [...uploaded, ...prev]);
-      alert(`${uploaded.length} foto(s) enviada(s) com sucesso.`);
+      alert(
+        `${uploaded.length} foto(s) enviada(s) com sucesso.` +
+        (converted.length ? `\n\nAjustes automáticos:\n${converted.join('\n')}` : '')
+      );
     } catch (error: any) {
       alert(`Erro no envio: ${error.message || error}`);
     } finally {
@@ -920,10 +939,12 @@ const Admin: React.FC = () => {
                 <label className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all ${uploadProgress ? 'bg-slate-200 text-slate-400 cursor-wait' : 'bg-[#002776] text-white hover:bg-[#001a4d] cursor-pointer'}`}>
                   <Upload size={16} />
                   {uploadProgress || 'Enviar fotos'}
+                  {/* .heic/.heif explícitos: no Windows o filtro image/* costuma
+                      esconder esses arquivos na janela de seleção. */}
                   <input
                     type="file"
                     className="hidden"
-                    accept="image/*"
+                    accept="image/*,.heic,.heif"
                     multiple
                     disabled={!!uploadProgress}
                     onChange={handleGalleryUpload}
@@ -932,9 +953,10 @@ const Admin: React.FC = () => {
               </div>
               <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
                 <p className="text-xs text-blue-600">
-                  <strong>Dica:</strong> dá para selecionar várias fotos de uma vez. Limite de 5MB por foto.
-                  As imagens vão para o Storage do Supabase, não para dentro do banco — por isso aqui o limite é
-                  bem maior que nos outros campos de imagem do painel.
+                  <strong>Dica:</strong> dá para selecionar várias fotos de uma vez, até 25MB cada.
+                  Foto de iPhone (HEIC) é convertida automaticamente, e imagens muito grandes são
+                  reduzidas para 2000px — nenhum navegador exibe HEIC, e foto de 4000px deixaria a
+                  galeria lenta.
                 </p>
               </div>
             </div>
