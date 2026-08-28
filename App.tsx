@@ -19,6 +19,7 @@ import ImpactText from './components/ImpactText';
 import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
 import AdBanner from './components/AdBanner';
+import PropagandaEleitoral from './components/PropagandaEleitoral';
 import GaleriaSection, { GalleryPhoto } from './components/GaleriaSection';
 import InstagramSection, { InstagramPost } from './components/InstagramSection';
 import { BANNER_DEFAULTS } from './src/siteDefaults';
@@ -207,9 +208,9 @@ const Home: React.FC = () => {
           <div className="flex items-center">
             <button onClick={() => scrollToSection('início')} className="hover:opacity-80 transition-opacity">
               <img
-                src="/LOGO DIEGO VERDE EXTENSA.png"
-                alt="Diego Castro"
-                className="h-20 w-auto"
+                src="/logo-diego-castro-22380.png"
+                alt="Diego Castro 22380 - Deputado Estadual"
+                className="h-14 w-auto"
                 referrerPolicy="no-referrer"
               />
             </button>
@@ -251,9 +252,9 @@ const Home: React.FC = () => {
             <div className="flex justify-between items-center mb-12">
               <div className="flex items-center">
                 <img
-                  src="/LOGO DIEGO VERDE EXTENSA.png"
-                  alt="Diego Castro"
-                  className="h-16 w-auto"
+                  src="/logo-diego-castro-22380.png"
+                  alt="Diego Castro 22380 - Deputado Estadual"
+                  className="h-12 w-auto"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -1021,9 +1022,9 @@ const Home: React.FC = () => {
             <div className="space-y-6">
               <div className="flex items-center">
                 <img
-                  src="/LOGO DIEGO VERDE EXTENSA.png"
-                  alt="Diego Castro"
-                  className="h-24 w-auto"
+                  src="/logo-diego-castro-22380-branca.png"
+                  alt="Diego Castro 22380 - Deputado Estadual"
+                  className="h-20 w-auto"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -1066,6 +1067,8 @@ const Home: React.FC = () => {
               </form>
             </div>
           </div>
+
+          <PropagandaEleitoral />
 
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">
             <span>© 2026 Diego Castro. Todos os direitos reservados | Desenvolvido por <a href="https://www.sa2marketing.com.br" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Agência SA2 Marketing</a></span>

@@ -9,6 +9,7 @@ import {
 import PatrioticBackground from './PatrioticBackground';
 import ImpactText from './ImpactText';
 import AdBanner from './AdBanner';
+import PropagandaEleitoral from './PropagandaEleitoral';
 import { BANNER_DEFAULTS } from '../src/siteDefaults';
 import { supabase } from '../src/supabaseClient';
 
@@ -219,9 +220,9 @@ const HistoriaPage: React.FC = () => {
           <div className="flex items-center">
             <Link to="/" className="hover:opacity-80 transition-opacity">
               <img
-                src="/LOGO DIEGO VERDE EXTENSA.png"
-                alt="Diego Castro"
-                className="h-20 w-auto"
+                src="/logo-diego-castro-22380.png"
+                alt="Diego Castro 22380 - Deputado Estadual"
+                className="h-14 w-auto"
                 referrerPolicy="no-referrer"
               />
             </Link>
@@ -339,11 +340,13 @@ const HistoriaPage: React.FC = () => {
       <footer className="bg-slate-900 text-white py-12 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <img
-            src="/LOGO DIEGO VERDE EXTENSA.png"
-            alt="Diego Castro"
+            src="/logo-diego-castro-22380-branca.png"
+            alt="Diego Castro 22380 - Deputado Estadual"
             className="h-20 w-auto mx-auto mb-6"
             referrerPolicy="no-referrer"
           />
+          <PropagandaEleitoral />
+
           <p className="text-white/40 text-sm">
             © 2026 Diego Castro. Todos os direitos reservados | Desenvolvido por{' '}
             <a href="https://www.sa2marketing.com.br" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">

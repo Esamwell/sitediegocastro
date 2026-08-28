@@ -819,7 +819,7 @@ const Admin: React.FC = () => {
 
         <div className="max-w-md w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-10 text-center shadow-2xl relative z-10">
           <div className="mb-8">
-            <img src="/LOGO DIEGO VERDE EXTENSA.png" className="h-20 mx-auto mb-6 drop-shadow-lg" alt="Logo" />
+            <img src="/logo-diego-castro-22380-branca.png" className="h-20 mx-auto mb-6 drop-shadow-lg" alt="Logo Diego Castro 22380" />
             <h1 className="text-2xl font-black text-white uppercase tracking-tight">Painel Admin</h1>
             <p className="text-white/50 text-sm mt-2 font-medium">Acesso restrito para gestão do portal do mandato.</p>
           </div>
@@ -867,7 +867,7 @@ const Admin: React.FC = () => {
         <div className="absolute bottom-20 left-0 w-24 h-24 bg-[#005a1a]/20 rounded-full blur-2xl" />
 
         <div className="p-6 pb-4 relative z-10">
-          <img src="/LOGO DIEGO VERDE EXTENSA.png" className="h-10 mb-3" alt="Logo" />
+          <img src="/logo-diego-castro-22380-branca.png" className="h-12 mb-3" alt="Logo Diego Castro 22380" />
           <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Mandato</div>
           <div className="text-xs font-bold text-white/50 uppercase tracking-wider">Diego Castro</div>
         </div>
