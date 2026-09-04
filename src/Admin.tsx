@@ -4,11 +4,11 @@ import {
   Plus, Trash2, Edit2, Save, X, LogOut, 
   Newspaper, Video, Link as LinkIcon, ExternalLink,
   ChevronRight, LayoutDashboard, Settings, Shield, Upload,
-  ImageOff, Images, Instagram
+  ImageOff, Images, Instagram, RotateCw, Loader2
 } from 'lucide-react';
 import { resolveBannerImage } from './siteDefaults';
 import { extractInstagramShortcode } from './instagram';
-import { prepareImageForUpload, formatSize, looksLikeHeic } from './imageUpload';
+import { prepareImageForUpload, formatSize, looksLikeHeic, rotateImageFromUrl } from './imageUpload';
 
 const BOX = 'w-24 h-16 flex-shrink-0 rounded-lg flex items-center justify-center';
 
@@ -100,10 +100,20 @@ const SettingThumb: React.FC<{ settingKey: string; value: string }> = ({ setting
  * existir) apareceria como ícone quebrado, sem explicar nada. Aqui vira um aviso
  * explícito, para saber quais apagar e reenviar.
  */
-const GalleryThumb: React.FC<{ url: string }> = ({ url }) => {
+const GalleryThumb: React.FC<{ url: string; spinning?: boolean }> = ({ url, spinning }) => {
   const [failed, setFailed] = useState(false);
 
+  // A rotação grava num caminho novo, então a url muda e o estado de falha
+  // precisa ser reavaliado para a imagem nova.
   useEffect(() => setFailed(false), [url]);
+
+  if (spinning) {
+    return (
+      <div className="w-16 h-16 flex-shrink-0 rounded-lg border border-slate-200 bg-slate-50 text-[#002776] flex items-center justify-center">
+        <Loader2 size={18} className="animate-spin" />
+      </div>
+    );
+  }
 
   if (failed) {
     return (
@@ -147,6 +157,7 @@ const Admin: React.FC = () => {
   const [gallery, setGallery] = useState<any[]>([]);
   const [instagramPosts, setInstagramPosts] = useState<any[]>([]);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+  const [rotatingId, setRotatingId] = useState<string | null>(null);
   const [settings, setSettings] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -556,6 +567,55 @@ const Admin: React.FC = () => {
       alert(`Erro ao reorganizar: ${error.message || error}`);
     } finally {
       setUploadProgress(null);
+    }
+  };
+
+  /**
+   * Gira uma foto da galeria em 90 graus e regrava o arquivo.
+   *
+   * Sobe num caminho novo em vez de sobrescrever o antigo: os arquivos são
+   * servidos com cache de um ano, então reaproveitar o mesmo nome faria o
+   * navegador continuar mostrando a versão torta por muito tempo.
+   */
+  const handleGalleryRotate = async (item: any) => {
+    if (rotatingId) return;
+    setRotatingId(item.id);
+    try {
+      const rotated = await rotateImageFromUrl(item.image_url, 90);
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.jpg`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('galeria')
+        .upload(path, rotated, {
+          cacheControl: '31536000',
+          upsert: false,
+          contentType: 'image/jpeg',
+        });
+      if (uploadError) throw uploadError;
+
+      const { data: publicUrl } = supabase.storage.from('galeria').getPublicUrl(path);
+
+      const { error: updateError } = await supabase
+        .from('gallery')
+        .update({ image_url: publicUrl.publicUrl, storage_path: path })
+        .eq('id', item.id);
+      if (updateError) throw updateError;
+
+      // Só remove o arquivo antigo depois que o novo já está registrado, para
+      // nunca existir uma linha apontando para arquivo inexistente.
+      if (item.storage_path) {
+        await supabase.storage.from('galeria').remove([item.storage_path]);
+      }
+
+      setGallery(prev => prev.map(g =>
+        g.id === item.id
+          ? { ...g, image_url: publicUrl.publicUrl, storage_path: path }
+          : g
+      ));
+    } catch (error: any) {
+      alert(`Erro ao girar a foto: ${error.message || error}`);
+    } finally {
+      setRotatingId(null);
     }
   };
 
@@ -1662,12 +1722,20 @@ const Admin: React.FC = () => {
 
             {activeTab === 'gallery' && gallery.map(item => (
               <div key={item.id} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50 transition-colors group">
-                <GalleryThumb url={item.image_url} />
+                <GalleryThumb url={item.image_url} spinning={rotatingId === item.id} />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-bold text-[#002776] truncate">{item.title || 'Sem legenda'}</h4>
                   <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">Ordem: {item.sort_order ?? 0}</p>
                 </div>
                 <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => handleGalleryRotate(item)}
+                    disabled={!!rotatingId}
+                    title="Girar 90 graus para a direita"
+                    className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white disabled:opacity-40 transition-all"
+                  >
+                    <RotateCw size={14} />
+                  </button>
                   <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setIsEditing(item.id); setFormData(item); }} className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-[#002776] hover:text-white transition-all"><Edit2 size={14} /></button>
                   <button onClick={() => handleGalleryDelete(item)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
                 </div>
