@@ -105,3 +105,12 @@ INSERT INTO site_settings (key, value, description) VALUES
 ('instagram_subtitle', 'Acompanhe o dia a dia em @diegocastroba', 'Subtítulo do Instagram'),
 ('instagram_url', 'https://www.instagram.com/diegocastroba/', 'Link do perfil no Instagram')
 ON CONFLICT (key) DO NOTHING;
+
+-- ---------------------------------------------------------------------
+-- 5) BANNER DE TOPO
+-- Faixa de campanha exibida antes de tudo, ao entrar no site.
+-- ---------------------------------------------------------------------
+INSERT INTO site_settings (key, value, description) VALUES
+('topo_banner_image', '/banners/topo.avif', 'Banner do Topo - Imagem'),
+('topo_banner_link', 'https://api.whatsapp.com/send?phone=5571992493802&text=Ol%C3%A1%2C+quero+material+de+Fl%C3%A1vio+Bolsonaro+22+e+do+Deputado+Estadual+Diego+Castro+22380', 'Banner do Topo - Link')
+ON CONFLICT (key) DO NOTHING;

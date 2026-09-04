@@ -8,7 +8,12 @@
  *
  * String vazia = banner realmente oculto até subirem uma arte pelo painel.
  */
+/** Link padrão do banner de topo: pedido de material de campanha via WhatsApp. */
+export const TOPO_BANNER_LINK =
+  'https://api.whatsapp.com/send?phone=5571992493802&text=Ol%C3%A1%2C+quero+material+de+Fl%C3%A1vio+Bolsonaro+22+e+do+Deputado+Estadual+Diego+Castro+22380';
+
 export const BANNER_DEFAULTS: Record<string, string> = {
+  topo_banner_image: '/banners/topo.avif',
   banner_1_image: '/banners/1.jpeg',
   banner_2_image: '/banners/2.jpeg',
   banner_3_image: '',

@@ -20,9 +20,10 @@ import CustomCursor from './components/CustomCursor';
 import MandateCard from './components/MandateCard';
 import AdBanner from './components/AdBanner';
 import PropagandaEleitoral from './components/PropagandaEleitoral';
+import TopBanner from './components/TopBanner';
 import GaleriaSection, { GalleryPhoto } from './components/GaleriaSection';
 import InstagramSection, { InstagramPost } from './components/InstagramSection';
-import { BANNER_DEFAULTS } from './src/siteDefaults';
+import { BANNER_DEFAULTS, TOPO_BANNER_LINK } from './src/siteDefaults';
 import Admin from './src/Admin';
 import SegurancaPage from './components/SegurancaPage';
 import HistoriaPage from './components/HistoriaPage';
@@ -186,6 +187,10 @@ const Home: React.FC = () => {
   // 3 projetos + banner (4 colunas fechadas); sem arte, os 4 projetos de sempre.
   const banner1Image = getSetting('banner_1_image', BANNER_DEFAULTS.banner_1_image);
 
+  // Faixa de campanha acima de tudo. Quando existe, ela ocupa o espaço que
+  // normalmente seria o respiro do topo, então o Hero recua.
+  const topoBannerImage = getSetting('topo_banner_image', BANNER_DEFAULTS.topo_banner_image);
+
   const extractYoutubeId = (url: string) => {
     if (!url) return null;
     const shortsMatch = url.match(/\/shorts\/([^#&?]+)/);
@@ -282,8 +287,19 @@ const Home: React.FC = () => {
         )}
       </AnimatePresence>
 
+      {/* BANNER DE TOPO - primeira coisa da página. O pt-28 limpa a altura
+          do menu, que é fixo e ficaria por cima da arte. */}
+      {topoBannerImage && (
+        <div className="pt-28">
+          <TopBanner
+            image={topoBannerImage}
+            link={getSetting('topo_banner_link', TOPO_BANNER_LINK)}
+          />
+        </div>
+      )}
+
       {/* HERO SECTION */}
-      <section id="início" className="relative pt-40 pb-20 lg:pt-56 lg:pb-32 px-6 overflow-hidden">
+      <section id="início" className={`relative pb-20 lg:pb-32 px-6 overflow-hidden ${topoBannerImage ? 'pt-12 lg:pt-20' : 'pt-40 lg:pt-56'}`}>
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}

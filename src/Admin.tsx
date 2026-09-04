@@ -262,6 +262,8 @@ const Admin: React.FC = () => {
     'historia_timeline_title': { label: 'Título da Linha do Tempo', desc: 'O título antes das datas importantes.', section: 'Página História - Conteúdo' },
     'historia_mission_title': { label: 'Título da Missão', desc: 'O título da seção de Missão e Valores.', section: 'Página História - Conteúdo' },
 
+    'topo_banner_image': { label: 'Banner do Topo - Imagem', desc: 'Faixa de campanha exibida no topo do site, antes de tudo. Ocupa a largura inteira e não é cortada, então use arte bem horizontal (a atual é 1413x558). Deixe em branco para ocultar.', section: 'Banners Publicitários' },
+    'topo_banner_link': { label: 'Banner do Topo - Link', desc: 'Para onde o clique leva. Por padrão abre o WhatsApp pedindo material de campanha.', section: 'Banners Publicitários' },
     'banner_1_image': { label: 'Banner 1 - Imagem', desc: 'Peça horizontal entre o Hero e os Projetos (e na página História). A arte nunca é cortada: faixa larga (ex: 1200x310) preenche a coluna toda; quadrada aparece inteira, centralizada e menor. Deixe em branco para ocultar.', section: 'Banners Publicitários' },
     'banner_1_link': { label: 'Banner 1 - Link', desc: 'URL de destino para o clique no Banner 1.', section: 'Banners Publicitários' },
     'banner_2_image': { label: 'Banner 2 - Imagem', desc: 'Peça horizontal entre Segurança e Família. Formato ideal: faixa larga (ex: 1200x310). Deixe em branco para ocultar.', section: 'Banners Publicitários' },
