@@ -612,6 +612,13 @@ const Admin: React.FC = () => {
           ? { ...g, image_url: publicUrl.publicUrl, storage_path: path }
           : g
       ));
+      // Se a foto girada é a que está aberta no formulário, atualiza a prévia
+      // para mostrar o resultado sem precisar reabrir.
+      setFormData((prev: any) =>
+        prev?.id === item.id
+          ? { ...prev, image_url: publicUrl.publicUrl, storage_path: path }
+          : prev
+      );
     } catch (error: any) {
       alert(`Erro ao girar a foto: ${error.message || error}`);
     } finally {
@@ -1535,15 +1542,31 @@ const Admin: React.FC = () => {
                       <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 mb-4">
                         <p className="text-xs text-blue-600">
                           <strong>Dica:</strong> para adicionar fotos novas use o botão <strong>Enviar fotos</strong> lá em cima.
-                          Este formulário serve para ajustar a legenda e a ordem de uma foto já enviada.
+                          Este formulário serve para girar, legendar e ordenar uma foto já enviada.
                         </p>
                       </div>
                       {formData.image_url && (
-                        <img
-                          src={formData.image_url}
-                          className="h-40 w-auto max-w-full rounded-xl border border-slate-200 object-contain mb-4"
-                          alt="Foto da galeria"
-                        />
+                        <div className="mb-4 flex flex-col items-start gap-2">
+                          <img
+                            src={formData.image_url}
+                            className="h-40 w-auto max-w-full rounded-xl border border-slate-200 object-contain"
+                            alt="Foto da galeria"
+                          />
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleGalleryRotate(formData)}
+                              disabled={!!rotatingId}
+                              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-100 disabled:opacity-50 transition-all"
+                            >
+                              <RotateCw size={15} className={rotatingId === formData.id ? 'animate-spin' : ''} />
+                              {rotatingId === formData.id ? 'Girando...' : 'Girar 90°'}
+                            </button>
+                            <span className="text-xs text-slate-500">
+                              Cada clique gira para a direita. A foto é salva já girada.
+                            </span>
+                          </div>
+                        </div>
                       )}
                       <div>
                         <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Legenda</label>
@@ -1727,7 +1750,7 @@ const Admin: React.FC = () => {
                   <h4 className="text-sm font-bold text-[#002776] truncate">{item.title || 'Sem legenda'}</h4>
                   <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">Ordem: {item.sort_order ?? 0}</p>
                 </div>
-                <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex gap-1.5">
                   <button
                     onClick={() => handleGalleryRotate(item)}
                     disabled={!!rotatingId}
