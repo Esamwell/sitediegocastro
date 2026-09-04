@@ -112,5 +112,6 @@ ON CONFLICT (key) DO NOTHING;
 -- ---------------------------------------------------------------------
 INSERT INTO site_settings (key, value, description) VALUES
 ('topo_banner_image', '/banners/topo.avif', 'Banner do Topo - Imagem'),
-('topo_banner_link', 'https://api.whatsapp.com/send?phone=5571992493802&text=Ol%C3%A1%2C+quero+material+de+Fl%C3%A1vio+Bolsonaro+22+e+do+Deputado+Estadual+Diego+Castro+22380', 'Banner do Topo - Link')
+('topo_banner_link', 'https://api.whatsapp.com/send?phone=5571992493802&text=Ol%C3%A1%2C+quero+material+de+Fl%C3%A1vio+Bolsonaro+22+e+do+Deputado+Estadual+Diego+Castro+22380', 'Banner do Topo - Link',
+('topo_banner_texto', 'Clique aqui e solicite material de Flávio Bolsonaro e Diego Castro na Bahia', 'Banner do Topo - Texto da Faixa')
 ON CONFLICT (key) DO NOTHING;

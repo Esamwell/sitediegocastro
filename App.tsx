@@ -23,7 +23,7 @@ import PropagandaEleitoral from './components/PropagandaEleitoral';
 import TopBanner from './components/TopBanner';
 import GaleriaSection, { GalleryPhoto } from './components/GaleriaSection';
 import InstagramSection, { InstagramPost } from './components/InstagramSection';
-import { BANNER_DEFAULTS, TOPO_BANNER_LINK } from './src/siteDefaults';
+import { BANNER_DEFAULTS, TOPO_BANNER_LINK, TOPO_BANNER_TEXTO } from './src/siteDefaults';
 import Admin from './src/Admin';
 import SegurancaPage from './components/SegurancaPage';
 import HistoriaPage from './components/HistoriaPage';
@@ -294,6 +294,7 @@ const Home: React.FC = () => {
           <TopBanner
             image={topoBannerImage}
             link={getSetting('topo_banner_link', TOPO_BANNER_LINK)}
+            text={getSetting('topo_banner_texto', TOPO_BANNER_TEXTO)}
           />
         </div>
       )}

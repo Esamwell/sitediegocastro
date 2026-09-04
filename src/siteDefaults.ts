@@ -12,6 +12,10 @@
 export const TOPO_BANNER_LINK =
   'https://api.whatsapp.com/send?phone=5571992493802&text=Ol%C3%A1%2C+quero+material+de+Fl%C3%A1vio+Bolsonaro+22+e+do+Deputado+Estadual+Diego+Castro+22380';
 
+/** Texto padrão das tarjas de chamada do banner de topo. */
+export const TOPO_BANNER_TEXTO =
+  'Clique aqui e solicite material de Flávio Bolsonaro e Diego Castro na Bahia';
+
 export const BANNER_DEFAULTS: Record<string, string> = {
   topo_banner_image: '/banners/topo.avif',
   banner_1_image: '/banners/1.jpeg',
